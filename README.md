@@ -1,2 +1,5618 @@
-# karbi-mizo-dictionary
-A bilingual dictionary app
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#8f1018">
+<title>Karbi ↔ Mizo Dictionary</title>
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f7f7fb;
+  color:#222;
+}
+
+/* MENU BUTTON */
+.menu-btn{
+  border:0;
+  padding:4px 6px;
+  border-radius:4px;
+  background:#5b4bff;
+  color:white;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 8px 25px #191970;
+}
+
+/* OVERLAYS */
+.menu-overlay,
+.month-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:rgba(10,10,25,.62);
+  backdrop-filter:blur(7px);
+}
+
+.menu-overlay.show,
+.month-overlay.show{
+  display:flex;
+}
+
+/* MENU */
+.menu-overlay{
+  align-items:flex-start;
+  justify-content:center;
+  padding:70px 15px 20px;
+}
+
+.menu-popup{
+  width:min(500px,100%);
+  max-height:85vh;
+  overflow:auto;
+  background:white;
+  border-radius:27px;
+  padding:20px;
+  box-shadow:0 25px 70px #0005;
+  animation:popupIn .2s ease;
+}
+
+.menu-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  margin-bottom:15px;
+}
+
+.menu-header small{
+  color:#5b4bff;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+.menu-header h2{
+  margin:4px 0 0;
+  font-size:24px;
+}
+
+.menu-header button,
+.popup-top button{
+  border:0;
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  background:#f0eff8;
+  font-size:23px;
+  cursor:pointer;
+}
+
+/* MENU ITEMS */
+.menu-list{
+  display:grid;
+  gap:9px;
+}
+
+.menu-list button{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:13px;
+  border:1px solid #e8e7f0;
+  border-radius:17px;
+  background:white;
+  text-align:left;
+  cursor:pointer;
+  transition:.15s ease;
+}
+
+.menu-list button:hover{
+  background:#f5f3ff;
+  transform:translateY(-1px);
+}
+
+.menu-icon{
+  width:43px;
+  height:43px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:#f0edff;
+  font-size:21px;
+  flex-shrink:0;
+}
+
+.menu-list span:nth-child(2){
+  flex:1;
+}
+
+.menu-list b{
+  display:block;
+  font-size:15px;
+}
+
+.menu-list small{
+  display:block;
+  margin-top:3px;
+  color:#858799;
+}
+
+.menu-list strong{
+  color:#5b4bff;
+  font-size:25px;
+}
+
+/* POPUPS */
+.month-overlay{
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.month-popup{
+  width:min(520px,100%);
+  max-height:88vh;
+  overflow:auto;
+  background:white;
+  border-radius:28px;
+  padding:18px;
+  box-shadow:0 25px 80px #0006;
+  animation:popupIn .2s ease;
+}
+
+.popup-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:15px;
+  font-size:18px;
+}
+
+.popup-top button{
+  background:#f0eff8;
+  font-size:19px;
+}
+
+/* MONTH */
+.month-item{
+  padding:20px;
+  border-radius:22px;
+  background:linear-gradient(135deg,#5b4bff,#986cff);
+  color:white;
+  text-align:center;
+}
+
+.month-number{
+  font-size:12px;
+  font-weight:900;
+  opacity:.8;
+}
+
+.month-english{
+  font-size:32px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.month-karbi{
+  font-size:22px;
+  font-weight:800;
+  margin-top:8px;
+}
+
+.month-buttons{
+  display:flex;
+  gap:8px;
+  margin-top:18px;
+}
+
+.month-buttons button{
+  flex:1;
+  border:0;
+  padding:11px;
+  border-radius:13px;
+  background:white;
+  color:#5b4bff;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.month-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:15px;
+}
+
+.month-grid button{
+  border:1px solid #e8e7f0;
+  background:white;
+  border-radius:15px;
+  padding:12px;
+  text-align:left;
+  cursor:pointer;
+}
+
+.month-grid b{
+  display:block;
+}
+
+.month-grid span{
+  display:block;
+  margin-top:4px;
+  color:#5b4bff;
+  font-weight:800;
+  font-size:13px;
+}
+
+/* SEARCH */
+.family-search{
+  width:100%;
+  padding:12px 15px;
+  border:1px solid #e8e7f0;
+  border-radius:14px;
+  font-size:15px;
+  margin-bottom:12px;
+  outline:none;
+  background:#fafafa;
+}
+
+.family-search:focus{
+  border-color:#5b4bff;
+  background:white;
+}
+
+/* LIST */
+.family-list{
+  display:grid;
+  gap:8px;
+}
+
+.family-card{
+  padding:14px;
+  border:1px solid #e8e7f0;
+  border-radius:16px;
+  background:white;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.family-card b{
+  color:#5b4bff;
+  font-size:16px;
+}
+
+.family-card span{
+  color:#444;
+  font-size:14px;
+  line-height:1.4;
+}
+
+/* APP INFO */
+.app-info-box{
+  padding:16px;
+  background:#f9f8ff;
+  border:1px solid #e2deff;
+  border-radius:18px;
+  margin-bottom:15px;
+}
+
+.app-info-box h3{
+  margin:0 0 8px;
+  color:#5b4bff;
+  font-size:18px;
+}
+
+.app-info-box p{
+  margin:6px 0;
+  color:#444;
+  font-size:14px;
+  line-height:1.5;
+}
+
+/* TAWNGTAINA */
+.prayer-card{
+  background:#fff;
+  border:1px solid #e8e7f0;
+  border-radius:20px;
+  margin-bottom:12px;
+  overflow:hidden;
+}
+
+.prayer-title{
+  width:100%;
+  border:0;
+  background:#f5f3ff;
+  color:#5b4bff;
+  padding:16px;
+  text-align:left;
+  font-size:16px;
+  font-weight:900;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.prayer-title span:first-child{
+  flex:1;
+}
+
+.prayer-title span:last-child{
+  font-size:20px;
+  transition:transform .2s ease;
+}
+
+.prayer-body{
+  display:none;
+  padding:16px;
+  color:#333;
+  font-size:14px;
+  line-height:1.8;
+  white-space:pre-line;
+  border-top:1px solid #eee;
+}
+
+.prayer-card.open .prayer-body{
+  display:block;
+}
+
+.prayer-card.open .prayer-title span:last-child{
+  transform:rotate(90deg);
+}
+
+.prayer-empty{
+  text-align:center;
+  padding:25px 10px;
+  color:#888;
+}
+
+/* ANIMATION */
+@keyframes popupIn{
+  from{
+    opacity:0;
+    transform:scale(.94) translateY(15px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1) translateY(0);
+  }
+}
+
+/* MOBILE */
+@media(max-width:500px){
+
+  .menu-popup{
+    border-radius:25px;
+  }
+
+  .month-popup{
+    align-self:flex-end;
+    border-radius:27px 27px 0 0;
+  }
+
+  .month-overlay{
+    align-items:flex-end;
+    padding:0;
+  }
+
+  .month-buttons{
+    flex-direction:column;
+  }
+
+  .month-buttons button{
+    width:100%;
+  }
+}
+
+
+
+ *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f6f7ff;color:#17172a}
+:root{--p:#8f1018;--p2:#111111;--ink:#17172a;--mut:#77706c;--card:#fff;--line:#e7ddd5;--soft:#f5eee8}
+body.dark{background:#0e1020;color:#f5f5fb;--card:#191b2d;--ink:#f5f5fb;--mut:#a9acc0;--line:#2b2e43;--soft:#262341}
+.app{max-width:560px;margin:auto;min-height:100vh;padding:18px 16px 90px}
+header{display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px}.mark{width:44px;height:44px;border-radius:15px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;display:grid;place-items:center;box-shadow:0 10px 25px #5b4bff40}
+.icon{border:1px solid var(--line);background:var(--card);color:var(--ink);width:43px;height:43px;border-radius:14px;font-size:15px}
+.hero{margin-top:25px}.hero h1{font-size:35px;line-height:1.05;margin:0 0 9px}.hero p{margin:0;color:var(--mut);line-height:1.5}
+.search{display:flex;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:6px 7px 6px 15px;box-shadow:0 12px 30px #31305c12;margin-top:20px}.search input{min-width:0;flex:1;border:0;outline:0;background:none;color:var(--ink);font-size:16px}.search button{border:0;background:var(--p);color:white;width:46px;height:46px;border-radius:14px;font-size:19px}
+.chips{display:flex;gap:8px;overflow:auto;padding:12px 0}.chip{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 13px}
+.card{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 15px 40px #33304b10}.wordrow{display:flex;justify-content:space-between;gap:12px}.word{font-size:31px;font-weight:900}.arrow{color:var(--p);font-weight:900;font-size:22px}.phon{color:var(--p);font-weight:700;margin-top:4px}.meaning{font-size:17px;line-height:1.55;margin-top:15px}.tag{display:inline-block;margin-top:14px;padding:6px 10px;background:var(--soft);color:var(--p);border-radius:9px;font-size:12px;font-weight:800}.actions{display:flex;gap:9px;margin-top:17px}.actions button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:13px;padding:11px;font-weight:700}.actions .primary{background:var(--p);color:white;border-color:var(--p)}
+.section{margin-top:25px}.section h2{font-size:19px;margin:0 0 12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{border:1px solid var(--line);background:var(--card);border-radius:17px;padding:14px;text-align:left;color:var(--ink)}.tile b{display:block}.tile span{color:var(--mut);font-size:13px}
+.learn{background:linear-gradient(135deg,#5b4bff,#9b6cff);color:white;border-radius:24px;padding:20px;margin-top:22px}.learn h2{margin:0 0 5px}.learn p{opacity:.88;line-height:1.45}.learn button{border:0;background:white;color:#4c3de0;border-radius:13px;padding:12px 16px;font-weight:900}
+.quiz{display:none}.quiz.show{display:block}.qword{font-size:34px;font-weight:900;text-align:center;padding:15px}.options{display:grid;gap:10px}.options button{padding:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;text-align:left;font-weight:750}
+.options .quiz-option.correct{
+  background:#22c55e !important;
+  border-color:#22c55e !important;
+  color:#fff !important;
+}
+.options .quiz-option.wrong{
+  background:#ef4444 !important;
+  border-color:#ef4444 !important;
+  color:#fff !important;
+}
+.options .quiz-option:disabled{
+  cursor:default;
+  opacity:1;
+}.score{color:var(--p);font-weight:900}
+footer{text-align:center;color:var(--mut);font-size:12px;margin-top:30px;line-height:1.5}
+@media(min-width:800px){body{padding:20px}.app{background:#ffffff33;border-radius:30px}}
+
+
+/* Search results stay empty/hidden until the user searches. */
+#result:empty {
+  display:none;
+}
+#result.has-results {
+  display:block;
+}
+
+/* ===== KARB I + MIZO TRADITIONAL PUAN THEME ===== */
+:root{
+  --p:#8f1018;
+  --p2:#111111;
+  --gold:#d6a548;
+  --ink:#18120f;
+  --mut:#6f625b;
+  --card:rgba(255,253,248,.94);
+  --line:rgba(113,23,26,.18);
+  --soft:#f7eee4;
+  --karbi-puan:url("data:image/jpeg;base64,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");
+  --mizo-puan:url("data:image/jpeg;base64,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");
+}
+body{
+  background:
+    linear-gradient(rgba(255,250,243,.92),rgba(255,250,243,.94)),
+    var(--mizo-puan) center/cover fixed !important;
+  color:var(--ink);
+}
+body.dark{
+  --card:rgba(25,18,19,.94);
+  --ink:#fff7ed;
+  --mut:#d0c1b7;
+  --line:rgba(255,236,217,.16);
+  --soft:#302425;
+  background:
+    linear-gradient(rgba(15,13,14,.91),rgba(15,13,14,.94)),
+    var(--mizo-puan) center/cover fixed !important;
+}
+body::before,body::after{
+  content:"";
+  position:fixed;
+  top:0; bottom:0;
+  width:18px;
+  z-index:0;
+  pointer-events:none;
+  background-image:var(--karbi-puan);
+  background-size:cover;
+  background-position:center;
+  opacity:.9;
+}
+body::before{left:0}
+body::after{right:0; transform:scaleX(-1)}
+.app{position:relative;z-index:1;max-width:580px;padding-top:22px}
+.app::before{
+  content:"";
+  position:absolute;
+  left:8px; right:8px; top:6px;
+  height:7px;
+  border-radius:99px;
+  background:linear-gradient(90deg,#111 0 8%,#f8f1e6 8% 20%,#8f1018 20% 38%,#8f1018 38% 55%,#8f1018 55% 75%,#d6a548 75% 78%,#111 78% 100%);
+  box-shadow:0 4px 14px #0002;
+}
+header{
+  padding:12px 13px;
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:linear-gradient(90deg,rgba(255,255,255,.92),rgba(250,243,233,.88));
+  box-shadow:0 16px 35px #3d1b1517;
+}
+body.dark header{background:rgba(25,18,19,.9)}
+.mark{
+  background-image:linear-gradient(135deg,rgba(8,8,8,.15),rgba(143,16,24,.35)),var(--karbi-puan)!important;
+  background-size:cover!important;
+  background-position:center!important;
+  border:2px solid var(--gold);
+  box-shadow:0 10px 24px rgba(89,12,17,.28)!important;
+}
+.menu-btn{
+  background:rgba(10,10,10,.78)!important;
+  border:1px solid rgba(255,255,255,.65)!important;
+  box-shadow:0 5px 15px #0007!important;
+}
+.icon{
+  border-color:var(--gold)!important;
+  box-shadow:inset 0 0 0 2px rgba(143,16,24,.08);
+}
+.hero{
+  margin-top:20px!important;
+  padding:26px 20px 22px;
+  border-radius:28px;
+  overflow:hidden;
+  position:relative;
+  background:
+    linear-gradient(90deg,rgba(255,250,243,.97) 0%,rgba(255,250,243,.88) 63%,rgba(255,250,243,.58) 100%),
+    var(--mizo-puan) right center/auto 100% no-repeat;
+  border:1px solid rgba(143,16,24,.18);
+  box-shadow:0 20px 48px #4a21151a;
+}
+body.dark .hero{
+  background:
+    linear-gradient(90deg,rgba(24,18,19,.98) 0%,rgba(24,18,19,.90) 63%,rgba(24,18,19,.56) 100%),
+    var(--mizo-puan) right center/auto 100% no-repeat;
+}
+.hero h1{
+  color:#7c0e17;
+  text-shadow:0 1px 0 #fff;
+  letter-spacing:-1px;
+}
+body.dark .hero h1{color:#ffbdc1;text-shadow:none}
+.hero h1::after{
+  content:"";
+  display:block;
+  width:105px;height:5px;margin-top:12px;border-radius:99px;
+  background:linear-gradient(90deg,#0b0b0b 0 25%,#f7f0e7 25% 45%,#8f1018 45% 70%,#8f1018 70%);
+}
+.search{
+  border:1px solid rgba(143,16,24,.26)!important;
+  box-shadow:0 12px 28px rgba(70,24,19,.14)!important;
+}
+.search button,.actions .primary{
+  background:linear-gradient(135deg,#8f1018,#b5242b)!important;
+}
+.search button{
+  border:2px solid #d6a548!important;
+}
+.chip{
+  border-color:rgba(143,16,24,.28)!important;
+  position:relative;
+}
+.chip:hover{background:#8f1018!important;color:white!important}
+.card,.tile{
+  border-color:var(--line)!important;
+  box-shadow:0 15px 35px rgba(62,25,18,.09)!important;
+}
+.card{
+  border-top:5px solid transparent!important;
+  border-image:linear-gradient(90deg,#111,#f5eee3,#8f1018,#8f1018,#d6a548) 1!important;
+}
+.learn{
+  position:relative;
+  overflow:hidden;
+  background:
+    linear-gradient(90deg,rgba(10,10,10,.91),rgba(62,10,15,.92)),
+    var(--karbi-puan) center/cover!important;
+  border:1px solid rgba(214,165,72,.75);
+  box-shadow:0 18px 42px rgba(47,10,14,.25);
+}
+.learn::after{
+  content:"";
+  position:absolute;right:-22px;top:-8px;width:145px;height:145px;
+  background:var(--mizo-puan) center/cover;
+  opacity:.3;border-radius:50%;border:2px solid rgba(255,255,255,.4);
+}
+.learn h2,.learn p,.learn button{position:relative;z-index:1}
+.learn button{
+  color:#7c0e17!important;
+  border:2px solid #d6a548!important;
+}
+.section h2{
+  display:flex;align-items:center;gap:9px;
+}
+.section h2::after{
+  content:"";height:3px;flex:1;border-radius:99px;
+  background:linear-gradient(90deg,#8f1018,#8f1018,#d6a548);
+}
+.tile:hover{
+  transform:translateY(-2px);
+  border-color:#8f1018!important;
+}
+.tile b,.phon,.arrow,.score{color:#8f1018!important}
+.menu-overlay,.month-overlay{backdrop-filter:blur(10px) saturate(.9)}
+.menu-popup,.month-popup{
+  background:
+    linear-gradient(rgba(255,253,249,.97),rgba(255,253,249,.97)),
+    var(--mizo-puan) center/cover!important;
+  border:2px solid rgba(214,165,72,.55);
+}
+body.dark .menu-popup,body.dark .month-popup{
+  background:rgba(25,18,19,.98)!important;
+}
+.menu-header small,.menu-list strong,.family-card b,.month-grid span{color:#8f1018!important}
+.menu-list button{
+  border-left:5px solid #8f1018!important;
+}
+.menu-list button:nth-child(odd){border-left-color:#8f1018!important}
+.menu-icon{
+  background:
+    linear-gradient(rgba(255,255,255,.75),rgba(255,255,255,.75)),
+    var(--karbi-puan) center/cover!important;
+  border:1px solid rgba(214,165,72,.5);
+}
+.month-item{
+  background:
+    linear-gradient(135deg,rgba(6,41,31,.96),rgba(143,16,24,.94)),
+    var(--mizo-puan) center/cover!important;
+  border:2px solid #d6a548;
+}
+.month-buttons button{
+  color:#7c0e17!important;
+  border:1px solid #d6a548!important;
+}
+.family-search:focus{border-color:#8f1018!important;box-shadow:0 0 0 3px rgba(143,16,24,.1)}
+.prayer-title{
+  color:#fff!important;
+  background:linear-gradient(90deg,#8f1018,#8f1018)!important;
+}
+.options .quiz-option.correct{background:#0c7a55!important;border-color:#0c7a55!important}
+footer{
+  padding:15px;border-radius:18px;
+  background:rgba(255,253,248,.7);
+  border:1px solid var(--line);
+}
+footer a{color:#8f1018;font-weight:800}
+/* Keep footer text and email link clearly visible in Dark Mode */
+body.dark footer{
+  background:rgba(22,24,38,.92)!important;
+  border-color:#4a4d63!important;
+  color:#f5f5fb!important;
+}
+body.dark footer p{color:#f5f5fb!important;}
+body.dark footer a{
+  color:#ffd166!important;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+@media(max-width:500px){
+  body::before,body::after{width:7px;opacity:.75}
+  .app{padding-left:14px;padding-right:14px}
+  .hero{padding:23px 16px}
+  .hero h1{font-size:31px!important}
+}
+
+
+
+/* ===== PREMIUM TRADITIONAL MENU REDESIGN ===== */
+.menu-overlay{
+  align-items:flex-end!important;
+  justify-content:center!important;
+  padding:0!important;
+  background:rgba(8,10,12,.64)!important;
+  backdrop-filter:blur(13px) saturate(1.1)!important;
+}
+.menu-popup{
+  width:min(560px,100%)!important;
+  max-height:88vh!important;
+  border-radius:30px 30px 0 0!important;
+  padding:0 16px calc(18px + env(safe-area-inset-bottom))!important;
+  overflow:auto!important;
+  border:1px solid rgba(214,165,72,.7)!important;
+  border-bottom:0!important;
+  box-shadow:0 -18px 60px rgba(0,0,0,.35)!important;
+  animation:menuRise .32s cubic-bezier(.22,.8,.25,1)!important;
+}
+.menu-popup::before{
+  content:"";
+  display:block;
+  width:58px;height:5px;
+  border-radius:99px;
+  margin:10px auto 12px;
+  background:linear-gradient(90deg,#8f1018,#d6a548,#8f1018);
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.menu-header{
+  position:relative;
+  padding:16px 14px 18px!important;
+  margin:0 0 12px!important;
+  border-radius:22px!important;
+  overflow:hidden;
+  background:linear-gradient(105deg,rgba(8,55,42,.97),rgba(112,11,21,.96)),var(--mizo-puan)!important;
+  background-size:auto,cover!important;
+  color:white!important;
+  border:1px solid rgba(214,165,72,.75)!important;
+  box-shadow:0 10px 28px rgba(59,14,18,.18)!important;
+}
+.menu-header::after{
+  content:"MIZO  ✦  KARBI";
+  position:absolute;
+  right:66px;bottom:13px;
+  font-size:9px;letter-spacing:2px;font-weight:900;
+  color:rgba(255,255,255,.65);
+}
+.menu-header small{
+  color:#ffd98b!important;
+  letter-spacing:2.4px!important;
+  font-size:10px!important;
+}
+.menu-header h2{
+  color:#fff!important;
+  font-size:25px!important;
+  margin-top:5px!important;
+}
+.menu-header button{
+  background:rgba(255,255,255,.14)!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.38)!important;
+  backdrop-filter:blur(6px);
+}
+.menu-list{
+  gap:10px!important;
+  padding:2px 0 8px!important;
+}
+.menu-list button{
+  position:relative;
+  min-height:70px;
+  padding:10px 12px!important;
+  border:1px solid rgba(122,72,38,.13)!important;
+  border-left:0!important;
+  border-radius:19px!important;
+  overflow:hidden;
+  background:linear-gradient(100deg,rgba(255,255,255,.98),rgba(250,247,240,.98))!important;
+  box-shadow:0 7px 18px rgba(64,30,20,.06)!important;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease!important;
+}
+.menu-list button::before{
+  content:"";
+  width:5px;
+  align-self:stretch;
+  margin:-10px 0 -10px -12px;
+  background:linear-gradient(#8f1018 0 33%,#f5eee3 33% 45%,#8f1018 45% 75%,#d6a548 75%);
+  border-radius:19px 0 0 19px;
+  flex-shrink:0;
+}
+.menu-list button:nth-child(3n+2)::before{background:linear-gradient(#8f1018 0 33%,#f5eee3 33% 45%,#8f1018 45% 75%,#d6a548 75%)}
+.menu-list button:nth-child(3n)::before{background:linear-gradient(#111 0 30%,#8f1018 30% 58%,#8f1018 58% 78%,#d6a548 78%)}
+.menu-list button:hover,.menu-list button:active{
+  transform:translateY(-2px) scale(1.005)!important;
+  box-shadow:0 13px 26px rgba(73,22,20,.13)!important;
+  border-color:rgba(214,165,72,.55)!important;
+}
+.menu-icon{
+  width:47px!important;height:47px!important;
+  border-radius:15px!important;
+  font-size:22px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.75),rgba(255,249,237,.55)),var(--karbi-puan) center/cover!important;
+  border:1px solid rgba(214,165,72,.62)!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),0 4px 10px rgba(64,30,20,.08)!important;
+}
+.menu-list span:nth-child(2){padding-left:1px!important}
+.menu-list b{
+  color:#2a2020!important;
+  font-size:15px!important;
+  letter-spacing:.1px;
+}
+.menu-list small{
+  color:#7c6f6a!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+.menu-list strong{
+  width:auto!important;
+  height:auto!important;
+  display:block!important;
+  place-items:unset!important;
+  border-radius:0!important;
+  color:#8f1018!important;
+  background:transparent!important;
+  font-size:32px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  box-shadow:none!important;
+  padding:0!important;
+  margin-left:8px!important;
+}
+body.dark .menu-popup{background:linear-gradient(rgba(20,17,18,.985),rgba(20,17,18,.985)),var(--mizo-puan) center/cover!important}
+body.dark .menu-header{border-color:rgba(214,165,72,.55)!important}
+body.dark .menu-list button{
+  background:linear-gradient(105deg,#201d20,#17171b)!important;
+  border-color:#39333a!important;
+  box-shadow:0 8px 20px rgba(0,0,0,.22)!important;
+}
+body.dark .menu-list b{color:#fff5ee!important}
+body.dark .menu-list small{color:#c5bbb8!important}
+body.dark .menu-icon{background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.03)),var(--karbi-puan) center/cover!important}
+.menu-btn{
+  padding:7px 10px!important;
+  border-radius:12px!important;
+  font-size:12px!important;
+  letter-spacing:.2px;
+  display:flex!important;align-items:center;gap:5px;
+}
+@keyframes menuRise{from{opacity:0;transform:translateY(45px)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:700px){
+  .menu-overlay{align-items:center!important;padding:20px!important}
+  .menu-popup{border-radius:30px!important;border-bottom:1px solid rgba(214,165,72,.7)!important;max-height:85vh!important}
+}
+
+
+/* HEADER CONTROLS: Menu button beside Light/Dark mode */
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+header .header-menu-btn{
+  min-height:43px;
+  padding:0 13px!important;
+  border:1px solid var(--line)!important;
+  background:var(--card)!important;
+  color:var(--ink)!important;
+  box-shadow:0 8px 20px rgba(0,0,0,.08)!important;
+  font-weight:850!important;
+}
+header .header-menu-btn:hover{transform:translateY(-1px)}
+body.dark header .header-menu-btn{
+  background:#191b2d!important;
+  color:#fff5ee!important;
+  border-color:#39333a!important;
+}
+@media(max-width:420px){
+  .brand{font-size:17px!important;gap:7px!important}
+  .brand .mark{width:39px!important;height:39px!important;border-radius:13px!important}
+  .header-actions{gap:6px}
+  header .header-menu-btn{padding:0 10px!important}
+  header .header-menu-btn span{display:none}
+}
+
+/* QUIZ CELEBRATION */
+.quiz-celebration{position:fixed;inset:0;pointer-events:none;z-index:20000;overflow:hidden}
+.confetti-piece{position:absolute;top:-20px;width:10px;height:18px;border-radius:2px;animation:confettiFall 1.8s cubic-bezier(.1,.7,.2,1) forwards}
+@keyframes confettiFall{to{transform:translate(var(--drift),110vh) rotate(720deg);opacity:0}}
+
+
+/* PERFECT SCORE CELEBRATION MODAL */
+.perfect-overlay{position:fixed;inset:0;z-index:30000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(7,9,12,.72);backdrop-filter:blur(7px);animation:perfectFade .22s ease}
+.perfect-modal{width:min(420px,100%);position:relative;overflow:hidden;border-radius:25px;background:linear-gradient(145deg,#fff,#f1f1f4);color:#30313b;padding:34px 28px 22px;text-align:center;box-shadow:0 25px 70px rgba(0,0,0,.45);animation:perfectPop .35s cubic-bezier(.2,.9,.25,1.15)}
+.perfect-modal::before{content:"";position:absolute;left:0;right:0;top:0;height:12px;background:repeating-linear-gradient(90deg,#183d33 0 14px,#f6f6f2 14px 28px,#d92832 28px 42px,#101315 42px 56px,#f6f6f2 56px 70px,#c51f2a 70px 84px)}
+.perfect-modal::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;background:repeating-linear-gradient(90deg,#c51f2a 0 18px,#f6f6f2 18px 36px,#183d33 36px 54px,#111 54px 72px)}
+.perfect-trophy{font-size:62px;line-height:1;margin-top:12px;filter:drop-shadow(0 5px 0 rgba(0,0,0,.12));animation:trophyBounce 1.1s ease-in-out infinite alternate}
+.perfect-title{margin:16px 0 8px;font-size:28px;font-weight:950;letter-spacing:.2px;background:linear-gradient(90deg,#a33d2d,#1e6a4d,#2c3340);-webkit-background-clip:text;background-clip:text;color:transparent}
+.perfect-sub{margin:0;color:#6d7078;font-size:16px;line-height:1.55}.perfect-sub strong{color:#2b7152}
+.perfect-score{margin:20px 0 18px;font-size:22px;font-weight:950;color:#343744}.perfect-score span{color:#238052;font-size:24px}
+.perfect-actions{display:flex;justify-content:center;gap:10px}.perfect-actions button{border:0;border-radius:13px;padding:13px 19px;font-size:16px;font-weight:900;cursor:pointer;transition:transform .15s ease,filter .15s ease}.perfect-actions button:hover{transform:translateY(-1px);filter:brightness(1.04)}.perfect-try{background:#217a54;color:white;box-shadow:0 8px 18px rgba(33,122,84,.22)}.perfect-close{background:#e4e5e9;color:#444852}
+body.dark .perfect-modal{background:linear-gradient(145deg,#202333,#161827);color:#f6f7fb}.perfect-modal .perfect-sub{color:#858996}body.dark .perfect-title{background:linear-gradient(90deg,#ff9078,#77d6a9,#f4f5f8);-webkit-background-clip:text;background-clip:text;color:transparent}body.dark .perfect-score{color:#f1f2f7}body.dark .perfect-close{background:#333747;color:#f2f3f7}
+@keyframes perfectFade{from{opacity:0}to{opacity:1}}@keyframes perfectPop{from{opacity:0;transform:scale(.86) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}@keyframes trophyBounce{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-5px) rotate(2deg)}}
+@media(max-width:420px){.perfect-modal{padding:30px 18px 20px;border-radius:23px}.perfect-title{font-size:25px}.perfect-actions button{padding:12px 15px}}
+
+
+/* ===== QUIZ BANNER BOY + GIRL ART ===== */
+.quiz-banner{
+  position:relative;
+  overflow:hidden;
+}
+.quiz-banner-content{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:165px;
+  padding-right:118px;
+}
+.quiz-banner-content > div:first-child{
+  position:relative;
+  z-index:2;
+  min-width:0;
+  width:100%;
+}
+.quiz-banner-art{
+  position:absolute;
+  right:0;
+  bottom:-8px;
+  width:128px;
+  height:172px;
+  z-index:1;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  pointer-events:none;
+}
+.quiz-banner-art img{
+  width:128px;
+  max-width:none;
+  height:172px;
+  object-fit:contain;
+  object-position:center bottom;
+  display:block;
+  opacity:1;
+  filter:drop-shadow(0 8px 12px rgba(0,0,0,.22));
+}
+@media(max-width:500px){
+  .quiz-banner-content{
+    min-height:150px;
+    gap:6px;
+    padding-right:98px;
+  }
+  .quiz-banner-art{
+    right:-2px;
+    bottom:-8px;
+    width:108px;
+    height:150px;
+  }
+  .quiz-banner-art img{
+    width:108px;
+    height:150px;
+  }
+}
+
+</style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8f1018">
+
+<style id="search-layout-update">
+/* Wider search bar */
+.hero-copy{
+  max-width:100% !important;
+  width:100% !important;
+}
+.search{
+  width:100% !important;
+  max-width:none !important;
+}
+
+/* Keep the language direction box centered and smaller */
+.direction-row{
+  width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+}
+.direction-action{
+  width:min(58%, 260px) !important;
+  min-width:180px;
+}
+
+/* Small screens */
+@media(max-width:520px){
+  .direction-action{
+    width:58% !important;
+    min-width:170px;
+  }
+}
+</style>
+
+
+<style id="layout-refinement-update">
+/* Center Mizo/Karbi + History/Saved/Progress */
+.kardom-search-controls{
+  padding:5px !important;
+  border-width:1px !important;
+  border-color:rgba(143,16,24,.16) !important;
+  background:rgba(255,255,255,.55) !important;
+  box-shadow:none !important;
+}
+
+.direction-row,
+.utility-row{
+  width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+}
+
+.utility-row{
+  gap:6px !important;
+  margin-top:5px !important;
+}
+
+.utility-action{
+  border-width:1px !important;
+  padding:4px 8px !important;
+  box-shadow:none !important;
+}
+
+/* Make the white/background border lighter and thinner-looking */
+.kardom-search-controls::before{
+  opacity:.10 !important;
+}
+
+/* Make Quiz card a little smaller */
+.learn.quiz-banner{
+  margin-top:18px !important;
+  padding:15px 18px !important;
+  border-radius:21px !important;
+}
+
+.quiz-banner-content{
+  min-height:132px !important;
+  padding-right:96px !important;
+}
+
+.quiz-banner-art{
+  width:100px !important;
+  height:136px !important;
+  bottom:-7px !important;
+}
+
+.quiz-banner-art img{
+  width:100px !important;
+  height:136px !important;
+}
+
+.learn.quiz-banner h2{
+  font-size:20px !important;
+  margin-bottom:4px !important;
+}
+
+.learn.quiz-banner p{
+  font-size:14px !important;
+  margin:0 0 12px !important;
+}
+
+.learn.quiz-banner button{
+  padding:10px 14px !important;
+  border-radius:12px !important;
+}
+
+@media(max-width:520px){
+  .kardom-search-controls{
+    padding:4px !important;
+  }
+
+  .utility-row{
+    gap:4px !important;
+  }
+
+  .utility-action{
+    font-size:.60rem !important;
+    padding:4px 7px !important;
+  }
+
+  .learn.quiz-banner{
+    padding:14px 16px !important;
+  }
+
+  .quiz-banner-content{
+    min-height:125px !important;
+    padding-right:88px !important;
+  }
+
+  .quiz-banner-art,
+  .quiz-banner-art img{
+    width:92px !important;
+    height:126px !important;
+  }
+
+  .learn.quiz-banner h2{
+    font-size:18px !important;
+  }
+
+  .learn.quiz-banner p{
+    font-size:13px !important;
+  }
+}
+</style>
+
+
+<style id="pci-logo-update">
+.brand .mark{
+  background:#fff !important;
+  border:2px solid var(--gold) !important;
+  overflow:hidden !important;
+}
+.brand .mark img{
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center !important;
+}
+</style>
+
+
+<style id="modern-history-saved-progress">
+/* Modern quick-tool buttons */
+.utility-row{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:8px !important;
+  margin-top:8px !important;
+  flex-wrap:wrap !important;
+}
+
+.utility-action{
+  appearance:none !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+  border-radius:999px !important;
+  padding:7px 12px !important;
+  min-width:82px !important;
+  background:linear-gradient(135deg,rgba(25,29,45,.96),rgba(48,25,31,.94)) !important;
+  color:#fff !important;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif !important;
+  font-size:.72rem !important;
+  font-weight:750 !important;
+  letter-spacing:.15px !important;
+  box-shadow:0 3px 10px rgba(0,0,0,.16) !important;
+  cursor:pointer !important;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease !important;
+}
+
+.utility-action:hover{
+  transform:translateY(-2px) !important;
+  border-color:rgba(244,193,69,.75) !important;
+  box-shadow:0 6px 16px rgba(0,0,0,.24) !important;
+}
+
+.utility-action:active{
+  transform:translateY(0) scale(.97) !important;
+}
+
+.utility-action:nth-child(1){
+  background:linear-gradient(135deg,#27364b,#18212f) !important;
+}
+
+.utility-action:nth-child(2){
+  background:linear-gradient(135deg,#4a2435,#291b2a) !important;
+}
+
+.utility-action:nth-child(3){
+  background:linear-gradient(135deg,#4b3918,#2b2419) !important;
+}
+
+@media(max-width:520px){
+  .utility-row{gap:6px !important;margin-top:7px !important}
+  .utility-action{
+    min-width:78px !important;
+    padding:7px 10px !important;
+    font-size:.68rem !important;
+  }
+}
+</style>
+
+
+<style id="clear-modern-actions">
+/* Clearer fonts across the app */
+body, button, input, textarea, select{
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Arial, sans-serif !important;
+}
+
+/* History / Saved / Progress — clearer and easier to read */
+.utility-row{
+  gap:9px !important;
+  margin-top:9px !important;
+}
+.utility-action{
+  min-width:auto !important;
+  padding:8px 13px !important;
+  border-radius:12px !important;
+  font-size:13px !important;
+  font-weight:800 !important;
+  letter-spacing:0 !important;
+  line-height:1.2 !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.14) !important;
+}
+
+/* Mizo / Karbi / Copy / Share / Save action buttons */
+.result-actions{
+  display:grid !important;
+  grid-template-columns:repeat(5, minmax(0,1fr)) !important;
+  gap:7px !important;
+  width:100% !important;
+  margin-top:15px !important;
+}
+
+.mini-action{
+  min-width:0 !important;
+  min-height:42px !important;
+  padding:8px 6px !important;
+  border-radius:13px !important;
+  font-size:12px !important;
+  font-weight:800 !important;
+  line-height:1.15 !important;
+  letter-spacing:0 !important;
+  background:rgba(255,255,255,.92) !important;
+  color:#20202a !important;
+  border:1px solid rgba(122,91,35,.20) !important;
+  box-shadow:0 2px 7px rgba(0,0,0,.08) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  white-space:nowrap !important;
+}
+
+.mini-action:hover{
+  transform:translateY(-2px) !important;
+  border-color:var(--gold,#d4a72c) !important;
+  box-shadow:0 6px 14px rgba(0,0,0,.14) !important;
+}
+
+/* Give each action a subtle modern identity */
+.mini-action[data-speak-mizo]{
+  background:linear-gradient(135deg,#eef6ff,#ffffff) !important;
+  color:#173a63 !important;
+}
+.mini-action[data-speak-karbi]{
+  background:linear-gradient(135deg,#f2fff6,#ffffff) !important;
+  color:#1c593b !important;
+}
+.mini-action[data-copy-key]{
+  background:linear-gradient(135deg,#fff8e8,#ffffff) !important;
+  color:#725015 !important;
+}
+.mini-action[data-share-key]{
+  background:linear-gradient(135deg,#f5efff,#ffffff) !important;
+  color:#56358a !important;
+}
+.mini-action[data-fav-key]{
+  background:linear-gradient(135deg,#fff0f3,#ffffff) !important;
+  color:#8a263f !important;
+}
+
+/* Improve dictionary text readability */
+.dictionary-card,
+.dictionary-card p,
+.dictionary-card .meaning,
+.dictionary-card .translation{
+  line-height:1.55 !important;
+}
+.dictionary-card h1,
+.dictionary-card h2,
+.dictionary-card h3{
+  letter-spacing:0 !important;
+}
+
+@media(max-width:620px){
+  .utility-action{
+    font-size:12px !important;
+    padding:8px 11px !important;
+  }
+
+  .result-actions{
+    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
+  }
+
+  .mini-action{
+    font-size:12px !important;
+    min-height:41px !important;
+  }
+}
+
+@media(max-width:390px){
+  .result-actions{
+    grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+  }
+}
+</style>
+
+
+<style id="compact-result-cards">
+/* Compact dictionary result cards */
+.result-card,
+.dictionary-card,
+.search-result,
+.word-card{
+  padding:14px !important;
+  margin-bottom:10px !important;
+  border-width:1px !important;
+  border-radius:16px !important;
+}
+
+/* Make word text smaller but still easy to read */
+.result-card .word,
+.dictionary-card .word,
+.search-result .word,
+.word-card .word{
+  font-size:1.55rem !important;
+  line-height:1.1 !important;
+}
+
+.result-card h2,
+.dictionary-card h2,
+.search-result h2,
+.word-card h2{
+  font-size:1.55rem !important;
+  line-height:1.1 !important;
+}
+
+/* Labels: Mizo / Karbi */
+.result-card .lang-label,
+.dictionary-card .lang-label,
+.search-result .lang-label,
+.word-card .lang-label{
+  font-size:.78rem !important;
+  margin-top:5px !important;
+}
+
+/* English meaning */
+.result-card .meaning,
+.dictionary-card .meaning,
+.search-result .meaning,
+.word-card .meaning{
+  font-size:.95rem !important;
+  line-height:1.4 !important;
+  margin-top:12px !important;
+}
+
+/* Arrow smaller */
+.result-card .arrow,
+.dictionary-card .arrow,
+.search-result .arrow,
+.word-card .arrow{
+  font-size:1rem !important;
+}
+
+/* Smaller action buttons */
+.result-actions{
+  gap:6px !important;
+  margin-top:12px !important;
+}
+
+.mini-action{
+  min-height:38px !important;
+  padding:6px 9px !important;
+  border-width:1px !important;
+  border-radius:11px !important;
+  font-size:11px !important;
+}
+
+/* Smaller borders and spacing inside cards */
+.result-card *,
+.dictionary-card *,
+.search-result *,
+.word-card *{
+  max-width:100%;
+}
+
+@media(max-width:520px){
+  .result-card,
+  .dictionary-card,
+  .search-result,
+  .word-card{
+    padding:12px !important;
+    border-radius:14px !important;
+  }
+
+  .result-card .word,
+  .dictionary-card .word,
+  .search-result .word,
+  .word-card .word,
+  .result-card h2,
+  .dictionary-card h2,
+  .search-result h2,
+  .word-card h2{
+    font-size:1.4rem !important;
+  }
+
+  .mini-action{
+    min-height:36px !important;
+    padding:6px 7px !important;
+    font-size:10.5px !important;
+  }
+}
+</style>
+
+
+<style id="single-line-result-actions">
+/* Make result cards much more compact */
+.result-card,
+.dictionary-card,
+.search-result,
+.word-card{
+  padding:10px !important;
+  margin-bottom:7px !important;
+  border-width:1px !important;
+  border-radius:12px !important;
+}
+
+/* Smaller word and meaning text */
+.result-card .word,
+.dictionary-card .word,
+.search-result .word,
+.word-card .word,
+.result-card h2,
+.dictionary-card h2,
+.search-result h2,
+.word-card h2{
+  font-size:1.28rem !important;
+  line-height:1.05 !important;
+}
+
+.result-card .lang-label,
+.dictionary-card .lang-label,
+.search-result .lang-label,
+.word-card .lang-label{
+  font-size:.68rem !important;
+  margin-top:3px !important;
+}
+
+.result-card .meaning,
+.dictionary-card .meaning,
+.search-result .meaning,
+.word-card .meaning{
+  font-size:.82rem !important;
+  line-height:1.25 !important;
+  margin-top:8px !important;
+}
+
+/* ALL action boxes in ONE SINGLE LINE */
+.result-actions{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:4px !important;
+  width:100% !important;
+  margin-top:9px !important;
+}
+
+.mini-action{
+  flex:1 1 0 !important;
+  min-width:0 !important;
+  min-height:32px !important;
+  height:32px !important;
+  padding:3px 2px !important;
+  border-width:1px !important;
+  border-radius:8px !important;
+  font-size:9.5px !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* Keep cards tight */
+.result-card p,
+.dictionary-card p,
+.search-result p,
+.word-card p{
+  margin-bottom:5px !important;
+}
+
+/* Extra-small phones: still force one line */
+@media(max-width:420px){
+  .result-actions{
+    gap:3px !important;
+  }
+  .mini-action{
+    min-height:30px !important;
+    height:30px !important;
+    font-size:8.5px !important;
+    padding:2px 1px !important;
+    border-radius:7px !important;
+  }
+}
+</style>
+
+
+<style id="white-bold-history-saved-progress">
+.utility-action{
+  color:#ffffff !important;
+  font-weight:900 !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.28) !important;
+}
+
+.utility-action *{
+  color:#ffffff !important;
+  font-weight:900 !important;
+}
+</style>
+
+
+<style id="phone-fit-dark-text-update">
+/* ===== PHONE-FIRST FIT ===== */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+.app{
+  width:100% !important;
+  max-width:560px !important;
+  margin:0 auto !important;
+  padding:12px 10px 80px !important;
+}
+
+/* ===== QUIZ: SMALLER TITLE FOR PHONES ===== */
+.quiz-banner .quiz-banner-content h2{
+  font-size:clamp(17px,5.1vw,22px) !important;
+  line-height:1.22 !important;
+  letter-spacing:.1px !important;
+  margin:0 0 6px !important;
+}
+.quiz-banner .quiz-banner-content p{
+  font-size:13px !important;
+  line-height:1.35 !important;
+}
+
+/* ===== RESULT CARDS: FIT EVERY PHONE ===== */
+#result,
+.dictionary-card{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+}
+
+.dictionary-card{
+  overflow:hidden !important;
+  padding:12px 10px !important;
+}
+
+.dictionary-card .wordrow{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr) !important;
+  gap:6px !important;
+  align-items:start !important;
+  width:100% !important;
+}
+
+.dictionary-card .wordrow > div{
+  min-width:0 !important;
+}
+
+.dictionary-card .word{
+  font-size:clamp(18px,6vw,27px) !important;
+  line-height:1.05 !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+
+.dictionary-card .arrow{
+  font-size:15px !important;
+  text-align:center !important;
+  padding-top:3px !important;
+}
+
+.dictionary-card .phon{
+  font-size:12px !important;
+  font-weight:800 !important;
+  margin-top:5px !important;
+}
+
+.dictionary-card .meaning{
+  font-size:14px !important;
+  line-height:1.4 !important;
+  overflow-wrap:anywhere !important;
+}
+
+/* Keep all action boxes on one line */
+.result-actions{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  width:100% !important;
+  gap:3px !important;
+  overflow:hidden !important;
+}
+
+.result-actions .tag,
+.result-actions .mini-action{
+  min-width:0 !important;
+  flex:1 1 0 !important;
+  height:34px !important;
+  min-height:34px !important;
+  padding:3px 2px !important;
+  font-size:9px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* ===== LIGHT MODE: BLACK, EASY-TO-READ RESULT TEXT ===== */
+body:not(.dark) #result .dictionary-card,
+body:not(.dark) #result .dictionary-card .word,
+body:not(.dark) #result .dictionary-card .phon,
+body:not(.dark) #result .dictionary-card .meaning,
+body:not(.dark) #result .dictionary-card .arrow{
+  color:#111111 !important;
+}
+
+/* ===== DARK MODE: WHITE, EASY-TO-READ RESULT TEXT ===== */
+body.dark #result .dictionary-card,
+body.dark #result .dictionary-card .word,
+body.dark #result .dictionary-card .phon,
+body.dark #result .dictionary-card .meaning,
+body.dark #result .dictionary-card .arrow,
+body.dark #result .dictionary-card b{
+  color:#ffffff !important;
+}
+
+/* Dark-mode card contrast */
+body.dark #result .dictionary-card{
+  background:#171923 !important;
+  border-color:rgba(255,255,255,.16) !important;
+}
+
+/* Keep Mizo/Karbi language label readable in both modes */
+body.dark #result .dictionary-card .phon{color:#ffffff !important}
+body:not(.dark) #result .dictionary-card .phon{color:#111111 !important}
+
+/* Extra-small phones */
+@media(max-width:390px){
+  .app{padding-left:7px !important;padding-right:7px !important}
+  .dictionary-card{padding:10px 8px !important}
+  .dictionary-card .word{font-size:18px !important}
+  .dictionary-card .meaning{font-size:13px !important}
+  .quiz-banner .quiz-banner-content h2{font-size:17px !important}
+}
+</style>
+
+
+<style id="clear-history-saved-progress">
+/* ===== HISTORY • SAVED • PROGRESS — CLEAR IN DARK MODE ===== */
+.utility-row{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:8px !important;
+  width:100% !important;
+  padding:4px 0 !important;
+}
+
+.utility-action{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:5px !important;
+  min-height:34px !important;
+  padding:7px 12px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(255,255,255,.25) !important;
+  color:#ffffff !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  letter-spacing:.1px !important;
+  line-height:1 !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.45) !important;
+  box-shadow:0 3px 10px rgba(0,0,0,.22) !important;
+}
+
+/* Dark mode: strong contrast */
+body.dark .utility-action,
+.dark .utility-action{
+  color:#ffffff !important;
+  border-color:rgba(255,255,255,.30) !important;
+}
+
+body.dark .utility-action *,
+.dark .utility-action *{
+  color:#ffffff !important;
+  fill:#ffffff !important;
+  stroke:currentColor !important;
+  font-weight:900 !important;
+}
+
+/* Each button gets a clear modern dark background */
+.utility-action:nth-child(1){
+  background:#243044 !important;
+}
+
+.utility-action:nth-child(2){
+  background:#54243a !important;
+}
+
+.utility-action:nth-child(3){
+  background:#5a451b !important;
+}
+
+/* Light mode also remains easy to read */
+body:not(.dark) .utility-action{
+  color:#ffffff !important;
+}
+
+/* Hover / touch feedback */
+.utility-action:hover,
+.utility-action:focus-visible{
+  transform:translateY(-1px) !important;
+  border-color:#f2c94c !important;
+  filter:brightness(1.12) !important;
+}
+
+/* Small phones */
+@media(max-width:390px){
+  .utility-row{gap:5px !important}
+  .utility-action{
+    min-height:32px !important;
+    padding:6px 9px !important;
+    font-size:11px !important;
+  }
+}
+</style>
+
+
+<style id="tools-normal-weight">
+.utility-action,
+body.dark .utility-action,
+.dark .utility-action,
+.utility-action *{
+  font-weight:500 !important;
+}
+</style>
+
+
+<style id="professional-phone-refinement">
+/* =====================================================
+   KARDOM — PROFESSIONAL PHONE-FIRST REFINEMENT
+   ===================================================== */
+
+/* 1. ONE CLEAN, MODERN FONT SYSTEM */
+html, body, button, input, select, textarea{
+  font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif !important;
+}
+
+/* 2. PHONE-FIRST APP WIDTH */
+html, body{
+  max-width:100%;
+  overflow-x:hidden !important;
+}
+.app{
+  width:100% !important;
+  max-width:520px !important;
+  margin:0 auto !important;
+  padding:10px 10px 64px !important;
+}
+
+/* 3. COMPACT HEADER */
+.topbar,
+.header,
+.app-header{
+  min-height:72px !important;
+  padding:10px 12px !important;
+  border-radius:20px !important;
+}
+.brand .mark{
+  width:48px !important;
+  height:48px !important;
+}
+.brand span{
+  font-size:18px !important;
+  font-weight:750 !important;
+}
+.menu-btn,
+.theme-btn,
+#menuBtn,
+#themeBtn{
+  min-height:44px !important;
+  padding:0 14px !important;
+  border-radius:14px !important;
+}
+
+/* 4. MAIN DICTIONARY HERO — CLEANER SPACING */
+.hero,
+.hero-copy,
+.search-hero{
+  padding-top:18px !important;
+}
+.hero h1,
+.hero-copy h1{
+  font-size:clamp(30px,8vw,39px) !important;
+  line-height:1.08 !important;
+  margin-bottom:10px !important;
+  letter-spacing:-.5px !important;
+}
+.hero p,
+.hero-copy p{
+  font-size:14px !important;
+  line-height:1.45 !important;
+  margin:8px 0 16px !important;
+}
+
+/* 5. CLEAN SEARCH BOX */
+.search{
+  min-height:58px !important;
+  border-radius:18px !important;
+}
+.search input{
+  font-family:Inter, "Segoe UI", sans-serif !important;
+  font-size:15px !important;
+  padding:0 14px !important;
+  letter-spacing:0 !important;
+}
+.search input::placeholder{
+  letter-spacing:0 !important;
+}
+.search button{
+  width:54px !important;
+  height:54px !important;
+  border-radius:16px !important;
+}
+
+/* 6. COMPACT LANGUAGE / QUICK-TOOLS PANEL */
+.kardom-search-controls,
+.direction-panel,
+.controls-panel{
+  padding:10px 8px !important;
+  min-height:auto !important;
+  border-radius:20px !important;
+}
+.direction-action{
+  width:min(62%, 300px) !important;
+  min-height:46px !important;
+  font-size:15px !important;
+  border-radius:14px !important;
+}
+.utility-row{
+  margin-top:8px !important;
+  gap:7px !important;
+}
+.utility-action{
+  min-height:34px !important;
+  padding:6px 11px !important;
+  border-radius:999px !important;
+  font-size:11.5px !important;
+  font-weight:500 !important;
+  color:#fff !important;
+}
+.utility-action *{
+  font-weight:500 !important;
+  color:#fff !important;
+}
+
+/* Strong dark-mode readability */
+body.dark .utility-action,
+.dark .utility-action{
+  color:#fff !important;
+  border-color:rgba(255,255,255,.28) !important;
+}
+
+/* 7. QUIZ CARD — SLIGHTLY SMALLER, PHONE FRIENDLY */
+.learn.quiz-banner,
+.quiz-banner{
+  margin-top:18px !important;
+  padding:16px 16px !important;
+  min-height:170px !important;
+  border-radius:22px !important;
+}
+.quiz-banner-content{
+  min-height:138px !important;
+  padding-right:115px !important;
+}
+.quiz-banner .quiz-banner-content h2,
+.learn.quiz-banner h2{
+  font-size:clamp(17px,4.7vw,21px) !important;
+  line-height:1.22 !important;
+  letter-spacing:0 !important;
+  margin:0 0 7px !important;
+}
+.quiz-banner .quiz-banner-content p,
+.learn.quiz-banner p{
+  font-size:13px !important;
+  line-height:1.35 !important;
+  margin-bottom:12px !important;
+}
+.quiz-banner-art{
+  width:118px !important;
+  height:150px !important;
+  right:4px !important;
+  bottom:-4px !important;
+}
+.quiz-banner-art img{
+  width:118px !important;
+  height:150px !important;
+  object-fit:contain !important;
+}
+.quiz-banner button,
+.learn.quiz-banner button{
+  min-height:44px !important;
+  padding:9px 14px !important;
+  font-size:14px !important;
+  border-radius:14px !important;
+}
+
+/* 8. SEARCH RESULT CARDS — HIGH READABILITY */
+.dictionary-card,
+.result-card{
+  padding:13px 12px !important;
+  margin-bottom:10px !important;
+  border-radius:16px !important;
+  overflow:hidden !important;
+}
+.dictionary-card .wordrow,
+.result-card .wordrow{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr) !important;
+  gap:6px !important;
+  align-items:start !important;
+}
+.dictionary-card .word,
+.result-card .word{
+  font-size:clamp(20px,6vw,28px) !important;
+  line-height:1.08 !important;
+  overflow-wrap:anywhere !important;
+}
+.dictionary-card .phon,
+.result-card .phon{
+  font-size:12px !important;
+  margin-top:5px !important;
+}
+.dictionary-card .meaning,
+.result-card .meaning{
+  font-size:14px !important;
+  line-height:1.45 !important;
+}
+
+/* Light mode = black text */
+body:not(.dark) .dictionary-card,
+body:not(.dark) .dictionary-card .word,
+body:not(.dark) .dictionary-card .phon,
+body:not(.dark) .dictionary-card .meaning,
+body:not(.dark) .dictionary-card .arrow,
+body:not(.dark) .result-card,
+body:not(.dark) .result-card *{
+  color:#151515 !important;
+}
+
+/* Dark mode = white text */
+body.dark .dictionary-card,
+body.dark .dictionary-card .word,
+body.dark .dictionary-card .phon,
+body.dark .dictionary-card .meaning,
+body.dark .dictionary-card .arrow,
+.dark .dictionary-card,
+.dark .dictionary-card *{
+  color:#fff !important;
+}
+body.dark .dictionary-card,
+.dark .dictionary-card{
+  background:#181922 !important;
+  border-color:rgba(255,255,255,.16) !important;
+}
+
+/* 9. RESULT ACTIONS — ONE LINE */
+.result-actions{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  gap:4px !important;
+  width:100% !important;
+  margin-top:10px !important;
+}
+.result-actions .mini-action,
+.result-actions .tag{
+  flex:1 1 0 !important;
+  min-width:0 !important;
+  min-height:34px !important;
+  height:34px !important;
+  padding:3px 2px !important;
+  border-radius:9px !important;
+  font-size:9px !important;
+  white-space:nowrap !important;
+}
+
+/* 10. COMPACT FOOTER */
+.footer,
+.app-footer{
+  margin-top:20px !important;
+  padding:22px 16px !important;
+  border-radius:20px !important;
+}
+.footer p,
+.app-footer p{
+  font-size:12px !important;
+  line-height:1.55 !important;
+  margin:0 !important;
+}
+
+/* VERY SMALL PHONES */
+@media(max-width:390px){
+  .app{padding-left:7px !important;padding-right:7px !important}
+  .topbar,.header,.app-header{padding:9px !important}
+  .brand span{font-size:17px !important}
+  .hero h1,.hero-copy h1{font-size:29px !important}
+  .quiz-banner-content{padding-right:98px !important}
+  .quiz-banner-art,.quiz-banner-art img{width:100px !important;height:135px !important}
+  .quiz-banner .quiz-banner-content h2{font-size:16px !important}
+  .utility-action{font-size:10.5px !important;padding:6px 9px !important}
+}
+</style>
+
+
+<style id="dark-mode-action-buttons-fix">
+/* =====================================================
+   FIX: RESULT ACTION BUTTONS — DARK MODE READABILITY
+   ===================================================== */
+
+/* Base buttons: always readable */
+.result-actions .mini-action,
+.result-actions button,
+.result-actions .tag{
+  color:#2b241d !important;
+  background:#f5f5f3 !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+}
+
+/* Dark Mode: remove bright white backgrounds */
+body.dark .result-actions .mini-action,
+body.dark .result-actions button,
+body.dark .result-actions .tag,
+.dark .result-actions .mini-action,
+.dark .result-actions button,
+.dark .result-actions .tag{
+  color:#ffffff !important;
+  background:#292c38 !important;
+  border-color:rgba(255,255,255,.18) !important;
+  text-shadow:none !important;
+}
+
+/* Force every icon/text inside action buttons to be visible */
+body.dark .result-actions .mini-action *,
+body.dark .result-actions button *,
+body.dark .result-actions .tag *,
+.dark .result-actions .mini-action *,
+.dark .result-actions button *,
+.dark .result-actions .tag *{
+  color:#ffffff !important;
+  fill:#ffffff !important;
+  font-weight:600 !important;
+  opacity:1 !important;
+}
+
+/* Give each action a subtle, distinct dark-mode tone */
+body.dark .result-actions > :nth-child(1),
+.dark .result-actions > :nth-child(1){
+  background:#243449 !important;
+}
+body.dark .result-actions > :nth-child(2),
+.dark .result-actions > :nth-child(2){
+  background:#254238 !important;
+}
+body.dark .result-actions > :nth-child(3),
+.dark .result-actions > :nth-child(3){
+  background:#4a4030 !important;
+}
+body.dark .result-actions > :nth-child(4),
+.dark .result-actions > :nth-child(4){
+  background:#353244 !important;
+}
+body.dark .result-actions > :nth-child(5),
+.dark .result-actions > :nth-child(5){
+  background:#4a2f38 !important;
+}
+
+/* Light Mode: dark text remains visible on light buttons */
+body:not(.dark) .result-actions .mini-action,
+body:not(.dark) .result-actions button,
+body:not(.dark) .result-actions .tag,
+body:not(.dark) .result-actions .mini-action *,
+body:not(.dark) .result-actions button *,
+body:not(.dark) .result-actions .tag *{
+  color:#3a2d20 !important;
+  fill:#3a2d20 !important;
+  opacity:1 !important;
+}
+
+/* Touch feedback */
+.result-actions .mini-action:active,
+.result-actions button:active,
+.result-actions .tag:active{
+  transform:scale(.97) !important;
+}
+</style>
+
+
+<style id="search-yellow-border-match">
+/* Search box border matches the Search icon border */
+.search{
+  border:1.5px solid #d8a72b !important;
+  box-shadow:0 0 0 1px rgba(216,167,43,.12) !important;
+}
+
+/* Keep the same yellow border in Dark Mode */
+body.dark .search,
+.dark .search{
+  border-color:#d8a72b !important;
+  box-shadow:0 0 0 1px rgba(216,167,43,.15) !important;
+}
+
+/* Light Mode */
+body:not(.dark) .search{
+  border-color:#d8a72b !important;
+}
+</style>
+
+
+<style id="black-white-red-menu-theme">
+/* =====================================================
+   MENU THEME: BLACK + WHITE + RED ONLY
+   Removes the Portugal-like green/yellow colour feeling
+   ===================================================== */
+
+/* Menu overlay background */
+#menuOverlay,
+.menu-overlay,
+.menu-panel,
+.menu-modal{
+  background:#0d0d0f !important;
+}
+
+/* Main menu header */
+.menu-head,
+.menu-header,
+.menu-title-area{
+  background:linear-gradient(135deg,#151515 0%,#090909 100%) !important;
+  border:1px solid #b71c1c !important;
+  box-shadow:0 8px 25px rgba(0,0,0,.45) !important;
+}
+
+/* Remove green / gold decoration */
+.menu-head *,
+.menu-header *,
+.menu-title-area *{
+  text-shadow:none !important;
+}
+
+/* Small MENU label */
+.menu-head .eyebrow,
+.menu-header .eyebrow,
+.menu-title-area .eyebrow{
+  color:#e31b23 !important;
+}
+
+/* Mizo ↔ Karbi title */
+.menu-head h2,
+.menu-header h2,
+.menu-title-area h2{
+  color:#ffffff !important;
+}
+
+/* Right-side language text */
+.menu-head .menu-sub,
+.menu-header .menu-sub,
+.menu-title-area .menu-sub{
+  color:#e31b23 !important;
+}
+
+/* Close button */
+.menu-close,
+#menuOverlay .close-btn,
+.menu-header button{
+  background:#1b1b1f !important;
+  color:#ffffff !important;
+  border:1px solid #e31b23 !important;
+  box-shadow:none !important;
+}
+
+/* Menu option cards */
+.menu-item,
+.menu-list-item,
+.menu-option{
+  background:#17171b !important;
+  border:1px solid #35353c !important;
+  box-shadow:none !important;
+}
+
+/* Remove green/yellow strips from menu cards */
+.menu-item::before,
+.menu-list-item::before,
+.menu-option::before{
+  background:#e31b23 !important;
+}
+
+/* Menu item title */
+.menu-item h3,
+.menu-list-item h3,
+.menu-option h3{
+  color:#ffffff !important;
+}
+
+/* Menu item subtitle */
+.menu-item p,
+.menu-list-item p,
+.menu-option p{
+  color:#bdbdc5 !important;
+}
+
+/* Circular/thumbnail backgrounds */
+.menu-item .menu-icon,
+.menu-list-item .menu-icon,
+.menu-option .menu-icon{
+  border-color:#e31b23 !important;
+}
+
+/* Red arrow buttons */
+.menu-item .go,
+.menu-list-item .go,
+.menu-option .go,
+.menu-arrow{
+  background:#b5121b !important;
+  color:#ffffff !important;
+  border:1px solid #e31b23 !important;
+}
+
+/* Hover */
+.menu-item:hover,
+.menu-list-item:hover,
+.menu-option:hover{
+  border-color:#e31b23 !important;
+  background:#1d1d22 !important;
+}
+
+/* Dark mode stays clean */
+body.dark #menuOverlay,
+body.dark .menu-overlay{
+  background:#09090b !important;
+}
+
+/* Mobile */
+@media(max-width:480px){
+  .menu-head,
+  .menu-header,
+  .menu-title-area{
+    border-radius:18px !important;
+  }
+  .menu-item,
+  .menu-list-item,
+  .menu-option{
+    border-radius:18px !important;
+  }
+}
+</style>
+
+
+<style id="quiz-exit-only-style">
+#quiz .quiz-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+#quiz .quiz-exit-btn{
+  margin-left:auto;
+  flex:0 0 auto;
+  padding:7px 12px;
+  border:1px solid #e31b23;
+  border-radius:10px;
+  background:#b5121b;
+  color:#fff;
+  font-size:12px;
+  font-weight:500;
+  cursor:pointer;
+}
+#quiz .quiz-exit-btn:active{
+  transform:scale(.97);
+}
+</style>
+
+
+<style id="kardom-final-clean-theme">
+:root{--p:#8f1018!important;--p2:#111111!important;--gold:#d6a548!important}
+body{background:#f7f7f7!important;color:#111!important}
+body.dark{background:#090909!important;color:#fff!important}
+.menu-btn{background:#8f1018!important;box-shadow:0 5px 15px #0006!important}
+.menu-header small,.menu-list strong,.month-grid span,.month-english,.phon{color:#8f1018!important}
+.menu-popup,.month-popup,.menu-list button,.month-grid button,.family-card,.prayer-card,.app-info-box{border-color:#d6a548!important}
+.menu-icon{background:#111!important;color:#fff!important}
+.search{border:2px solid #d6a548!important}
+.search button{background:#8f1018!important}
+.direction-action{background:#111!important;border-color:#d6a548!important}
+.utility-row{justify-content:center!important}
+.utility-action{font-weight:400!important;color:#111!important}
+body.dark .utility-action{background:#191919!important;color:#fff!important;border-color:#d6a548!important}
+body.dark .search input,body.dark .card,body.dark .tile,body.dark .options button{color:#fff!important}
+body.dark .card,body.dark .tile,body.dark .options button,body.dark .menu-popup,body.dark .month-popup{background:#161616!important}
+.actions{gap:5px!important}
+.actions button{font-weight:400!important;padding:8px 6px!important;font-size:13px!important}
+.result-actions{display:flex!important;gap:5px!important;flex-wrap:nowrap!important}
+.result-actions>*{min-width:0!important;flex:1!important;font-size:12px!important;padding:7px 4px!important}
+.hero h1{font-size:clamp(25px,8vw,35px)!important}
+@media(max-width:500px){.app{padding:12px 10px 70px!important}.hero{margin-top:15px!important}.card{padding:14px!important;border-radius:18px!important}.word{font-size:26px!important}.meaning{font-size:15px!important}.result-actions{overflow:hidden!important}.result-actions>*{font-size:10px!important;padding:7px 2px!important}.utility-row{gap:4px!important}.utility-action{font-size:11px!important;padding:6px 8px!important}}
+</style>
+
+<style id="menu-arrow-final-fix">
+.menu-list strong{
+  width:auto!important;
+  height:auto!important;
+  display:block!important;
+  border-radius:0!important;
+  color:#8f1018!important;
+  background:transparent!important;
+  font-size:32px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  box-shadow:none!important;
+  padding:0!important;
+  margin-left:8px!important;
+}
+body.dark .menu-list strong{
+  color:#e01b26!important;
+  background:transparent!important;
+}
+</style>
+</head>
+<body>
+
+
+
+
+
+
+<style>
+/* ===== Cute Hnam Peng design ===== */
+#hnamPengOverlay .month-popup{
+  background:linear-gradient(145deg,#fffdf8 0%,#f8f5ff 48%,#f3fbff 100%);
+  border:1px solid rgba(120,95,160,.16);
+}
+#hnamPengOverlay .popup-top{
+  position:sticky;top:0;z-index:5;
+  background:rgba(255,255,255,.88);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(120,95,160,.12);
+}
+.hpg-wrap{padding:8px 2px 22px}
+.hpg-intro{
+  margin:4px 0 14px;padding:14px 16px;border-radius:18px;
+  background:linear-gradient(135deg,rgba(255,224,236,.72),rgba(225,242,255,.8));
+  box-shadow:0 7px 22px rgba(80,70,110,.08);
+  text-align:center;
+}
+.hpg-intro .emoji{font-size:27px;display:block;margin-bottom:3px}
+.hpg-intro b{font-size:1.05rem}
+.hpg-intro small{display:block;opacity:.68;margin-top:3px}
+.hpg-search{
+  width:100%;box-sizing:border-box;padding:12px 15px;border-radius:15px;
+  border:1px solid rgba(120,95,160,.16);background:#fff;outline:none;
+  box-shadow:0 5px 16px rgba(70,60,100,.06);margin-bottom:14px;font-size:15px;
+}
+.hpg-group{
+  margin:12px 0;border-radius:20px;overflow:hidden;background:rgba(255,255,255,.82);
+  border:1px solid rgba(120,95,160,.13);box-shadow:0 8px 24px rgba(70,60,100,.08);
+}
+.hpg-group summary{
+  list-style:none;cursor:pointer;padding:15px 16px;
+  background:linear-gradient(135deg,rgba(239,230,255,.9),rgba(224,244,255,.9));
+  font-weight:800;display:flex;align-items:center;gap:10px;
+}
+.hpg-group summary::-webkit-details-marker{display:none}
+.hpg-dot{width:10px;height:10px;border-radius:50%;background:#9b82d0;box-shadow:0 0 0 5px rgba(155,130,208,.12);flex:none}
+.hpg-title{flex:1}.hpg-count{font-size:12px;padding:5px 9px;border-radius:999px;background:#fff;opacity:.78}
+.hpg-arrow{font-size:18px;transition:.2s}.hpg-group[open] .hpg-arrow{transform:rotate(90deg)}
+.hpg-items{padding:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.hpg-item{
+  padding:10px 10px;border-radius:13px;background:#fff;
+  border:1px solid rgba(120,95,160,.09);font-size:.91rem;
+  box-shadow:0 3px 10px rgba(70,60,100,.045);
+}
+.hpg-num{font-size:11px;opacity:.48;margin-right:5px}.hpg-empty{padding:25px;text-align:center;opacity:.65}
+@media(max-width:520px){.hpg-items{grid-template-columns:1fr}.hpg-item{padding:11px 12px}}
+
+/* ===== Hnam Peng dark-mode fix ===== */
+body.dark #hnamPengOverlay .month-popup,
+body.dark-mode #hnamPengOverlay .month-popup,
+body.dark-theme #hnamPengOverlay .month-popup,
+[data-theme="dark"] #hnamPengOverlay .month-popup{
+  background:linear-gradient(145deg,#17151d 0%,#1c1a27 48%,#151d24 100%);
+  color:#f5f3fa;
+  border-color:rgba(255,255,255,.12);
+}
+body.dark #hnamPengOverlay .popup-top,
+body.dark-mode #hnamPengOverlay .popup-top,
+body.dark-theme #hnamPengOverlay .popup-top,
+[data-theme="dark"] #hnamPengOverlay .popup-top{
+  background:rgba(24,22,31,.90);
+  color:#fff;
+  border-bottom-color:rgba(255,255,255,.10);
+}
+body.dark .hpg-intro,
+body.dark-mode .hpg-intro,
+body.dark-theme .hpg-intro,
+[data-theme="dark"] .hpg-intro{
+  background:linear-gradient(135deg,rgba(83,53,76,.55),rgba(42,67,84,.65));
+  color:#f7f5fb;
+}
+body.dark .hpg-intro small,
+body.dark-mode .hpg-intro small,
+body.dark-theme .hpg-intro small,
+[data-theme="dark"] .hpg-intro small{opacity:.82}
+body.dark .hpg-search,
+body.dark-mode .hpg-search,
+body.dark-theme .hpg-search,
+[data-theme="dark"] .hpg-search{
+  background:#24212d;
+  color:#fff;
+  border-color:rgba(255,255,255,.14);
+}
+body.dark .hpg-search::placeholder,
+body.dark-mode .hpg-search::placeholder,
+body.dark-theme .hpg-search::placeholder,
+[data-theme="dark"] .hpg-search::placeholder{color:#aaa5b5}
+body.dark .hpg-group,
+body.dark-mode .hpg-group,
+body.dark-theme .hpg-group,
+[data-theme="dark"] .hpg-group{
+  background:rgba(31,29,40,.92);
+  border-color:rgba(255,255,255,.11);
+}
+body.dark .hpg-group summary,
+body.dark-mode .hpg-group summary,
+body.dark-theme .hpg-group summary,
+[data-theme="dark"] .hpg-group summary{
+  background:linear-gradient(135deg,rgba(60,48,78,.95),rgba(39,62,76,.95));
+  color:#fff;
+}
+body.dark .hpg-count,
+body.dark-mode .hpg-count,
+body.dark-theme .hpg-count,
+[data-theme="dark"] .hpg-count{
+  background:#2b2736;
+  color:#fff;
+  opacity:1;
+}
+body.dark .hpg-item,
+body.dark-mode .hpg-item,
+body.dark-theme .hpg-item,
+[data-theme="dark"] .hpg-item{
+  background:#25222e;
+  color:#f6f4fa;
+  border-color:rgba(255,255,255,.10);
+}
+body.dark .hpg-num,
+body.dark-mode .hpg-num,
+body.dark-theme .hpg-num,
+[data-theme="dark"] .hpg-num{opacity:.65}
+body.dark .hpg-empty,
+body.dark-mode .hpg-empty,
+body.dark-theme .hpg-empty,
+[data-theme="dark"] .hpg-empty{color:#eee;opacity:.8}
+
+</style>
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenu(event)">
+
+  <div class="menu-popup" onclick="event.stopPropagation()">
+
+    <div class="menu-header">
+      <div>
+        <small>MENU</small>
+        <h2>Mizo ↔ Karbi</h2>
+      </div>
+
+      <button type="button" onclick="closeMenu()">×</button>
+    </div>
+
+    <div class="menu-list">
+
+      <button type="button" onclick="openMonths()">
+        <span class="menu-icon">📅</span>
+        <span>
+          <b>Thla Hming</b>
+          <small>Chiklo Amen</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+      <button type="button" onclick="openWeekdays()">
+        <span class="menu-icon">📆</span>
+        <span>
+          <b>Ni Hming</b>
+          <small>Arni amen</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+      <button type="button" onclick="openNumbers()">
+        <span class="menu-icon">🔢</span>
+        <span>
+          <b>Nambar</b>
+          <small>number</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+      <button type="button" onclick="openColours()">
+        <span class="menu-icon">🎨</span>
+        <span>
+          <b>Rawng</b>
+          <small>Rong</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+      <button type="button" onclick="openFamily()">
+        <span class="menu-icon">👨‍👩‍👧</span>
+        <span>
+          <b>Chhungkua (Koh Dan)</b>
+          <small>Hem Isi kachehang</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+      <button type="button" onclick="openAnimals()">
+        <span class="menu-icon">🐄</span>
+        <span>
+          <b>Ramsa/Ransa</b>
+          <small>Marat Mareng</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+
+      <button type="button" onclick="openHnamPeng()">
+        <span class="menu-icon">📜</span>
+        <span>
+          <b>Hnam Peng Hrangte</b>
+          <small>Karbi Hnam Hming</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+      <button type="button" onclick="openLamAchor()">
+        <span class="menu-icon">📖</span>
+        <span>
+          <b>Tawng Upa</b>
+          <small>Lam Achor</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+      <!-- NEW TAWNGTAINA -->
+      <button type="button" onclick="openPrayer()">
+        <span class="menu-icon">🙏</span>
+        <span>
+          <b>Tawngtaina</b>
+          <small>Arnam Ardom</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+      <button type="button" onclick="openBible()">
+        <span class="menu-icon">📖</span>
+        <span>
+          <b>Bible Bu Hming</b>
+          <small>Baibel Buhi Amen</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+      <button type="button" onclick="openAppInfo()">
+        <span class="menu-icon">ℹ️</span>
+        <span>
+          <b>App Info & Creator</b>
+          <small>App atomo</small>
+        </span>
+        <strong>›</strong>
+      </button>
+
+    </div>
+  </div>
+</div>
+
+
+
+<div class="month-overlay" id="monthOverlay" onclick="closeMonths(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closeMonths()">←</button>
+      <b>THLA HMING</b>
+      <button type="button" onclick="closeMonths()">×</button>
+    </div>
+
+    <div id="monthContent"></div>
+
+  </div>
+</div>
+
+
+<div class="month-overlay" id="weekOverlay" onclick="closeWeekdays(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closeWeekdays()">←</button>
+      <b>NI HMING</b>
+      <button type="button" onclick="closeWeekdays()">×</button>
+    </div>
+
+    <div id="weekContent"></div>
+
+  </div>
+</div>
+
+
+
+<div class="month-overlay" id="familyOverlay" onclick="closeFamily(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closeFamily()">←</button>
+      <b>CHHUNGKAW (Koh Dan)</b>
+      <button type="button" onclick="closeFamily()">×</button>
+    </div>
+
+    <div id="familyContent"></div>
+
+  </div>
+</div>
+
+
+
+<div class="month-overlay" id="numberOverlay" onclick="closeNumbers(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closeNumbers()">←</button>
+      <b>NAMBAR</b>
+      <button type="button" onclick="closeNumbers()">×</button>
+    </div>
+
+    <div id="numberContent"></div>
+
+  </div>
+</div>
+
+
+<div class="month-overlay" id="coloursOverlay" onclick="closeColours(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closeColours()">←</button>
+      <b>RAWNG (Mizo to Karbi)</b>
+      <button type="button" onclick="closeColours()">×</button>
+    </div>
+
+    <div id="coloursContent"></div>
+
+  </div>
+</div>
+
+
+<div class="month-overlay" id="animalOverlay" onclick="closeAnimals(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closeAnimals()">←</button>
+      <b>Ramsa/Ransa (Mizo ↔ Karbi)</b>
+      <button type="button" onclick="closeAnimals()">×</button>
+    </div>
+
+    <div id="animalContent"></div>
+
+  </div>
+</div>
+
+
+
+<div class="month-overlay" id="hnamPengOverlay" onclick="closeHnamPeng(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closeHnamPeng()">←</button>
+      <b>Hnam Peng Hrangte</b>
+      <button type="button" onclick="closeHnamPeng()">×</button>
+    </div>
+
+    <div id="hnamPengContent"></div>
+
+  </div>
+</div>
+
+
+<div class="month-overlay" id="lamAchorOverlay" onclick="closeLamAchor(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closeLamAchor()">←</button>
+      <b>Lam Achor (Karbi Tawng Upa)</b>
+      <button type="button" onclick="closeLamAchor()">×</button>
+    </div>
+
+    <div id="lamAchorContent"></div>
+
+  </div>
+</div>
+
+
+
+<div class="month-overlay" id="prayerOverlay" onclick="closePrayer(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closePrayer()">←</button>
+      <b>🙏 Tawngtaina</b>
+      <button type="button" onclick="closePrayer()">×</button>
+    </div>
+
+    <input
+      type="text"
+      id="prayerSearch"
+      class="family-search"
+      placeholder="Search Tawngtaina..."
+      oninput="filterPrayers(this.value)"
+    >
+
+    <div id="prayerContent"></div>
+
+  </div>
+</div>
+
+
+<div class="month-overlay" id="bibleOverlay" onclick="closeBible(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closeBible()">←</button>
+      <b>BIBLE BU HMING</b>
+      <button type="button" onclick="closeBible()">×</button>
+    </div>
+
+    <div id="bibleContent"></div>
+
+  </div>
+</div>
+
+
+
+<div class="month-overlay" id="appInfoOverlay" onclick="closeAppInfo(event)">
+
+  <div class="month-popup" onclick="event.stopPropagation()">
+
+    <div class="popup-top">
+      <button type="button" onclick="closeAppInfo()">←</button>
+      <b>App Info & Creator</b>
+      <button type="button" onclick="closeAppInfo()">×</button>
+    </div>
+
+    <div id="appInfoContent"></div>
+
+  </div>
+</div>
+
+
+
+
+<main class="app">
+<header>
+  <div class="brand"><div class="mark">
+  <img src="data:image/webp;base64,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" alt="PCI Logo">
+</div> <span>Mizo ↔ Karbi</span></div>
+  <div class="header-actions">
+    <button class="menu-btn header-menu-btn" type="button" onclick="openMenu()" aria-label="Open menu">☰ <span>Menu</span></button>
+    <button class="icon" id="dark" aria-label="Toggle light and dark mode">☾</button>
+  </div>
+</header>
+<section class="hero">
+<div class="hero-copy"><h1>KARDOM<br>Kachingkime✨</h1><p>Zawng la, ngaithla la, vawng rawh — and learn Mizo to Karbi.</p>
+<div class="search"><input id="q" placeholder="I thu zawn duh hetah chhu lut rawh......."><button id="go">⌕</button></div>
+</div></section>
+<div id="result"></div>
+
+<section class="learn quiz-banner">
+  <div class="quiz-banner-content">
+    <div>
+      <h2>📚 I THIAM NGE<br>IN CHHIN TEH LE!!!</h2>
+      <p>15 questions • Mizo ↔ Karbi •</p>
+      <button id="start">Start 15-word quiz →</button>
+    </div>
+    <div class="quiz-banner-art" aria-hidden="true">
+      <img class="quiz-couple-img" src="https://i.ibb.co/Vpph7fhP/Chat-GPT-Image-Sep-3-2026-06-14-29-PM.png" alt="" loading="lazy">
+    </div>
+  </div>
+</section>
+<section class="section quiz" id="quiz"><h2 class="quiz-heading">⚡ Quick Challenge <span class="score" id="score"></span><button type="button" class="quiz-exit-btn" onclick="exitQuiz()" aria-label="Exit Quiz">✕ Exit</button></h2><div class="card"><div class="qword" id="qword"></div><div class="options" id="options"></div></div></section>
+<footer><p>
+  Please let me know here if there is anything that needs to be corrected or improved:
+  <a href="mailto:karbitomizodic@mail.com" target="_blank">karbitomizodic@mail.com</a>
+  <br><br>
+  <b >KARBI ANGLONG MISSION FIELD</b>
+</p></footer>
+</main>
+
+
+<script>
+/* ===== MENU / OVERLAYS / EXTRA LEARNING SECTIONS ===== */
+
+
+
+
+function openMenu(){
+  document.getElementById("menuOverlay").classList.add("show");
+}
+
+function returnToMenu(){
+  document.querySelectorAll(".month-overlay.show, .kardom-panel-overlay.show")
+    .forEach(el => el.classList.remove("show"));
+  document.getElementById("menuOverlay").classList.add("show");
+}
+
+function returnToHome(){
+  document.querySelectorAll(".menu-overlay.show, .month-overlay.show, .kardom-panel-overlay.show").forEach(el => el.classList.remove("show"));
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function closeMenu(event){
+  const overlay = document.getElementById("menuOverlay");
+  if(!event || event.target === overlay){
+    returnToHome();
+  }
+}
+
+
+const months = [
+  ["January","Arkoi"],
+  ["February","Thangthang"],
+  ["March","There"],
+  ["April","Jangmi"],
+  ["May","Aru"],
+  ["June","Vosik"],
+  ["July","Jakhong (Jakhongpo)"],
+  ["August","Paipai"],
+  ["September","Chiti"],
+  ["October","Phre"],
+  ["November","Phaikuni"],
+  ["December","Matijong"]
+];
+
+let currentMonth = 0;
+
+function openMonths(){
+  document.getElementById("menuOverlay").classList.remove("show");
+  document.getElementById("monthOverlay").classList.add("show");
+  showMonth(currentMonth);
+}
+
+function closeMonths(event){
+  const overlay = document.getElementById("monthOverlay");
+  if(!event || event.target === overlay){
+    overlay.classList.remove("show");
+    document.getElementById("menuOverlay").classList.add("show");
+  }
+}
+
+function showMonth(index){
+
+  currentMonth = index;
+
+  const month = months[index];
+
+  document.getElementById("monthContent").innerHTML = `
+    <div class="month-item">
+
+      <div class="month-number">
+        MONTH ${String(index + 1).padStart(2,"0")}
+      </div>
+
+      <div class="month-english">
+        ${escapeHTML(month[0])}
+      </div>
+
+      <div class="month-karbi">
+        ${escapeHTML(month[1])}
+      </div>
+
+      <div class="month-buttons">
+
+        <button type="button" onclick="previousMonth()">
+          ← Previous
+        </button>
+
+        <button type="button" onclick="speakMonth()">
+          🔊 Listen
+        </button>
+
+        <button type="button" onclick="nextMonth()">
+          Next →
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="month-grid">
+
+      ${months.map((m,i)=>`
+        <button type="button" onclick="showMonth(${i})">
+          <b>${escapeHTML(m[0])}</b>
+          <span>${escapeHTML(m[1])}</span>
+        </button>
+      `).join("")}
+
+    </div>
+  `;
+}
+
+function previousMonth(){
+  currentMonth =
+    (currentMonth + months.length - 1) % months.length;
+
+  showMonth(currentMonth);
+}
+
+function nextMonth(){
+  currentMonth =
+    (currentMonth + 1) % months.length;
+
+  showMonth(currentMonth);
+}
+
+function speakMonth(){
+
+  if(!("speechSynthesis" in window)){
+    return;
+  }
+
+  const month = months[currentMonth];
+
+  window.speechSynthesis.cancel();
+
+  const speech =
+    new SpeechSynthesisUtterance(
+      month[0] + ". " + month[1]
+    );
+
+  window.speechSynthesis.speak(speech);
+}
+
+
+
+const weekTerms = [
+  ["Urmi", "Monday"],
+  ["Durmi", "Tuesday"],
+  ["Thelang", "Wednesday"],
+  ["Theman", "Thursday"],
+  ["Bhomta", "Friday"],
+  ["Bhomti", "Saturday"],
+  ["Bhomkuru", "Sunday"]
+];
+
+function openWeekdays(){
+  closeMenu();
+
+  document.getElementById("weekOverlay")
+    .classList.add("show");
+
+  renderList(
+    "weekContent",
+    weekTerms,
+    "weekListContainer",
+    "Search weekday..."
+  );
+}
+
+function closeWeekdays(event){
+  const overlay = document.getElementById("weekOverlay");
+  if(!event || event.target === overlay) returnToMenu();
+}
+
+
+const familyTerms = [
+  ["armo","nupui nutate nupui kohna, anmahni pawhin min kohna"],
+  ["bong","nau"],
+  ["hupo","nupuia pa sawina (kohnaah chuan ong a ni thung)"],
+  ["ik","u mipa"],
+  ["lok","ni pasalte (mipain a koh dan)"],
+  ["lokhei","ni pasal (hmeichhiain a koh dan) leh a pasala pa"],
+  ["mehei","farnu pasalte"],
+  ["melinpopo","farnu pasal leh mahni sawina (relationship between brothers-in-law)"],
+  ["mu","nau"],
+  ["munhei","fapa nupui, pu (ongsar) fanute"],
+  ["munpi","mo"],
+  ["neng","nuta nupuite leh anmahni pawhin min koh let ve dan"],
+  ["ni","ni, u (mipa tan u hmeichhia), pi zawn, nu (nupui or nu), pi"],
+  ["pasala","pu"],
+  ["ong","pu (nu nuta te, nupuia pate)"],
+  ["ongsar","pu (nupui nutate)"],
+  ["ongso","pu (ongsar fapa)"],
+  ["osa","makpa (farnu pasal), tupa (farnu fapa)"],
+  ["pei","nu"],
+  ["phi","pi"],
+  ["philipi","tunu (farnua fanu)"],
+  ["Phu","pu"],
+  ["pinu","nutei"],
+  ["po","pa"],
+  ["punu","patea"],
+  ["saidu","nuphal"],
+  ["te","u (hmeichhia leh hmeichhia)"],
+  ["tepo","u pasal (hmeichhia leh hmeichhia)"],
+  ["tepi","u nupui (mipa leh mipa), nupuia u hmeichhiate"],
+  ["korpi","nupui naute (hmeichhia) te"],
+  ["korpo","pasala nau mipate"],
+  ["pesar","palian, nulian"],
+  ["tepohei","pasal u mipate an koh tur a ni a, mahse an ko ngai lo"],
+  ["korpihei","mipain a nau mipa nupuite an koh dan tur"]
+];
+
+function openFamily(){
+  closeMenu();
+
+  document.getElementById("familyOverlay")
+    .classList.add("show");
+
+  renderList(
+    "familyContent",
+    familyTerms,
+    "familyListContainer",
+    "Search kinship terms..."
+  );
+}
+
+function closeFamily(event){
+  const overlay = document.getElementById("familyOverlay");
+  if(!event || event.target === overlay) returnToMenu();
+}
+
+
+const numberTerms = [
+  ["phaive", "0"],
+  ["isi", "1"],
+  ["hini", "2"],
+  ["kethom", "3"],
+  ["phli", "4 (phlih)"],
+  ["pho", "5 (phoh)"],
+  ["throk", "6"],
+  ["throksi", "7"],
+  ["nerkep", "8"],
+  ["sirkep", "9"],
+  ["kep", "10"],
+  ["Kre isi", "11"],
+  ["krehini", "12"],
+  ["krekethom", "13"],
+  ["krephli", "14"],
+  ["krepho", "15"],
+  ["krethrok", "16"],
+  ["krethroksi", "17"],
+  ["krenerkep", "18"],
+  ["kresirkep", "19"],
+  ["ingkoi", "20"],
+  ["ingkoi ra isi", "21"],
+  ["ingkoi ra hini", "22"],
+  ["ingkoi ra kethom", "23"],
+  ["ingkoi ra phli", "24"],
+  ["ingkoi ra pho", "25"],
+  ["ingkoi ra throk", "26"],
+  ["ingkoi ra throksi", "27"],
+  ["ingkoi ra nerkep", "28"],
+  ["ingkoi ra sirkep", "29"],
+  ["thomkep", "30"],
+  ["thomkep ra isi", "31"],
+  ["thomkep ra hini", "32"],
+  ["thomkep ra kethom", "33"],
+  ["thomkep ra phli", "34"],
+  ["thomkep ra pho", "35"],
+  ["thomkep ra throk", "36"],
+  ["thomkep ra throksi", "37"],
+  ["thomkep ra nerkep", "38"],
+  ["thomkep ra sirkep", "39"],
+  ["phlikep", "40"],
+  ["phlikep ra isi", "41"],
+  ["phlikep ra hini", "42"],
+  ["phlikep ra kethom", "43"],
+  ["phlikep ra phli", "44"],
+  ["phlikep ra pho", "45"],
+  ["phlikep ra throk", "46"],
+  ["phlikep ra throksi", "47"],
+  ["phlikep ra nerkep", "48"],
+  ["phlikep ra sirkep", "49"],
+  ["phokep", "50"],
+  ["phokep ra isi", "51"],
+  ["phokep ra hini", "52"],
+  ["phokep ra kethom", "53"],
+  ["phokep ra phli", "54"],
+  ["phokep ra pho", "55"],
+  ["phokep ra throk", "56"],
+  ["phokep ra throksi", "57"],
+  ["phokep ra nerkep", "58"],
+  ["phokep ra sirkep", "59"],
+  ["throkkep", "60"],
+  ["throkkep ra isi", "61"],
+  ["throkkep ra hini", "62"],
+  ["throkkep ra kethom", "63"],
+  ["throkkep ra phli", "64"],
+  ["throkkep ra pho", "65"],
+  ["throkkep ra throk", "66"],
+  ["throkkep ra throksi", "67"],
+  ["throkkep ra nerkep", "68"],
+  ["throkkep ra sirkep", "69"],
+  ["throksirkep", "70"],
+  ["thriksikep ra isi", "71"],
+  ["throksikep ra hini", "72"],
+  ["throksikep ra kethom", "73"],
+  ["throksikep ra phli", "74"],
+  ["throksikep ra pho", "75"],
+  ["throksikep ra throk", "76"],
+  ["throksikep ra throksi", "77"],
+  ["throksikep ra nerkep", "78"],
+  ["throksikep ra sirkep", "79"],
+  ["throknerkep", "80"],
+  ["throknerkep ra isi", "81"],
+  ["throknerkep ra hini", "82"],
+  ["throknerkep ra kethom", "83"],
+  ["throknerkep ra phli", "84"],
+  ["throknerkep ra pho", "85"],
+  ["throknerkep ra throk", "86"],
+  ["throknerkep ra throksi", "87"],
+  ["throknerkep ra nerkep", "88"],
+  ["throknerkep ra sirkep", "89"],
+  ["throksirkep", "90"],
+  ["throksirkep ra isi", "91"],
+  ["throksirkep ra hini", "92"],
+  ["throksirkep ra kethom", "93"],
+  ["throksirkep ra phli", "94"],
+  ["throksirkep ra pho", "95"],
+  ["throksirkep ra throk", "96"],
+  ["throksirkep ra throksi", "97"],
+  ["throksirkep ra nerkep", "98"],
+  ["throksirkep ra sirkep", "99"],
+  ["pharo isi", "100"],
+  ["pharo isi ra isi", "101"],
+  ["pharo isi ra hini", "102"],
+  ["pharo isi ra kep", "110"],
+  ["pharo isi ra kre isi", "111"],
+  ["pharo isi ra krehini", "112"],
+  ["pharo isi ra ingkoi", "120"],
+  ["pharo isi ra ingkoi ra isi", "121"],
+  ["pharo isi ra ingkoi ra hini", "122"],
+  ["pharo isi ra thomkep", "130"],
+  ["pharo isi ra thomkep ra isi", "131"],
+  ["pharo isi ra thomkep ra hini", "132"],
+  ["pharo isi ra phlikep", "140"],
+  ["pharo isi ra phlikep ra isi", "141"],
+  ["pharo isi ra phlikep ra hini", "142"],
+  ["pharo isi ra phokep", "150"],
+  ["pharo isi ra phokep ra isi", "151"],
+  ["pharp isi ra phokep ra hini", "152"],
+  ["pharo isi ra throkkep", "160"],
+  ["pharo isi ra throkkep ra isi", "161"],
+  ["pharo isi ra throkkep ra hini", "162"],
+  ["pharo isi ra throksikep", "170"],
+  ["pharo isi ra throksikep ra isi", "171"],
+  ["pharo isi ra throksikep ra hini", "172"],
+  ["pharo isi ra throknerkep", "180"],
+  ["pharo isi ra throknerkep ra isi", "181"],
+  ["pharo isi ra throknerkep ra hini", "182"],
+  ["pharo isi ra throksirkep", "190"],
+  ["pharo isi ra throksirkep ra isi", "191"],
+  ["pharo isi ra throksirkep ra hini", "192"],
+  ["pharo isi ra throksirkep ra sirkep", "199"],
+  ["pharo hini", "200"],
+  ["pharo hini ra isi", "201"],
+  ["pharo hini ra throksirkep ra sirkep", "299"],
+  ["pharo kethom", "300"],
+  ["pharo kethom ra isi", "301"],
+  ["pharo kethom ra throksirkep ra sirkep", "399"],
+  ["pharo phli", "400"],
+  ["pharo phli ra isi", "401"],
+  ["pharo phli ra throksirkep ra sirkep", "499"],
+  ["pharo pho", "500"],
+  ["pharo pho ra isi", "501"],
+  ["pharo pho ra throksirkep ra sirkep", "599"],
+  ["pharo throk", "600"],
+  ["pharo throk ra isi", "601"],
+  ["pharo throk ra throksirkep ra sirkep", "699"],
+  ["pharo throksi", "700"],
+  ["pharo throksi ra isi", "701"],
+  ["pharo throksi ra throksirkep ra sirkep", "799"],
+  ["pharo nerkep", "800"],
+  ["pharo nerkep ra isi", "801"],
+  ["pharo nerkep ra throksirkep ra sirkep", "899"],
+  ["pahro sirkep", "900"],
+  ["pharo sirkep ra isi", "901"],
+  ["pharo throksirkep ra sirkep", "999"],
+  ["suri isi", "1,000"],
+  ["suri isi ra isi", "1,001"],
+  ["suri isi ra pharo isi ra isi", "1,101"],
+  ["suri isi ra pharo hini ra isi", "1,201"],
+  ["suri isi ra pharo sirkep ra throksirkep ra sirkep", "1,999"],
+  ["suri kep", "10,000"],
+  ["suri ingkoi", "20,000"],
+  ["suri throksirkep ra sirkep", "99,000"],
+  ["lak isi", "1,00,000"],
+  ["lak isi ra suri throksirkep ra sirkep ra- pharo sirkep ra throksirkep ra sirkep", "1,99,999"]
+];
+
+function openNumbers(){
+  closeMenu();
+
+  document.getElementById("numberOverlay")
+    .classList.add("show");
+
+  renderList(
+    "numberContent",
+    numberTerms,
+    "numberListContainer",
+    "Search number..."
+  );
+}
+
+function closeNumbers(event){
+  const overlay = document.getElementById("numberOverlay");
+  if(!event || event.target === overlay) returnToMenu();
+}
+
+
+const colours = [
+  ["Ki-ik", "Black"],
+  ["Kelok", "White"],
+  ["Kilir", "Green"],
+  ["Ke-et", "Yellow"],
+  ["Ke-er", "Red"],
+  ["Kilu", "Blue"],
+  ["Luhum", "Sky Blue"],
+  ["Lirheng", "Purple"],
+  ["Lokru", "Grey"],
+  ["Ik-rim", "Brown"],
+  ["Ke-ang", "Orange"],
+  ["Er-hik", "Pink"]
+];
+  
+function openColours(){
+  closeMenu();
+
+  document.getElementById("coloursOverlay")
+    .classList.add("show");
+
+  renderList(
+    "coloursContent",
+    colours,
+    "coloursListContainer",
+    "Search colours..."
+  );
+}
+
+function closeColours(event){
+  const overlay = document.getElementById("coloursOverlay");
+  if(!event || event.target === overlay) returnToMenu();
+}
+
+
+const animalTerms = [
+  ["bak","vo- arphlak"],
+  ["sakhi","ok-hi"],
+  ["biang","lobeng"],
+  ["sakuh","ok-hi bonghom"],
+  ["bui","phakphule"],
+  ["samak","kindu"],
+  ["chinghnia","mahar"],
+  ["satel","chitung"],
+  ["ngau","misang"],
+  ["sathar","karlu"],
+  ["hauhuk","kenghoidu"],
+  ["savawm","thokvam"],
+  ["keite","bongkrui"],
+  ["saza","karju"],
+  ["rulral","phelangjule"],
+  ["sazaw","kaselet"],
+  ["sanghal","phakleng/habit aphak"],
+  ["sazu","phiju"],
+  ["sanghar","kethoi"],
+  ["sazuk","thijok"],
+  ["ashram","sirim"],
+  ["sihal","sirung (hijal Asom)"],
+  ["sahuai","ingren"],
+  ["tangkawng","chehang"],
+  ["sai","ingnar"],
+  ["thehlei","karle"],
+  ["sakei","teke"],
+  ["zawng","thero"],
+  ["sakeibaknei","hingho/ sinkong"],
+  ["ar","vo"],
+  ["sakawr","losei"],
+  ["ar-awn","voram"],
+  ["sazupui","mengserang"],
+  ["bawng","chaining"],
+  ["sial","chai"],
+  ["beram","meresak/ biresak"],
+  ["ui","methan"],
+  ["kel","bi"],
+  ["varak","vokak"],
+  ["lawi","chelong"],
+  ["vatawk","vopithunghar"],
+  ["parva","vothung"],
+  ["vawk","phak/ arum api"],
+  ["sabengtung","gadha"],
+  ["zawhte","meng/mengkalu"],
+  ["sanghawngsei","ka-ut"],
+  ["chawngzawng","vosokpuru"],
+  ["thuro","vokakrit"],
+  ["chhimbuk","vo-inghu"],
+  ["vahluk","tarlut"],
+  ["chingpirinu","vodudu"],
+  ["vahmim","vo-ut"],
+  ["choak","vo-ak"],
+  ["vahrit","vorek"],
+  ["kaikuangral","masarengka"],
+  ["vaiva","maino"],
+  ["mupui","vomu"],
+  ["vaiva (phaivaiva uk)","vosaru"],
+  ["pengleng","arnam vokongkang"],
+  ["vaki","vokek"],
+  ["pit","vophri"],
+  ["vakul","vojaru"],
+  ["ramar","vohar"],
+  ["vamur","arnam-vothaiso"],
+  ["riakmaw","vohamlam"],
+  ["varihaw","voram"],
+  ["thangfenpabawp","vosobiku"],
+  ["vasuih","vochet"],
+  ["thloh","voleng"],
+  ["varung","voham"],
+  ["tlaiberh","vocherok"],
+  ["zetzet/kireuh","volangdung"],
+  ["tuklo","bengtarlok"],
+  ["awle","temong"],
+  ["sangha","lang-aok"],
+  ["chakai","chehe"],
+  ["tuikep","jarop"],
+  ["chengkawl","chupi"],
+  ["uchang","ok-ak/karakdangdang"],
+  ["kaikuang","chikung"],
+  ["ulawng","ok-langhan"]
+];
+
+function openAnimals(){
+  closeMenu();
+
+  document.getElementById("animalOverlay")
+    .classList.add("show");
+
+  renderList(
+    "animalContent",
+    animalTerms,
+    "animalListContainer",
+    "Search animal..."
+  );
+}
+
+function closeAnimals(event){
+  const overlay = document.getElementById("animalOverlay");
+  if(!event || event.target === overlay) returnToMenu();
+}
+
+
+
+/* =====================================================
+   HNAM PENG HRANGTE
+   Source: user-provided book pages 115-116
+   ===================================================== */
+
+const hnamPengGroups = [
+  {
+    title: "1. EJANG (Inghi)",
+    items: [
+      "Inghi",
+      "Rongpi Chingthong",
+      "Ronghang",
+      "Ronghi",
+      "Rongpi Ronghang",
+      "Rongchehon",
+      "Rongpi Lindok",
+      "Tisso",
+      "Tisso Rongpi",
+      "Tisso Rongchitum",
+      "Tisso Adar",
+      "Tisso Rongling",
+      "Tisso Rongphu",
+      "Tisso Motho",
+      "Kramsa",
+      "Ke-ap",
+      "Ke-ap Reng-oi",
+      "Ke-ap Rengte",
+      "Ke-ap Renglum",
+      "Dongrung",
+      "Hanse",
+      "Hanse Nongdu",
+      "Hanse Nongkirla",
+      "Lekthe",
+      "Ronghang Lindok",
+      "Hanse Lindok",
+      "Hanse Nongprit",
+      "Hanse Nongplir",
+      "Hanse Nongjirong",
+      "Hanse Nongkira"
+    ]
+  },
+  {
+    title: "2. TUNGJANG or TUNG-E (Timung)",
+    items: [
+      "Timung Dera",
+      "Timung Phura",
+      "Timung Miji",
+      "Timung Rongpi",
+      "Timung Pator",
+      "Singnar",
+      "Singnar Pator",
+      "Singnar Miji",
+      "Singnar Musiki",
+      "Pator Sarpo",
+      "Singnar Pator Riso",
+      "Tokbi Hemso",
+      "Tokbi Hempi",
+      "Tokbi Chinthong",
+      "Tokbi Ronghang",
+      "Tokbi Dera",
+      "Tokbi Kiling",
+      "Tokbi Phura",
+      "Phangcho",
+      "Phangcho Langerloi",
+      "Phangcho Vojaru",
+      "Phangcho Juiti",
+      "Rongphar Chinthong",
+      "Rongphar Singnot",
+      "Rongphar Phura",
+      "Kiling",
+      "Kiling Nokbare",
+      "Kiling Miji",
+      "Kiling Tokbi",
+      "Kiling Dera"
+    ]
+  },
+  {
+    title: "3. HANJANG (Terang)",
+    items: [
+      "Terang Dili",
+      "Terang Rongchicho",
+      "Terang ingjai",
+      "Terang Ingnar",
+      "Bedun",
+      "Be Ke-et",
+      "Be Ke-ik",
+      "Be Lindok",
+      "Be Miji",
+      "Be Chinthong",
+      "Be Ronghang",
+      "Kro Nihang",
+      "Kro Nilip"
+    ]
+  },
+  {
+    title: "4. KRONJANG or KRON-E (Teron)",
+    items: [
+      "Teron Langne",
+      "Teron Kongkat",
+      "Teron Milik",
+      "Teron Miji",
+      "Teron Sir-ang",
+      "Teron Sir-ik",
+      "Teron Dengja"
+    ]
+  },
+  {
+    title: "5. LIJJANG or LI-E (Ingti)",
+    items: [
+      "Ingti Kathar",
+      "Ingti Taro",
+      "Ingti Hensek",
+      "Ingti Kiling",
+      "Ingti Ingleng",
+      "Kathar Sarpo"
+    ]
+  }
+];
+
+function openHnamPeng(){
+  closeMenu();
+
+  document.getElementById("hnamPengOverlay")
+    .classList.add("show");
+
+  renderHnamPeng();
+}
+
+function closeHnamPeng(event){
+  const overlay = document.getElementById("hnamPengOverlay");
+  if(!event || event.target === overlay) returnToMenu();
+}
+
+function renderHnamPeng(query = ""){
+  const q = String(query || "").toLowerCase().trim();
+  const content = document.getElementById("hnamPengContent");
+
+  const groups = hnamPengGroups.map(group => ({
+    ...group,
+    items: group.items.filter(item =>
+      !q || item.toLowerCase().includes(q) || group.title.toLowerCase().includes(q)
+    )
+  })).filter(group => group.items.length);
+
+  content.innerHTML = `
+    <div class="hpg-wrap">
+      <div class="hpg-intro">
+        <span class="emoji">🌸</span>
+        <b>Hnam Peng Hrangte</b>
+        <small>Karbi Hnam Peng Lian 5 — peng hrang hrangte chu an chhunga an awm</small>
+      </div>
+
+      <input type="text" id="hnamPengSearch" class="hpg-search"
+        placeholder="🔎 Hnam emaw peng emaw zawn rawh..."
+        value="${escapeHTML(query)}" oninput="renderHnamPeng(this.value)">
+
+      <div class="hpg-list">
+        ${groups.length ? groups.map((group, gi) => `
+          <details class="hpg-group" ${q ? "open" : (gi === 0 ? "open" : "")}>
+            <summary>
+              <span class="hpg-dot"></span>
+              <span class="hpg-title">${escapeHTML(group.title)}</span>
+              <span class="hpg-count">${group.items.length} peng</span>
+              <span class="hpg-arrow">›</span>
+            </summary>
+            <div class="hpg-items">
+              ${group.items.map((item,index) => `
+                <div class="hpg-item">
+                  <span class="hpg-num">${String(index + 1).padStart(2,"0")}</span>
+                  <b>${escapeHTML(item)}</b>
+                </div>
+              `).join("")}
+            </div>
+          </details>
+        `).join("") : `<div class="hpg-empty">🌷 Matching peng hmuh tur a awm lo.</div>`}
+      </div>
+    </div>
+  `;
+}
+
+const lamAchorTerms = [
+  ["abi apan","mau hmanga thil siam, thiamthil chi hrang hrang"],
+  ["abui angsom","thil chek khawm, thil tian khawm"],
+  ["achom aphang","thlai emaw thing emaw chi khat hung or mihring khat fuan khawm"],
+  ["achor alok","kawppui, khingpui"],
+  ["achor arup","nupui pasal, thil inkawp tuak"],
+  ["adai areng","le, leichawi"],
+  ["adak atur","ropuina"],
+  ["adam asar","Karbi dan anga inneihna, hlen chhuah tur bung hrang zinga ahnung ber"],
+  ["adan adi","thilpek, thilhlan"],
+  ["ade angtur","lei leh ka, thusawi theihna"],
+  ["adi aran","a chuang a liam"],
+  ["aduk aprot","them nawi, te reuh te te"],
+  ["adung arei","kiang, bul hnai"],
+  ["ahi aphe","ek"],
+  ["ahin akele","a bang, a chuang"],
+  ["ahir asang","ropuina, khunkhan"],
+  ["ahoi adui","ramri"],
+  ["ahut adak","a chang changin"],
+  ["aini aijong","chau, chak lo"],
+  ["ajeng ajati","chi, hnam"],
+  ["ajeng arni","chi, hnam"],
+  ["ajir aroi","intanpuitawn, inlawm"],
+  ["ajo anerlo","chhun leh zan"],
+  ["ajo phir lo","zan lai, zan thilthu"],
+  ["ajut ajeng","a tawp, a tawpna"],
+  ["akam ajam","(a) hna, (a) hnathawh"],
+  ["akhi adat","ro sum, khawvel hausakna"],
+  ["aklim angphar","nupang te te, thlai tiak tir"],
+  ["akrom ajom","(mihring) pian hmang"],
+  ["akrong alat","kawng, kalkawng"],
+  ["akur ajon","chi leh kuang, chi bil bik"],
+  ["alam aki","tawng (language)"],
+  ["alir acham","mawi, cheimawi"],
+  ["amon adang","tam tham tak"],
+  ["anam amui","man leh mual"],
+  ["anbo ansam","chaw thing, chaw ei bang"],
+  ["angdeng anghoi","inanlohna, danglamna"],
+  ["angkok angki","kua (hole)"],
+  ["angri angdon","inlungrualna, inantlanna"],
+  ["aning angthin","rilru, thinlung"],
+  ["anlok anme","chaw chhum hmin"],
+  ["angthun ave","thil indawt chhawng, inkahpukchaw"],
+  ["anong athang","hmingthanna"],
+  ["aot adur","mizia, nungchang"],
+  ["aphu aphang","taksa pumpui"],
+  ["apun achak","Pathian thil pek; tehna"],
+  ["arbung arphe","in (?)"],
+  ["ardom ardi","tawngtai"],
+  ["arje abolon","lan dan, hmelhmang leh nih phung"],
+  ["arkok arphek","hmun phiat"],
+  ["arkli phejo","inthawi, thil hlan (sacrifice)"],
+  ["arkum arke","bawkvak; nasa taka bei"],
+  ["arleng arlok","awihtlan"],
+  ["arni arve","khaw chin, khaw awm dan"],
+  ["aro arim","zar, peng (parts, branches)"],
+  ["aron atang","dan leh hrai"],
+  ["arong aje/ arong bohong","intihhlimna"],
+  ["arpum arjon","taksa pumpui"],
+  ["aru arang","thil hlui, thil hlui vawn that"],
+  ["aso asu","tu leh fate"],
+  ["ason amung","thil chi hrang hrang"],
+  ["atar athon","bu, sava bu"],
+  ["athok ajir","inthawina thilhlan"],
+  ["avur akrem","hri, hri leng"],
+  ["ban sot","chhiahhlawh, tirhkah"],
+  ["bap bi","hnim, hnimhnah, hnamtur"],
+  ["bari-the bari-eh","van mite (heavenly beings)"],
+  ["barla chala","nipui, fur ruahtui tlak lai"],
+  ["barpi barso","zunram"],
+  ["beisa daro","uirena"],
+  ["bidi sore","finna, ngaihtuahthiamna"],
+  ["bipan bijon","thiamhrang"],
+  ["biri bithung","huan, chuktuah huan"],
+  ["bisar kidar","rorelna (judgment)"],
+  ["boche ingtung","chhungkaw din, chhawngkaw inrelbawlna"],
+  ["bor kan","malsawmna"],
+  ["bor-i bor-a","theih tawp chhuah, bei hram hram"],
+  ["botor bokan","sik leh sa"],
+  ["chanri chanjai","pung, inthlahpung"],
+  ["chardom chardi","chibai inbuk"],
+  ["chakri chakor","chhiahhlawh, tirhkah (servants)"],
+  ["chardak charbu","awm hle hle thei lo, huaibak"],
+  ["charvo chingchek","inhau, inhnial"],
+  ["chedam chevang","intlawh pawh, inkawmngeih"],
+  ["che-en chedo","innei (to be married)"],
+  ["chekor chedit","insual, inhau"],
+  ["chelem chekurki","inchul inkhal"],
+  ["chelong chainong","ran, ranvulh"],
+  ["chenek holo","tihduhdah, tirethei"],
+  ["chepangri chepangdon","(nupa) innei; rorel"],
+  ["chepatum chepani","thawhpui"],
+  ["chepaduk chepalak","thawkrim"],
+  ["hepu chetam","zilhhau"],
+  ["cherap cheto","intanpui tawn"],
+  ["cherui chelen","vei tawn sek"],
+  ["chercheto / cherung cherek","thawhlawm, pawisa etc. khawn"],
+  ["chethek cheni","inhmelhriat"],
+  ["chethu chethat","insat inthat"],
+  ["cheti chevar","(nupui) ma, then"],
+  ["chiklo arni","ni leh thla, hun leh ni"],
+  ["chingbar chingdon","kum inrualkhat tlang"],
+  ["chinghon chingjinso","kawngaihna leh lainatna"],
+  ["chingkhan chingre","hmanhmawhthalk"],
+  ["chingkrin chingchap","vau, innghirngho"],
+  ["chinglu chingthi","inbuai, insilfai"],
+  ["chingmoi chingche","thi (thinur tawngkam)"],
+  ["chingnek chingni","nui, hlim"],
+  ["chingri chingdon","inang tlang, rual tlang"],
+  ["chington chingthi","inhau"],
+  ["chingtung char-eh","ngai, lungleng"],
+  ["chingvai chingsai","rorel, sawiho"],
+  ["chir nok","ralthuam"],
+  ["chiri pharkong","zah, zahawmna"],
+  ["chiru charnap","Schia tap, lungchhiatna leh lungngaihna"],
+  ["chiru taram","tap, lungchhiatna leh lungngaihna"],
+  ["chobei chokai","bum, dawt sawi"],
+  ["chohang chorek","dil, kut dawh"],
+  ["chojun choku","ruai, ruai theh"],
+  ["chongdat chotelo","inhlawhfa"],
+  ["chonghu chonghi","ru, rukru"],
+  ["chongvir chongtham","tlan bo"],
+  ["choningri choninglak","ngen, dil"],
+  ["chopan chojui","tla, hnim pet"],
+  ["chonpro chonjam","mahni duh ang anga tal mai mai"],
+  ["chorung chojar","fuih pawrh"],
+  ["chungkreng marjeng","cher"],
+  ["damme jume","dam takin kal rawh, dam takin le."],
+  ["dampri dampro","kawng lakah (khawiah pawh)"],
+  ["duhuidi duhuijan","khuangpu, khuangvawtu"],
+  ["dim klong","hmun (place)"],
+  ["dong chan","kawr, luikawr"],
+  ["don rap","chhungkhat laina"],
+  ["dorde phophe","daih lo, tlin lo"],
+  ["dorde rire","siam that ngaihna awm lo"],
+  ["dovai daro","damdawi"],
+  ["dovan dopat","maicham"],
+  ["duksang dukjir","karbi hmeichhia"],
+  ["hangjo hanghai","bengchheng nuai nuai"],
+  ["helat heleng","vei tawn"],
+  ["hemangtar ritangtar","chungkhatpathiante"],
+  ["hem rit","in leh lo, chungkua"],
+  ["hemai honsere","thirdeng"],
+  ["hember hemthak","kawmchhak kawmthlang, thenawm khawveng"],
+  ["heme (pi)jangre (pi)","hmeithai"],
+  ["hen phurui","thlai (vegetable)"],
+  ["him sangpher","thingpui ruai (refreshments)"],
+  ["hormu hortar","in chhung bungrua"],
+  ["hukum hora","thupek"],
+  ["humri humpat","tlawh (visit)"],
+  ["honi kanti","sarthi"],
+  ["hurihoman","bengchheng siam"],
+  ["inghun arve","ruah"],
+  ["ingjir arlo","farnu"],
+  ["ingki ingket","rannung"],
+  ["ingkro ingtong","buh leh bal hnianghnar"],
+  ["inglong arlok","tlang leh ruam"],
+  ["ingnam arlok","ramhnuai"],
+  ["ingreng-u ingrengklung","thli thaw vuk vuk ri"],
+  ["ingsu arhang","hling leh buar"],
+  ["ingting siring","thim"],
+  ["jakong horang","cakna, thiltihtheihna"],
+  ["jangre jangreng","fahrah"],
+  ["jeng jati","mahni chi leh kuang"],
+  ["jengtoi jengni","huhova kawngzawh"],
+  ["jirlo phirlo","zanlai"],
+  ["jiro jisung","khawchhak lam Karbi sawina"],
+  ["jirpi jirpo","thian"],
+  ["jo padap","nitin, tukzan"],
+  ["joike joivan","awlsam"],
+  ["kahelo kahelak","hla, lam hla"],
+  ["kamjam","hna, hnathawhte"],
+  ["kangbo kevir","hlohna, channa"],
+  ["kangchir kalang-it","riltamtuihal"],
+  ["kanglit kangther","diak, nal"],
+  ["kangri kangkrang","rui, zu rui"],
+  ["kangtang kangsak","cakna"],
+  ["kangton kangthi","hau, tawngkam tha lova an khum"],
+  ["karbi karbak","Karbi mi"],
+  ["kardom kardi","tawngtaina"],
+  ["kaselok kangthong","bengngawng tawngtheilo"],
+  ["kebe keche","pem (migrate)"],
+  ["kebek kesin","uanna, chapona"],
+  ["kebeng kephan","dodalna, bahlahna"],
+  ["kebI kethi","te (small)"],
+  ["kecham kangthi","silfai, su"],
+  ["kecho kejun","ei leh in"],
+  ["kedo kethak","khawsakna, khawsa, cheng"],
+  ["ke-e kesom","phun, tuh"],
+  ["kejut, kepleng","zo fel, kimchang taka a tawp thleng"],
+  ["kekat kangplong","tlan"],
+  ["kekkek kangkang","kawm, kawi"],
+  ["kekim, kerang","sa, din (build)"],
+  ["kekok kangnang","phuar, man (arrest)"],
+  ["kelak keleng","hah, chau"],
+  ["kelet kephet","hlawhchhamna"],
+  ["kelu kekom","mawina"],
+  ["kelun, kekan","zai leh lam, intihhlimna"],
+  ["keme kechok","tha famkim"],
+  ["kenam keret","lei (buy)"],
+  ["keplang kephi","hausa, neinung"],
+  ["keram, kerong","hawh, puk"],
+  ["keri karlan","zawng"],
+  ["kerim kebi","vawng, dah tha"],
+  ["kero karcho","fak, chawimawi"],
+  ["keron, kebak","sem (distribute)"],
+  ["keru kethai","rawngbawlna"],
+  ["keso ke-un-e","natna, damlohna"],
+  ["kesung keboi","tuarna, harsatna"],
+  ["kesung kelak","tuarna, harsatna"],
+  ["keter keer","bawlhhlawh, thianghlimlo"],
+  ["kethan kemum","zirtirna (instruction)"],
+  ["kethe keding","mi lian, mi pawimawh"],
+  ["kethe kere","mi fing, finna"],
+  ["kether kehap","vauna (to threaten)"],
+  ["kethi kejang","thihna"],
+  ["kethip ketheng","din, siam (create)"],
+  ["kethok kejir","hlan, inthawi"],
+  ["kethu ke-ui","tawih"],
+  ["ketun kedang","ei rawngbawl, chaw chhum"],
+  ["kiri kirot","mi hausa"],
+  ["klolin thengkok","thimna"],
+  ["kora mara","luikam"],
+  ["korte murti","unaute"],
+  ["lana lahon","enkawl"],
+  ["langbung langphet","(chirh avanga) diak leh nâl"],
+  ["langme langdok","hmelha, duhawm"],
+  ["langroi langjeng","lui"],
+  ["langselet langhijim","hua, ngei"],
+  ["langso langmek","lui te; tlang kara tui rawn chik chhuak alanga lui te luang"],
+  ["lek roi","tlereuh"],
+  ["loban lobi","hnah (a hlai chi) hman hnu paih"],
+  ["long-e longchong","lungpui"],
+  ["longkam longhat","lamhla a zin"],
+  ["longku longdang","puk"],
+  ["longle phelang","in hmun lo ram"],
+  ["longri longpat","chenna ram bial"],
+  ["luntomo","hla leh thawnthu (thu leh hla)"],
+  ["lurchi lurcha","lawng akip akawi"],
+  ["maju maja","dam, hrisel"],
+  ["man peng","zahwm (na)"],
+  ["mane mana","tu (te) emaw"],
+  ["mang mun","mumang"],
+  ["manghu mangram","bang bo; vak bo"],
+  ["marat mareng","ramsaa"],
+  ["matha jadi","ngaihtuah"],
+  ["mehek hanthu","ramthlai"],
+  ["mithei","inhmuhkhawmna, intawhkhawmna"],
+  ["mekbur mekthang","zan hun, mut hlan"],
+  ["mekkri meklang","mittui"],
+  ["mek langno no langno","nungchang mawi lo, hmeichhiat mipat thil"],
+  ["mirjangthu","hnawih rimtui (cosmetics)"],
+  ["monit munor","mihring"],
+  ["monduk monlak","lungngai"],
+  ["munthi munlak","ngunthluk taka ngaihtuah"],
+  ["musit miso","rannung mi seh chi; fanghmir"],
+  ["nampi namdur","ramhnuai, ramngaw"],
+  ["nempru nemlang","rimtui"],
+  ["nemthu nemthor","rimchhia"],
+  ["ningding ningjon","dawhthei, tuarthei"],
+  ["ningkreng ningthi","thlasik, hal"],
+  ["ningni ningot","taksa bal"],
+  ["ningri ninglak","lungngai, rilu hah"],
+  ["ningso ningi","rinawm lo, mi itsik, phunnawi"],
+  ["nirep nitur","hmar leh chhim"],
+  ["nokbe chaibe","mi chak, pasalha"],
+  ["noke nopak","chem"],
+  ["ok an","chaw ha, chaw tuihnai"],
+  ["ongnihu","putea (maternal uncle)"],
+  ["ove chale","thangthar rualkhat"],
+  ["putot pusit","sawi chhia"],
+  ["pang-e panglak","chei mawi"],
+  ["pangji patehong","hun rei tak chhung na, natna benvawn"],
+  ["pangrum pangsom","la khawm, seng khawm"],
+  ["pap pun","sualna"],
+  ["parai harai","lui ral lehm lehlam"],
+  ["parlin parlo","tibuaichuar, thil a indawt dan ni lova sawi"],
+  ["patekung pakong deng","inchhuih, petek"],
+  ["pateng paju","a um hnihna ataná nupui pasal nei"],
+  ["pe ri","silhfen"],
+  ["pe sele ri sele","silhfen inthlakna (spare clothes)"],
+  ["pharlep pharlo","inlet, rilru thlak"],
+  ["phirui sangman","rannung hlauhawm"],
+  ["phisar phusar","thlahtute"],
+  ["phule phukok","bungbel"],
+  ["pinchong pinthi","siam, din (create)"],
+  ["pindeng sumpot","incheina silhfen"],
+  ["pini penap","tunlai"],
+  ["pinkhat pinlar","awm dan tur, thil tih dan tur hrilh"],
+  ["pi pholongpo pholong","enkawltu nei lo"],
+  ["pirthe mindar","khawhvel"],
+  ["pit-pit khai-khai","mipui tam tak, innek nulh nulh"],
+  ["pran mui","hriselna"],
+  ["preng arvo","leiba"],
+  ["rat det","khua leh tuite"],
+  ["rengdok rengni","nuam sa, ralmuang"],
+  ["rikang rinui","hruizam"],
+  ["riso nimso","halai, nula tlangval"],
+  ["ri sele keng sele","huihruai, anpuitu"],
+  ["rit jai","lo, thlawhhma"],
+  ["riti niti","hnamzia"],
+  ["ron mai","indona"],
+  ["rong rup","khawtlang, vantlang"],
+  ["rong asar rup asar","khawtlang hotu"],
+  ["rongber rongthak","khaw henawm"],
+  ["sangprot sang-e","buh den tawh, buhfai"],
+  ["sar lar","khaw hotu (village headman)"],
+  ["sarphu sarphi","pitar putar"],
+  ["sarru sarhang","kum upa"],
+  ["seme kore","chhechham, thuhiam"],
+  ["ser rup","rangkachak leh tangka, ro hlu"],
+  ["soluk sodak","boruak ralmuang lo"],
+  ["sonu sokleng","mipa fa upa ber"],
+  ["sovei sovoi","naù nei, nau hring"],
+  ["tangka maha","pawisa"],
+  ["teke ingnar","ramsa kawlh"],
+  ["tekok teki","kebai"],
+  ["thengpi thengphrang","thing (trees)"],
+  ["thengtak thengro","thingnawi"],
+  ["thengtut thenglong","thingbul, thingluang, enthlatu (spy)"],
+  ["thepai thereng","kham, lengkir"],
+  ["therak ingring","zak"],
+  ["thorthor mormor","damlo na tak (serious sickness)"],
+  ["tomon arve","thlipui ruahpui"],
+  ["tomon herei","rial leh thlipui"],
+  ["tomon tepri","thlipui"],
+  ["tong sarmong/tongprop","hmanmawh, hnawhsarum"],
+  ["tongso/tongru tonghap","hmanmawh, hnawhsarum"],
+  ["vecheng veri","furtui tlaklai"],
+  ["voku voki","(zana) ar khuan hun"],
+  ["votek voso","sava"],
+  ["voti voso","artui"]
+];
+
+function openLamAchor(){
+  closeMenu();
+
+  document.getElementById("lamAchorOverlay")
+    .classList.add("show");
+
+  renderList(
+    "lamAchorContent",
+    lamAchorTerms,
+    "lamAchorListContainer",
+    "Search Lam Achor..."
+  );
+}
+
+function closeLamAchor(event){
+  const overlay = document.getElementById("lamAchorOverlay");
+  if(!event || event.target === overlay) returnToMenu();
+}
+
+
+/* =====================================================
+   TAWNGTAINA
+===================================================== */
+
+const prayerTerms = [
+  {
+    title: "LALBIAKNA",
+    subtitle: "Hemphu akardom",
+    text: `Sining athak kedo netum a-Po
+Nang men pangthirnang
+Nangrat pevang nang
+Sining athak asonthot pirthe athak ta,
+Nang ning kehang pepleng nang.
+Pini netum kenangji a-an,
+Pini netum aphan ne pitha;
+Lapen netum along apreng kedo atum aphan,
+Netum kadiyatang asonthot le,
+Netum apreng ta netum aphan ne diyatha.
+Lapen asat kelangjile netum aphan neponri non,
+Bonta kahingno ajakong pen netum aphan ne pejoktha;
+Pima Nang rat, jakong lapen anong,
+kai apar kai anta pedo(ver)nang. Amen.`
+  },
+
+  {
+    title: "THINGPUI IN DAWN TAWNGTAI",
+    subtitle: "Sa kejun akardom",
+    text: `O Hemphu, netum a Arnam
+Non Labangso a sa kejun aphan netum chesik lo.
+Kanghon pen nangli pangthir ra,
+Ahirjume pitha pusi nang cho
+Ardom lo. Amen`
+  },
+
+  {
+    title: "CHAW EI DAWN TAWNGTAINA",
+    subtitle: "An kecho akardom",
+    text: `(Aw Lalpa chaw leh thil tin reng)
+O hemphu,
+An lapen ason keprek an nang kepi apot nang phan chorolo.
+Nangli ruthai akam keklemji aphan nang rap tha.
+Jisu kristo amen pen si ardom lo. Amen`
+  },
+
+  {
+    title: "DAMLO TAWNGTAI SAKNA",
+    subtitle: "Keso aphan akardom",
+    text: `O Hemphu,
+Nangli kadokave keklem thek abang lo.
+Pini netum akorte/angjir (Dam lo hming) keso aphuthak netum nang rideng hodai lo.
+Alangli keso kapame aphan netum along thang ajakong ave seta,
+nangli jakong the parpik pen pame po pu ningthe pensi,
+Hemphu Jisu Kristo amen pensi ardom lo. Amen`
+  },
+
+  {
+    title: "BIRTHDAY TAWNGTAI SAKNA",
+    subtitle: "Mahang kethek arni akardom",
+    text: `O Hemphu,
+Pini netum birthday katalon bom,
+netum akorte/angjir(Hming) aphan nang ardom lo.
+Kedamtang aningkan arjon alangli phan nang keja ason thak thaksi,
+non kevang ji lang ahut seta ja pon bom tha.
+Nang phan kachiki ver thekji,
+lapen nangli mondoli along ruthai keklem pon bom thekji aphan seta rap tha.
+Ok pran keme pen kedo pon bom thekji aphansi nangli rai/lana pon bom tha,
+pusi Hemphu Jisu Kristo amen ardom lo. Amen`
+  }
+];
+
+function openPrayer(){
+
+  closeMenu();
+
+  const overlay =
+    document.getElementById("prayerOverlay");
+
+  overlay.classList.add("show");
+
+  const search =
+    document.getElementById("prayerSearch");
+
+  search.value = "";
+
+  renderPrayers(prayerTerms);
+}
+
+function closePrayer(event){
+  const overlay = document.getElementById("prayerOverlay");
+  if(!event || event.target === overlay) returnToMenu();
+}
+
+function renderPrayers(list){
+
+  const content =
+    document.getElementById("prayerContent");
+
+  if(!list.length){
+
+    content.innerHTML = `
+      <div class="prayer-empty">
+        No matching Tawngtaina found.
+      </div>
+    `;
+
+    return;
+  }
+
+  content.innerHTML = list.map((prayer,index)=>`
+
+    <div class="prayer-card" id="prayerCard${index}">
+
+      <button
+        type="button"
+        class="prayer-title"
+        onclick="togglePrayer(${index})"
+      >
+
+        <span style="display:block;">
+  🙏 ${escapeHTML(prayer.title)}
+  <small style="display:block; margin-left:26px; font-size:13px; opacity:0.7;">
+    ${escapeHTML(prayer.subtitle || "")}
+  </small>
+</span>
+
+        <span>›</span>
+
+      </button>
+
+      <div class="prayer-body">
+${escapeHTML(prayer.text)}
+      </div>
+
+    </div>
+
+  `).join("");
+}
+
+function togglePrayer(index){
+
+  const card =
+    document.getElementById("prayerCard" + index);
+
+  if(card){
+    card.classList.toggle("open");
+  }
+}
+
+function filterPrayers(query){
+
+  const q =
+    String(query || "").trim().toLowerCase();
+
+  if(!q){
+
+    renderPrayers(prayerTerms);
+
+    return;
+  }
+
+  const filtered =
+    prayerTerms.filter(prayer =>
+
+      prayer.title.toLowerCase().includes(q) ||
+      prayer.text.toLowerCase().includes(q)
+
+    );
+
+  renderPrayers(filtered);
+}
+
+
+const bibleBooks = [
+  ["Kecheng/Genesis","Kachejok aloh barim - Aron"],
+  ["Kebar/Exodus","Kachejok aloh barim - Aron"],
+  ["Levi/Leviticus","Kachejok aloh barim - Aron"],
+  ["Kalakha/Numbers","Kachejok aloh barim - Aron"],
+  ["Kethan/Deuteronomy","Kachejok aloh barim - Aron"],
+  ["Joshua/josua","Kachejok aloh barim - Lamo"],
+  ["Kangsai atum/Roreltute","Kachejok aloh barim - Lamo"],
+  ["Ruth/Ruthi","Kachejok aloh barim - Lamo"],
+  ["1 Samuel/1 Samuela","Kachejok aloh barim - Lamo"],
+  ["2 Samuel/2 Samuela","Kachejok aloh barim - Lamo"],
+  ["1 Recho/1 Lalte","Kachejok aloh barim - Lamo"],
+  ["2 Recho/2 Lalte","Kachejok aloh barim - Lamo"],
+  ["1 Phurkimo/1 Chronicles","Kachejok aloh barim - Lamo"],
+  ["1 Phurkimo/2 Chronicles","Kachejok aloh barim - Lamo"],
+  ["Ezra","Kachejok aloh barim - Lamo"],
+  ["Nehemiah/Nehemia","Kachejok aloh barim - Lamo"],
+  ["Esther/Estheri","Kachejok aloh barim - Lamo"],
+  ["Job/joba","Kachejok aloh barim - hirbang(lun & lam)"],
+  ["Lun/Sam","Kachejok aloh barim - hirbang(lun & lam)"],
+  ["Sarlamthe/Thufingte","Kachejok aloh barim - hirbang(lun & lam)"],
+  ["Thanpere/Thuhriltu","Kachejok aloh barim - hirbang(lun & lam)"],
+  ["solomon alun/Hla thlan khawm","Kachejok aloh barim - hirbang(lun & lam)"],
+  ["Isaiah/Isaia","Kachejok aloh barim - montri"],
+  ["Jeremiah/Jeremia","Kachejok aloh barim - montri"],
+  ["Ningduk alun/Tah hla","Kachejok aloh barim - montri"],
+  ["Ezekiel/Ezekiela","Kachejok aloh barim - montri"],
+  ["Daniel/Daniela","Kachejok aloh barim - montri"],
+  ["Hosea","Kachejok aloh barim - montri"],
+  ["Joel/Joela","Kachejok aloh barim - montri"],
+  ["Amos/Amosa","Kachejok aloh barim - montri"],
+  ["Obadiah/Obadia","Kachejok aloh barim - montri"],
+  ["Jonah/Johana","Kachejok aloh barim - montri"],
+  ["Micah/mika","Kachejok aloh barim - montri"],
+  ["Nahum/Nahuma","Kachejok aloh barim - montri"],
+  ["Habakkuk/Habakuka","Kachejok aloh barim - montri"],
+  ["Zephaniah/Zephania","Kachejok aloh barim - montri"],
+  ["Haggai/Hagaia","Kachejok aloh barim - montri"],
+  ["Zechariah/Zakaria","Kachejok aloh barim - montri"],
+  ["Malachi/Malakia","Kachejok aloh barim - montri"],
+  ["Mathaios/Mathaia","Kachejok aloh kimi - Birta keme"],
+  ["Mark/Marka","Kachejok aloh kimi - Birta keme"],
+  ["Luke/Luka","Kachejok aloh kimi - Birta keme"],
+  ["Johan/johana","Kachejok aloh kimi - Birta keme"],
+  ["Akam/Tirhkohte","Kachejok aloh kimi - Lamo"],
+  ["Roman/Rom","Kachejok aloh kimi - Paul akido"],
+  ["1 Korinth","Kachejok aloh kimi - Paul akido"],
+  ["2 Korinth","Kachejok aloh kimi - Paul akido"],
+  ["Galatia","Kachejok aloh kimi - Paul akido"],
+  ["Ephesus/Ephesi","Kachejok aloh kimi - Paul akido"],
+  ["Philippi","Kachejok aloh kimi - Paul akido"],
+  ["Kolosa/Kolossa","Kachejok aloh kimi - Paul akido"],
+  ["1 Thessalonica/1 Thessolonika","Kachejok aloh kimi - Paul akido"],
+  ["2 Thessalonica/2 Thessolonika","Kachejok aloh kimi - Paul akido"],
+  ["1 Timothy/1 Timothea","Kachejok aloh kimi - Paul akido"],
+  ["2 Timothy/2 Timothea","Kachejok aloh kimi - Paul akido"],
+  ["Titus/Tita","Kachejok aloh kimi - Paul akido"],
+  ["Philemon/Philemona","Kachejok aloh kimi - Paul akido"],
+  ["Ibri/Hebrai","Kachejok aloh kimi - General akido"],
+  ["Jakob/Jakoba","Kachejok aloh kimi - General akido"],
+  ["1 Pitor/1 Petera","Kachejok aloh kimi - General akido"],
+  ["2 Pitor/2 Petera","Kachejok aloh kimi - General akido"],
+  ["1 Johan/1 Johana","Kachejok aloh kimi - General akido"],
+  ["2 Johan/2 Johana","Kachejok aloh kimi - General akido"],
+  ["3 Johan/3 Johana","Kachejok aloh kimi - General akido"],
+  ["Jude/Juda","Kachejok aloh kimi - General akido"],
+  ["Kapeklang/Thupuan","Kachejok aloh kimi - than mek"]
+];
+
+function openBible(){
+
+  closeMenu();
+
+  document.getElementById("bibleOverlay")
+    .classList.add("show");
+
+  renderList(
+    "bibleContent",
+    bibleBooks,
+    "bibleListContainer",
+    "Search book of the Bible..."
+  );
+}
+
+function closeBible(event){
+  const overlay = document.getElementById("bibleOverlay");
+  if(!event || event.target === overlay) returnToMenu();
+}
+
+
+function openAppInfo(){
+
+  closeMenu();
+
+  document.getElementById("appInfoOverlay")
+    .classList.add("show");
+
+  const content =
+    document.getElementById("appInfoContent");
+
+  content.innerHTML = `
+
+    <div class="app-info-box">
+
+  <h3>📱 Mizo ↔ Karbi Dictionary</h3>
+
+  <p>
+    <b>Version:</b> 1.0.0
+  </p>
+
+  <p>
+    <b>Owned & Managed by:</b><br>
+    Karbi Anglong Mission Field (KAMF)
+  </p>
+
+  <p>
+    <b>Reference Sources & Materials:</b>
+    <br><br>
+
+    1. Karbi Tawng Thiam Nan (2007) – Lalramthanga Ngente
+    <br>(Published by Karbi Anglong Mission)
+
+    <br><br>
+
+    2. Karbi Tawng Zirna (2022) – Rev. Zoramsanga
+    <br>(Published by Karbi Anglong Mission Field)
+
+    <br><br>
+
+    3. Karbi Lamtasam – Karbi-Assamese-English Online Dictionary
+    <br>(Produced by ABILAC in collaboration with IGNCA)
+
+    <br><br>
+
+    4. Dimasa Thairili & Online Resources –
+    www.dimasathairili.com and online database.
+  </p>
+
+</div>
+
+
+<div class="app-info-box">
+
+  <h3>👨‍💻 About the Creator</h3>
+
+  <p>
+    <b>Creator Name:</b><br>
+    Sangtea (Lianthansanga)
+  </p>
+
+  <p>
+    <b>Background:</b><br>
+    First and foremost, all praise and glory be to God,
+    who graciously blessed me with good health and strength
+    to see this app to completion.
+  </p>
+
+  <p>
+    Building this platform was a massive and challenging task
+    that could not have been accomplished alone. I am deeply
+    grateful to my dear friend and missionary,
+    <b>R. Lalchhanhima (Jengkha)</b>, who constantly helped me
+    identify mistakes, review the content, and refine the app.
+  </p>
+
+  <p>
+    Bringing this app to life required a significant investment
+    of time, and I want to express my heartfelt thanks to our
+    Pastorate Pastor i/c,
+    <b>Rev. Joseph Vanlalfakawma Renthlei</b>, for granting me
+    the time and flexibility to work on this project.
+  </p>
+
+</div>
+
+
+<div class="app-info-box">
+
+  <h3>🛠️ How This App Was Created</h3>
+
+  <p>
+    This digital platform was born out of a practical necessity
+    for missionaries and field workers serving within the
+    <b>Karbi Anglong Mission Field</b> who come from other
+    regions and must learn the local language from scratch.
+  </p>
+
+  <p>
+    Recognizing how difficult it is to carry physical books while
+    traveling on active ministry assignments—yet acknowledging
+    that almost everyone carries a smartphone today—this application
+    was thoughtfully designed to bridge that gap.
+  </p>
+
+  <p>
+    Despite its humble beginnings and imperfections, it was created
+    with a sincere prayer and hope that it will be a profound
+    blessing and a practical linguistic tool for everyone seeking
+    to learn and connect.
+  </p>
+
+  <p>
+    <b>To God be all the glory.</b>
+  </p>
+
+</div>
+
+
+<div class="app-info-box">
+
+  <h3>©️ Ownership & Acknowledgement</h3>
+
+  <p>
+    This application is owned and managed by
+    <b>Karbi Anglong Mission Field (KAMF)</b>.
+  </p>
+
+  <p>
+    The application was created by
+    <b>Sangtea (Lianthansanga)</b>
+    as a digital linguistic resource for the benefit of
+    missionaries, field workers, and others seeking to learn
+    and connect through the Mizo to Karbi languages.
+  </p>
+
+  <p>
+    <b>© 2026 Karbi Anglong Mission Field (KAMF)</b><br>
+    Version 1.0.0
+  </p>
+
+</div>
+  `;
+}
+
+function closeAppInfo(event){
+  const overlay = document.getElementById("appInfoOverlay");
+  if(!event || event.target === overlay) returnToMenu();
+}
+
+
+function renderList(
+  containerId,
+  terms,
+  listId,
+  placeholderText
+){
+
+  const content =
+    document.getElementById(containerId);
+
+  content.innerHTML = `
+
+    <input
+      type="text"
+      class="family-search"
+      placeholder="${escapeHTML(placeholderText)}"
+      oninput="filterGeneric(
+        this.value,
+        '${containerId}',
+        '${listId}'
+      )"
+    >
+
+    <div
+      class="family-list"
+      id="${listId}"
+    >
+      ${makeCards(terms)}
+    </div>
+
+  `;
+
+  /* Store current dataset safely */
+  const container =
+    document.getElementById(listId);
+
+  if(container){
+    container.dataset.source = containerId;
+  }
+}
+
+function makeCards(terms){
+
+  return terms.map(t => `
+
+    <div class="family-card">
+
+      <b>${escapeHTML(t[0])}</b>
+
+      <span>${escapeHTML(t[1])}</span>
+
+    </div>
+
+  `).join("");
+}
+
+function filterGeneric(
+  query,
+  containerId,
+  listId
+){
+
+  let terms = [];
+
+  if(containerId === "weekContent"){
+    terms = weekTerms;
+  }
+  else if(containerId === "familyContent"){
+    terms = familyTerms;
+  }
+  else if(containerId === "numberContent"){
+    terms = numberTerms;
+  }
+  else if(containerId === "coloursContent"){
+    terms = colours;
+  }
+  else if(containerId === "animalContent"){
+    terms = animalTerms;
+  }
+  else if(containerId === "lamAchorContent"){
+    terms = lamAchorTerms;
+  }
+  else if(containerId === "bibleContent"){
+    terms = bibleBooks;
+  }
+
+  const q =
+    String(query || "").toLowerCase().trim();
+
+  const filtered =
+    !q
+      ? terms
+      : terms.filter(t =>
+          String(t[0]).toLowerCase().includes(q) ||
+          String(t[1]).toLowerCase().includes(q)
+        );
+
+  const container =
+    document.getElementById(listId);
+
+  if(!container) return;
+
+  container.innerHTML =
+    filtered.length
+      ? makeCards(filtered)
+      : `
+        <div class="prayer-empty">
+          No matching results found.
+        </div>
+      `;
+}
+
+
+function escapeHTML(value){
+
+  return String(value)
+
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+document.addEventListener(
+  "keydown",
+  function(e){
+
+    if(e.key !== "Escape"){
+      return;
+    }
+
+    const overlays = [
+
+      "menuOverlay",
+      "monthOverlay",
+      "weekOverlay",
+      "familyOverlay",
+      "numberOverlay",
+      "coloursOverlay",
+      "animalOverlay",
+      "hnamPengOverlay",
+      "lamAchorOverlay",
+      "prayerOverlay",
+      "bibleOverlay",
+      "appInfoOverlay"
+
+    ];
+
+    overlays.forEach(id => {
+
+      const el =
+        document.getElementById(id);
+
+      if(el){
+        el.classList.remove("show");
+      }
+
+    });
+
+  }
+);
+
+
+
+/* ===== DICTIONARY / SEARCH / QUIZ / DATA ===== */
+
+
+const DATA=[{"karbi":"Ahin akele","mizo":"A bang, a chuang","meaning":"Beside, next to"},{"karbi":"(A)dung","mizo":"(A)bul, kiang","meaning":"Side"},{"karbi":"Ahut pen ahut","mizo":"A chang changin","meaning":"Sometimes"},{"karbi":"Ahut adak","mizo":"A chang changin","meaning":"Alternately, one after another"},{"karbi":"Pima","mizo":"A chhan chu","meaning":"Because"},{"karbi":"Pima, thangbakma","mizo":"A chhan chu","meaning":"Because"},{"karbi":"Adi aran","mizo":"A chuang a liam","meaning":"Overflow, spill over"},{"karbi":"Ahok lo","mizo":"A dik chiah","meaning":"Exactly / absolutely "},{"karbi":"Ason","mizo":"Ang","meaning":"Similar / same"},{"karbi":"Along","mizo":"Ah","meaning":"At"},{"karbi":"Si","mizo":"Ah","meaning":"At"},{"karbi":"Aphrang","mizo":"Ahma,ahmasa","meaning":"First/before"},{"karbi":"(A)dim","mizo":"(A)hmun","meaning":"Place"},{"karbi":"Aphi","mizo":"A hnu, a hnung","meaning":"Behind"},{"karbi":"Aphisi abang","mizo":"A hnunung ber","meaning":"Last"},{"karbi":"Alar","mizo":"Aiawhtu","meaning":"Representative"},{"karbi":"Tara","mizo":"Aichhia","meaning":"Spoiled ginger / Wild ginger"},{"karbi":"Philangdung","mizo":"Aidu(sentil)","meaning":"Wild cardamom / Aidu"},{"karbi":"Tharmit","mizo":"Aieng","meaning":"Turmeric"},{"karbi":"Lodep / sangkelang","mizo":"Aienthiam","meaning":"Diviner"},{"karbi":"Ri (damrap ari-klemrap ari)","mizo":"Aihnahphahpui","meaning":"Companion"},{"karbi":"Kali","mizo":"Aih, ni lo","meaning":"No / not"},{"karbi":"Chevek","mizo":"Ak (ipte)","meaning":"Pocket / Bag"},{"karbi":"Ingti kejok","mizo":"Al (chi telh)","meaning":"Salty"},{"karbi":"Kar","mizo":"Alh","meaning":"Flame / Blaze"},{"karbi":"Phurui-Athe","mizo":"Alu","meaning":"Potato"},{"karbi":"Alangli","mizo":"Amah","meaning":"He,Him/She,Her"},{"karbi":"Alang, alangli","mizo":"Amah, ani","meaning":"He / she"},{"karbi":"Ingcham","mizo":"A / mi a","meaning":"Fool//Mad"},{"karbi":"Haujuno","mizo":"Anchhia","meaning":"Curse"},{"karbi":"Kalang","mizo":"A ni / a dik a lawm","meaning":"Fine / okay"},{"karbi":"Lote","mizo":"A nih chuan","meaning":"If / so / then / inthat case / if so"},{"karbi":"Hansibu","mizo":"Ankhapui","meaning":"Leafy vegetable variety"},{"karbi":"Alangtum, alanglitum","mizo":"Anmahni, anni","meaning":"They"},{"karbi":"Latum, halatum","mizo":"Anmahni, anni","meaning":"They"},{"karbi":"Hanthu","mizo":"An-pangthuam/pelh","meaning":"Leafy vegetable variety"},{"karbi":"Hanjang","mizo":"Antam","meaning":"Mustard greens"},{"karbi":"Hanserong","mizo":"Anthur","meaning":"Sorrel leaves / Sour greens"},{"karbi":"Vo","mizo":"Ar","meaning":"Chicken / Bird"},{"karbi":"Voram","mizo":"Ar awn","meaning":"Rooster / Domestic fowl"},{"karbi":"Vo-Um","mizo":"Arbawm","meaning":"Chicken coop / Basket for poultry"},{"karbi":"Voroi","mizo":"Archhiar","meaning":"Chicken dropping / Bird dropping"},{"karbi":"Tiso angthe","mizo":"Arngeng","meaning":"Pimple"},{"karbi":"Vorek","mizo":"Arhrik","meaning":"chicken louse"},{"karbi":"Vo","mizo":"Ar, sava","meaning":"Chiken / Bird"},{"karbi":"Chiklolongso","mizo":"Arsi","meaning":"Star"},{"karbi":"Chiklongso","mizo":"Arsi","meaning":"Star"},{"karbi":"Voti voso","mizo":"Artui","meaning":"Egg"},{"karbi":"Rot","mizo":"At","meaning":"Crazy / Stupid"},{"karbi":"Ajut ajeng","mizo":"A tawp, a tawpna","meaning":"End, ending"},{"karbi":"(A)kimi","mizo":"(A)thar","meaning":"New"},{"karbi":"Hang-chir","mizo":"Au","meaning":"Shout"},{"karbi":"Han","mizo":"Au","meaning":"Shout / Call"},{"karbi":"Apot, ajok","mizo":"Avangin","meaning":"Because of  / due to / therefore"},{"karbi":"Kadokave","mizo":"A vai","meaning":"All / total"},{"karbi":"Ai!","mizo":"Aw!","meaning":"Yes"},{"karbi":"Se","mizo":"Aw","meaning":"Voice"},{"karbi":"Pelim","mizo":"Awngphah","meaning":"Mat / Floor mat"},{"karbi":"Arleng arlok","mizo":"Awihlan","meaning":"Beforehand"},{"karbi":"O pei oi!","mizo":"Awi ka nu!","meaning":"Omg"},{"karbi":"Chingnang","mizo":"Awk (tang)","meaning":"Trapped / Caught"},{"karbi":"Temong","mizo":"Awle","meaning":"Alligator / Crocodile"},{"karbi":"Joike joivan","mizo":"Awlsam","meaning":"Easy"},{"karbi":"Do","mizo":"Awm","meaning":"Present / exist"},{"karbi":"Ning","mizo":"Awm","meaning":"Chest"},{"karbi":"Pinkhat pinlar","mizo":"Awm dan tur, thil tih dan tur hrilh","meaning":"Instructions on how to behave/do something"},{"karbi":"Chardak charchu","mizo":"Awm hle hle thei lo, huaibak","meaning":"Restless, unable to remain still"},{"karbi":"Do","mizo":"Awm, nei","meaning":"Have / present"},{"karbi":"Do","mizo":"Awm, nei","meaning":"Have / possess / present"},{"karbi":"Thechi","mizo":"Awmpawng","meaning":"Chayote / Squash"},{"karbi":"Tam-ingchin","mizo":"Awmphaw","meaning":"Armor / shield"},{"karbi":"Chong","mizo":"Awmphaw","meaning":"Pillow"},{"karbi":"Athe","mizo":"Awmzia","meaning":"Meaning"},{"karbi":"Kalang","mizo":"Aw, ni","meaning":"Yes / Good"},{"karbi":"Par-om","mizo":"Awp","meaning":"Govern"},{"karbi":"Chekok i","mizo":"Awrh","meaning":"Necktie / Wear around neck"},{"karbi":"Ar-i","mizo":"Awt (it)","meaning":"Desire / Envy"},{"karbi":"Arpong","mizo":"Bang","meaning":"Wall"},{"karbi":"Manghumangram","mizo":"Bang bo; vak bo","meaning":"Wander about"},{"karbi":"Iri/iribup/che o","mizo":"Bang (kalsan)","meaning":"Leave / Stop"},{"karbi":"Arpong ahop","mizo":"Bangrel","meaning":"Wall frame / Wall beam"},{"karbi":"Vo-arphlak","mizo":"Bak","meaning":"Bat"},{"karbi":"Kesi","mizo":"Bakcheh","meaning":"Scissors"},{"karbi":"Keter","mizo":"Bal","meaning":"Dirty"},{"karbi":"Hen","mizo":"Bal","meaning":"Plantain / Banana stem"},{"karbi":"Preng","mizo":"Ba / leiba","meaning":"Debt"},{"karbi":"Lothe, phengnu","mizo":"Balhla","meaning":"Banana"},{"karbi":"Lothe/Phinu","mizo":"Balhla","meaning":"Banana"},{"karbi":"Nujok","mizo":"Ban","meaning":"Post"},{"karbi":"Ri","mizo":"Ban","meaning":"Arm"},{"karbi":"Nujok","mizo":"Ban","meaning":"House pillar / Post"},{"karbi":"Nujok","mizo":"Ban","meaning":"Pillar / Post"},{"karbi":"Pesang","mizo":"Ban (chawlhtir)","meaning":"Release / Dismiss"},{"karbi":"Nikan","mizo":"Banrek","meaning":"Wrist"},{"karbi":"Ing-u","mizo":"Bauh","meaning":"Bark (dog)"},{"karbi":"Chainong","mizo":"Bawng","meaning":"Cow / Beef"},{"karbi":"Chainong","mizo":"Bawng","meaning":"Cow / Cattle"},{"karbi":"Chaining Aroi","mizo":"Bawng in","meaning":"Cowshed / Cattle barn"},{"karbi":"Chainong (ok)","mizo":"Bawng (sa)","meaning":"Cow (beef)"},{"karbi":"Ku","mizo":"Bawngtuthlawh","meaning":"Hoe / Spade"},{"karbi":"Ban","mizo":"Bawi","meaning":"Slave"},{"karbi":"Baivuk","mizo":"Bawihhlawhruhna","meaning":"Cleaning tool / Broom"},{"karbi":"Sakor","mizo":"Bawi / sal","meaning":"Slave"},{"karbi":"I-parlipbak","mizo":"Bawk (bawk khup)","meaning":"Prostrate / Bow down"},{"karbi":"Hepi","mizo":"Bawkbawn","meaning":"Brinjal / Eggplant"},{"karbi":"Arkum arke","mizo":"Bawkvak; nasa taka bei","meaning":"Fight fiercely"},{"karbi":"Bun","mizo":"Bawlhhlawh","meaning":"Rubbish"},{"karbi":"Keter keer","mizo":"Bawlhhlawh, thianghlimlo","meaning":"Unclean, dirty"},{"karbi":"Hijamso","mizo":"Bawl(khaw lum bawl)","meaning":"Heat rash"},{"karbi":"Bonthip, borthip","mizo":"Bawm (bawr)","meaning":"Cover / Bundle"},{"karbi":"Kapatebe","mizo":"Bawp khawkherha thu","meaning":"Sitting cross-legged"},{"karbi":"Bhendi","mizo":"Bawrhsaiabet","meaning":"Ladyfinger / Okra"},{"karbi":"Ardep","mizo":"Beng","meaning":"Slap"},{"karbi":"Ardep","mizo":"Beng","meaning":"Slap / Hit"},{"karbi":"No","mizo":"Beng","meaning":"Ear"},{"karbi":"Jaring","mizo":"Bengbeh","meaning":"Earring"},{"karbi":"Jangsai/Norik","mizo":"Bengbeh","meaning":"Earrings"},{"karbi":"Huri / hurisei","mizo":"Bengcheng","meaning":"Noisy"},{"karbi":"Hangjo hanghai","mizo":"Bengchheng nuai nuai","meaning":"Under the eaves"},{"karbi":"Huri hroman","mizo":"Bengchheng siam","meaning":"Noise"},{"karbi":"Nokangthong","mizo":"Bengchhet","meaning":"Deaf"},{"karbi":"Kaselok kangthong","mizo":"Bengngawng ṭawngtheilo","meaning":"Deaf, unable to hear"},{"karbi":"Hantharvo","mizo":"Behlawi(Hnah)","meaning":"Snake gourd leaves"},{"karbi":"Hantharvo-Athe","mizo":"Behlawi(Rah)","meaning":"Snake gourd fruit"},{"karbi":"Thekek","mizo":"Behliang","meaning":"Bean variety"},{"karbi":"Chethon","mizo":"Beh (thi beh)","meaning":"Stick to / Attach"},{"karbi":"Ningkethe","mizo":"Beisei","meaning":"Hope"},{"karbi":"Tinto","mizo":"Bekang","meaning":"Fermented soybean"},{"karbi":"Palamso","mizo":"Bekbawr (hrilh ru)","meaning":"Whisper"},{"karbi":"Phule","mizo":"Bel","meaning":"Pot"},{"karbi":"Phule","mizo":"Bel","meaning":"Pot / Cooking vessel"},{"karbi":"Pebon, pacherap","mizo":"Bel, char","meaning":"Stick / stuck"},{"karbi":"Pebon, pacherap","mizo":"Bel (char)","meaning":"Stick"},{"karbi":"Dang","mizo":"(Bel) chhuang","meaning":"Cooking"},{"karbi":"Phu-ik","mizo":"Belmang","meaning":"Lid of a pot"},{"karbi":"Chohu","mizo":"Belval","meaning":"Base of a pot"},{"karbi":"Thepak","mizo":"Bepui","meaning":"Cowpea / Bean variety"},{"karbi":"Meresak","mizo":"Beram","meaning":"Sheep"},{"karbi":"Bimeresak(Meresak)","mizo":"Beram","meaning":"Sheep"},{"karbi":"Thechi","mizo":"Berul","meaning":"Bitter gourd / Balsam apple"},{"karbi":"Thengbon","mizo":"Bete","meaning":"Soybean / Small bean"},{"karbi":"Ingki","mizo":"Bia","meaning":"Talk"},{"karbi":"Ingki","mizo":"Bia","meaning":"Talk / Worship"},{"karbi":"Lobeng","mizo":"Biang","meaning":"Cheek"},{"karbi":"Ing-om","mizo":"Biang","meaning":"Cheek"},{"karbi":"Kardom ahem","mizo":"Biak in","meaning":"Church"},{"karbi":"Kabonglong","mizo":"Bial / mum","meaning":"Circle"},{"karbi":"Chetut/parlinphak","mizo":"Bingbilet","meaning":"Up side down"},{"karbi":"Che-i","mizo":"Bih (puan)","meaning":"Wear / Wrap cloth"},{"karbi":"Chepatu","mizo":"Biru","meaning":"Hide"},{"karbi":"Chepatuchongthui","mizo":"Biru","meaning":"Hide"},{"karbi":"Kangbo","mizo":"Bo","meaning":"Lost"},{"karbi":"Bukori","mizo":"Borai","meaning":"Pomelo / Citrus maxima"},{"karbi":"Vir, thi","mizo":"Boral","meaning":"Perish / Die"},{"karbi":"Soluk sodak","mizo":"Boruak ralmuang lo","meaning":"Disturbed atmosphere"},{"karbi":"Tomon","mizo":"Boruak/thli","meaning":"Air"},{"karbi":"Tomon kangsam","mizo":"Boruak/thli-vawt","meaning":"Cold breeze"},{"karbi":"Atar","mizo":"Bu","meaning":"Nest"},{"karbi":"Kam do","mizo":"Buai","meaning":"Busy"},{"karbi":"Lang panglu","mizo":"Bual","meaning":"Bathe"},{"karbi":"Phule phukok","mizo":"Bungbel","meaning":"Pillar"},{"karbi":"Angdengpi & angdengso","mizo":"Bung leh chang","meaning":"Verses"},{"karbi":"Sok","mizo":"Buh","meaning":"Paddy / Unhusked rice"},{"karbi":"Sok","mizo":"Buh (a kung a la awm)","meaning":"Paddy (rice)"},{"karbi":"Bara(Sang)","mizo":"Buhban(fai)","meaning":"Sticky rice / Glutinous rice"},{"karbi":"Sangprot sang-e","mizo":"Buh dentawh, buhfai","meaning":"Rice/grain"},{"karbi":"Sang","mizo":"Buhfai","meaning":"Rice (uncooked rice) "},{"karbi":"Sang","mizo":"Buhfai","meaning":"Rice"},{"karbi":"Sang","mizo":"Buhfai","meaning":"Rice (husked)"},{"karbi":"Sangprot","mizo":"Buhkem","meaning":"Broken rice"},{"karbi":"Ingkro ingtong","mizo":"Buh leh bal hnianghnar","meaning":"Rice and nutritious food"},{"karbi":"Phek-e","mizo":"Buhsi/favai","meaning":"Rice grains / Light rice"},{"karbi":"Lumphlak","mizo":"Buhtlei","meaning":"Winnowing fan / Rice winnower"},{"karbi":"Jangmelen","mizo":"Buhtun","meaning":"Stack of paddy"},{"karbi":"Phakphule","mizo":"Bui","meaning":"Snail / Slug"},{"karbi":"Lin","mizo":"Buk","meaning":"Weigh"},{"karbi":"Adung","mizo":"Bulah","meaning":"Near"},{"karbi":"Akung","mizo":"Bulah","meaning":"Under"},{"karbi":"Chongthui","mizo":"Bum","meaning":"Deceive / fool"},{"karbi":"Pacherei, chongthui","mizo":"Bum","meaning":"Deceive"},{"karbi":"Chobei chokai","mizo":"Bum, dawt sawi","meaning":"Deceive, lie"},{"karbi":"Bong","mizo":"Bur","meaning":"Bottle"},{"karbi":"Atar athon","mizo":"Bu, sava bu","meaning":"Nest"},{"karbi":"Lobong","mizo":"Chang-el","meaning":"Wild banana plant"},{"karbi":"Lorop","mizo":"Changel","meaning":"Wild Banana plant"},{"karbi":"Kangkaroi","mizo":"Changkha","meaning":"Bitter gourd (variety)"},{"karbi":"Hilong","mizo":"Changpat","meaning":"Earthworm"},{"karbi":"Mumhep","mizo":"Chaicheh","meaning":"Scissors"},{"karbi":"Chehe","mizo":"Chakai","meaning":"Crab"},{"karbi":"Jakong horang","mizo":"Chakna","meaning":"Strength"},{"karbi":"Kangtang kangsak","mizo":"Chakna","meaning":"Strength"},{"karbi":"Jakong horang","mizo":"Chakna, thiltihteihna","meaning":"Strength, ability"},{"karbi":"Tehang","mizo":"Chal","meaning":"Forehead"},{"karbi":"Lep/ingthan","mizo":"Chan","meaning":"Cut"},{"karbi":"Lamo","mizo":"Chanchin","meaning":"History"},{"karbi":"Birta Keme","mizo":"Chanchin ṭha","meaning":"Gospel"},{"karbi":"Birta kimi","mizo":"Chanchin thar","meaning":"News"},{"karbi":"Chepindak","mizo":"Chapo","meaning":"Proud"},{"karbi":"Kaike","mizo":"Chatuan","meaning":"Eternal / eternity"},{"karbi":"Aini ajong","mizo":"Chau, chak lo","meaning":"Weak, powerless"},{"karbi":"Chot","mizo":"Chauh","meaning":"Only"},{"karbi":"An","mizo":"Chaw","meaning":"Food (cooked rice)"},{"karbi":"An","mizo":"Chaw","meaning":"Rice / Meal / Food"},{"karbi":"Tun","mizo":"Chaw chhum","meaning":"Cooking"},{"karbi":"Tun","mizo":"(Chaw) chhum","meaning":"Cook"},{"karbi":"Anlok anme","mizo":"Chaw chhum hmin","meaning":"Cooked food"},{"karbi":"Klirningve","mizo":"Chawngmawii","meaning":"Venus"},{"karbi":"Vosokpuru","mizo":"Chawngzawng","meaning":"Langur / Rhesus macaque"},{"karbi":"Han","mizo":"Chawhmeh","meaning":"Curry / Dish"},{"karbi":"Anbo ansam","mizo":"Chaw hring, chaw ei bang","meaning":"Raw food, food to eat"},{"karbi":"Silumsi","mizo":"Chawhtawlh","meaning":"Basin"},{"karbi":"Silumsi(Dubor)","mizo":"Chawhtawlh","meaning":"Washing basin / Dish tub"},{"karbi":"Rung","mizo":"Chawi","meaning":"Lift"},{"karbi":"Rung","mizo":"Chawi","meaning":"Lift / Carry"},{"karbi":"Sang","mizo":"Chawl","meaning":"Rest"},{"karbi":"Thap","mizo":"Chawl / dawidim","meaning":"Yeast"},{"karbi":"Hithi arui","mizo":"Chawlhkar","meaning":"Week"},{"karbi":"Pangreng","mizo":"Chawm/vulh","meaning":"Feed / Support"},{"karbi":"Kengsarti","mizo":"Chawn(ke)","meaning":"Shin / Calf of the leg"},{"karbi":"Chingjor","mizo":"Chawr","meaning":"Growth"},{"karbi":"Ok an","mizo":"Chaw ṭha, chaw tuihnai","meaning":"Good food, drink"},{"karbi":"Ansam","mizo":"Chawthing","meaning":"Stale food/rice"},{"karbi":"Ansam","mizo":"Chaw thing","meaning":"Leftover rice / Stale food"},{"karbi":"Klem (move)","mizo":"Che","meaning":"Move"},{"karbi":"Sika","mizo":"Cheng","meaning":"Rupees"},{"karbi":"Do, chedo","mizo":"Cheng","meaning":"Live / Dwell"},{"karbi":"Chupi","mizo":"Chengkawl","meaning":"Python / Large snake"},{"karbi":"Pranso","mizo":"Chengkek","meaning":"Grasshopper / Locust"},{"karbi":"Pangthei, alir achampedo","mizo":"Chei","meaning":"Decorate"},{"karbi":"Pang-e panglak","mizo":"Chei mawi","meaning":"Beautifully decorated"},{"karbi":"Pu","mizo":"Chek/ek (hreiin)","meaning":"Feces / Waste"},{"karbi":"Ot","mizo":"Chelh (vuan)","meaning":"Hold / Detain"},{"karbi":"Nopak","mizo":"Chem","meaning":"Dao"},{"karbi":"Noke nopak","mizo":"Chem","meaning":"Knife"},{"karbi":"Nopak","mizo":"Chem","meaning":"Dao / Machete"},{"karbi":"Nokek","mizo":"Chemte (chhip kawm)","meaning":"Small knife"},{"karbi":"Nokek","mizo":"Chemte(chhip kawm)","meaning":"Curved small knife"},{"karbi":"Tari","mizo":"Chemte(kaihthleh)","meaning":"Pocket knife / Small folding knife"},{"karbi":"Longri longpat","mizo":"Chenna ram bial","meaning":"Residential area"},{"karbi":"Ingtip","mizo":"Chep (met)","meaning":"Clip / Pinch"},{"karbi":"Chungkreng","mizo":"Cher","meaning":"Thin/Flat"},{"karbi":"Chungkreng marjeng","mizo":"Cher","meaning":"High/tall"},{"karbi":"Chingkoi","mizo":"Chesual","meaning":"Accident"},{"karbi":"Thak","mizo":"Chhang ","meaning":"Reply"},{"karbi":"Thak","mizo":"Chhang","meaning":"Answer / Reply"},{"karbi":"Him","mizo":"Chhang","meaning":"Bread / Cake"},{"karbi":"Pu, patam","mizo":"Chham (sawi)","meaning":"Swear / Utter"},{"karbi":"Kapejok","mizo":"Chhandamna","meaning":"Salvation"},{"karbi":"Kapejok abang","mizo":"Chhandamtu","meaning":"Savior"},{"karbi":"Hum","mizo":"Chhar","meaning":"Pick up"},{"karbi":"Nempo","mizo":"Chhawhchhi","meaning":"Bitter eggplant / Solanum"},{"karbi":"Akampedo","mizo":"Chhawr (Ṭangkaipui)","meaning":"Use / Employ"},{"karbi":"Manai","mizo":"Chhawrthlapui","meaning":"Moonlight"},{"karbi":"Seme kore","mizo":"Chhechham, thuhiam","meaning":"Scolding, reprimand"},{"karbi":"Sokpuru","mizo":"Chhekin","meaning":"Granary / Rice barn"},{"karbi":"Roi","mizo":"Chhek (thiar)","meaning":"Sort / Clear"},{"karbi":"Monsam / tomon kangsam","mizo":"Chhemdamthli / thlifim","meaning":"Breeze"},{"karbi":"But","mizo":"Chhem (ham)","meaning":"Blow (wind)"},{"karbi":"Hir","mizo":"Chhhuk","meaning":"Boil down / Reduce"},{"karbi":"Kei/phrin","mizo":"Chhi","meaning":"Burn"},{"karbi":"Ban sot","mizo":"Chhiahlawh, tirhkah","meaning":"Dirty, filthy"},{"karbi":"Chakri chakor","mizo":"Chhiahlawh, tirhkah","meaning":"Servants"},{"karbi":"Ban / sakor","mizo":"Chhiahlhlawh","meaning":"Servant"},{"karbi":"Porhi","mizo":"Chhiar ","meaning":"Read"},{"karbi":"Porhi/lakha","mizo":"Chhiar","meaning":"Read / Count"},{"karbi":"Dip (sarnung kedip)","mizo":"Chhih (in chung)","meaning":"Thatch roof"},{"karbi":"Ingkrung","mizo":"Chhihri","meaning":"Disinfectant"},{"karbi":"Or","mizo":"Chhilh (vur)","meaning":"Cover over"},{"karbi":"Nirep","mizo":"Chhim","meaning":"South"},{"karbi":"Vo-inghu","mizo":"Chhimbuk","meaning":"Owl"},{"karbi":"Cherat","mizo":"Chhimtaivang","meaning":""},{"karbi":"Adip/akup","mizo":"Chhin / chhinna","meaning":"Lid"},{"karbi":"Dip/kup","mizo":"Chhin (khuh)","meaning":"Cover / Lid"},{"karbi":"Phurvervor","mizo":"Chhipvir","meaning":"Crown of the head / Hair whorl"},{"karbi":"Tur","mizo":"Chhir (chhuih)","meaning":"Kick"},{"karbi":"Hingchong","mizo":"Chhohreivung","meaning":"Morning star"},{"karbi":"Arlu","mizo":"Chho (lawn)","meaning":"Climb up"},{"karbi":"Mak","mizo":"Chhu","meaning":"Vulva / Genitals"},{"karbi":"Aklong","mizo":"Chhuat","meaning":"Floor"},{"karbi":"Arlo","mizo":"Chhung","meaning":"Inside"},{"karbi":"Hem angtar rit angtar","mizo":"Chhungkhat pathiante","meaning":"Household deities"},{"karbi":"Boche ingtung","mizo":"Chhungkhaw din, chhawngkaw inrelbawlna","meaning":"Household arrangement, family administration"},{"karbi":"Don rap","mizo":"Chhungkhawtlaina","meaning":"Household life"},{"karbi":"Hem-isi (donrap, chepho chero;)","mizo":"Chhungkua","meaning":"Family"},{"karbi":"Thai","mizo":"Chhung (thil tuiril)","meaning":"Fill inside"},{"karbi":"Hir","mizo":"Chhuk","meaning":"Descend / get down / go dowm"},{"karbi":"Tun","mizo":"Chhum","meaning":"Cooking"},{"karbi":"Inghun","mizo":"Chhum","meaning":"Cloud"},{"karbi":"Tun/up","mizo":"Chhum","meaning":"Cook / Boil"},{"karbi":"Inghunmelan / hunmelan","mizo":"Chhumleivak","meaning":"Fog"},{"karbi":"Anerlo (nerlo chitim)","mizo":"Chhun","meaning":"Day"},{"karbi":"Chinglit","mizo":"Chhun","meaning":"Pierce / Resemble"},{"karbi":"Anerlo (chitim)","mizo":"Chhun ( chhun vanglai)","meaning":"Day /(noon)"},{"karbi":"Ajo anerlo","mizo":"Chhun leh zan","meaning":"Day and night"},{"karbi":"Boklapo","mizo":"Chhurbura","meaning":"Chhurbura"},{"karbi":"Theng","mizo":"Chhu (tubohin)","meaning":"Wash / Clean"},{"karbi":"Chili","mizo":"Chi","meaning":"Seed"},{"karbi":"Ingti","mizo":"Chi","meaning":"Salt"},{"karbi":"Lor","mizo":"Chiang","meaning":"Clear"},{"karbi":"Kardom","mizo":"Chibai","meaning":"Greetings"},{"karbi":"Kardom kepi, kardom","mizo":"Chibai buk","meaning":"Salute / Bow"},{"karbi":"Chardom chardi","mizo":"Chibai inbûk","meaning":"Bowing greeting"},{"karbi":"Phelo","mizo":"Chingal","meaning":"Sieve / Strainer"},{"karbi":"Phelo-Bisir","mizo":"Chingalthlawrbur","meaning":"Funnel / Strainer part"},{"karbi":"Mahar","mizo":"Chinghnia","meaning":"wolf"},{"karbi":"Hanjor","mizo":"Chingit","meaning":"Mustard leaves / Local green"},{"karbi":"E","mizo":"Ching (ling)","meaning":"Planting"},{"karbi":"Vodudu","mizo":"Chingpirinu","meaning":"Bulbul / Small bird"},{"karbi":"Ajeng ajati","mizo":"Chi, hnam","meaning":"Species, tribe"},{"karbi":"Ajeng arni","mizo":"Chi, hnam","meaning":"Species, tribe"},{"karbi":"Pru, pu","mizo":"Chik (dap)","meaning":"Inspect / Squeeze"},{"karbi":"Ingthe","mizo":"Chil","meaning":"Saliva / Spittle"},{"karbi":"Si, dong, sak","mizo":"Chil (rap)","meaning":"Spit / Tread"},{"karbi":"Ingkroi","mizo":"Chilthli","meaning":"Drool / Saliva"},{"karbi":"Ru","mizo":"Chim","meaning":"Overflow / Collapse"},{"karbi":"Saini","mizo":"Chinai","meaning":"Lime"},{"karbi":"Sini","mizo":"Chini","meaning":"Sugar"},{"karbi":"Inghan","mizo":"Chirh","meaning":"Mud"},{"karbi":"Inghan","mizo":"Chirh / chirhdiak","meaning":"Mud"},{"karbi":"Morton/chocolate","mizo":"Chithlum / chithlummum","meaning":"Candy"},{"karbi":"Vo-ak","mizo":"Choak","meaning":"Crow"},{"karbi":"Ardon","mizo":"Chuang (engemaw chungah)","meaning":"Ride / Mount"},{"karbi":"Ingphor","mizo":"Chuap","meaning":"Lung"},{"karbi":"Athak","mizo":"Chung","meaning":"Above"},{"karbi":"Angsong","mizo":"Chung","meaning":"Above / upper"},{"karbi":"Ardon","mizo":"(Chungah) chuang","meaning":"Ride"},{"karbi":"Chongho","mizo":"Chungu","meaning":"Centipede"},{"karbi":"Thi","mizo":"Chuh (chuhpui)","meaning":"Fight for / Compete"},{"karbi":"Kilu","mizo":"Chukchu","meaning":"cockroach"},{"karbi":"Archu","mizo":"Chuk  (rul chuk ang chi)","meaning":"Peck / Bite"},{"karbi":"Vit","mizo":"Chul (hnawih)","meaning":"Stroke / Rub"},{"karbi":"Kardong","mizo":"Chum","meaning":"Thatch / Roofing material"},{"karbi":"Teng","mizo":"Chum (hnek)","meaning":"Pound / Crush"},{"karbi":"La apot si, lasi","mizo":"Chuvang in","meaning":"So / for this reason / therefore"},{"karbi":"Ingham/dekok","mizo":"Dang/dangmawn","meaning":"Palate / Throat"},{"karbi":"Khang, khinde","mizo":"Dang (dodal)","meaning":"Block / Prevent"},{"karbi":"Bi","mizo":"Dah","meaning":"Place / put"},{"karbi":"Bi, bikok (to put)","mizo":"Dah","meaning":"Put / Place"},{"karbi":"Ar-e / ar-e kelok","mizo":"Dai","meaning":"Dew"},{"karbi":"Dorde phophe","mizo":"Daih lo, tlin lo","meaning":"Inadequate, insufficient"},{"karbi":"Dali (Asom)","mizo":"Dailuah","meaning":"Dal"},{"karbi":"Kangsam","mizo":"Dai / vawt","meaning":"Cold"},{"karbi":"Utar, u","mizo":"Dak (chung lam en)","meaning":"Look up"},{"karbi":"Khang","mizo":"Dal / titawp","meaning":"Block"},{"karbi":"Dovai","mizo":"Damdawi","meaning":"Medicine / drug"},{"karbi":"Dovai daro","mizo":"Damdawi","meaning":"Medicine"},{"karbi":"Maju maja","mizo":"Dam, hrisel","meaning":"Healthy"},{"karbi":"Keso","mizo":"Dam lo","meaning":"Fever / sick"},{"karbi":"Thorthor mormor","mizo":"Damlo na tak","meaning":"Serious sickness"},{"karbi":"Damme jume","mizo":"Dam takin kal rawh, dam takin le.","meaning":"Go safely, goodbye"},{"karbi":"Aron; aniom (Asom)","mizo":"Dan","meaning":"Law"},{"karbi":"Aron arkan","mizo":"Dan bawhchhia","meaning":"Break law"},{"karbi":"Aron atang","mizo":"Dan leh hrai","meaning":"Law and custom"},{"karbi":"Klong","mizo":"Dap","meaning":"Hut"},{"karbi":"Klong","mizo":"Dap","meaning":"Bamboo matting (for wall)"},{"karbi":"Ri","mizo":"Dap (zawng)","meaning":"Search / Explore"},{"karbi":"Ghonti / gonta","mizo":"Dar","meaning":"Hour / bell"},{"karbi":"Bronz","mizo":"Dar","meaning":"Bronze"},{"karbi":"Phang","mizo":"Dar","meaning":"Shoulder"},{"karbi":"Mirdong","mizo":"Darbenthek","meaning":"Bell"},{"karbi":"Prat, pratsei","mizo":"Darh (darhsarh)","meaning":"Scatter"},{"karbi":"Ghonta","mizo":"Darkar","meaning":"Hours"},{"karbi":"Chobei","mizo":"Daw (dawt sawi)","meaning":"Lie / Falsehood"},{"karbi":"Deng","mizo":"Dawng","meaning":"Receive"},{"karbi":"Deng/chak","mizo":"Dawng","meaning":"Receive / Get"},{"karbi":"Kangjar achongho","mizo":"Dawngthlek","meaning":"shrub frog"},{"karbi":"TebulMez","mizo":"Dawhkan","meaning":"Table"},{"karbi":"Ningding ningjon","mizo":"Dawhthei, tuarthei","meaning":"Patient, tolerant"},{"karbi":"Chechak","mizo":"Dawh (tuar)","meaning":"Endure / Bear"},{"karbi":"Mintor","mizo":"Dawi","meaning":"Black magic"},{"karbi":"Henru","mizo":"Dawl(ba-zik)","meaning":"Elephant foot yam / Wild vegetable stem"},{"karbi":"Joilut","mizo":"Dawlh","meaning":"Swallow"},{"karbi":"jengjengnai","mizo":"Dawlrem","meaning":"Tree frog"},{"karbi":"Ot/rung","mizo":"Dawm","meaning":"Hold / Support"},{"karbi":"Thoithe-bonghom","mizo":"Dawnfawh","meaning":"Melon / Pumpkin variety"},{"karbi":"Dukan / kulat","mizo":"Dawr","meaning":"Shop"},{"karbi":"Chobei","mizo":"Dawt","meaning":"Lie"},{"karbi":"Chobai-tap","mizo":"Dawthei","meaning":"Lie / liar"},{"karbi":"Chobei","mizo":"Dawtsawi","meaning":"Lie"},{"karbi":"Arbu/tok","mizo":"Deng","meaning":"Pound / Beat"},{"karbi":"Chik","mizo":"Dek","meaning":"Tickle"},{"karbi":"Phelang","mizo":"Di","meaning":"Thatch"},{"karbi":"Langbung langphet","mizo":"Diak leh nal","meaning":"Limping due to injury"},{"karbi":"Kanglit kangther","mizo":"Diak, nal","meaning":"Limping, lame"},{"karbi":"Arjap","mizo":"Ding","meaning":"Stand"},{"karbi":"Arjap/thur","mizo":"Ding","meaning":"Stand / Rise"},{"karbi":"Ar-e","mizo":"Ding / dinglam","meaning":"Right"},{"karbi":"Chokche","mizo":"Dik lo","meaning":"False/wrong"},{"karbi":"Hang","mizo":"Dil","meaning":"Ask"},{"karbi":"Langbi,langteng ","mizo":"Dil","meaning":"Lake"},{"karbi":"Hang","mizo":"Dil","meaning":"Ask for / Beg"},{"karbi":"Chohang chorek","mizo":"Dil, kut dawh","meaning":"Lake, handwashing"},{"karbi":"Pinchong/kim","mizo":"Din","meaning":"Create / Establish"},{"karbi":"Kethipketheng","mizo":"Din, siam","meaning":"Create"},{"karbi":"Pet","mizo":"Dip (dal)","meaning":"Block / Prevent"},{"karbi":"Ron kedam/khinde","mizo":"Do","meaning":"Oppose / Fight"},{"karbi":"Kebeng kephan","mizo":"Dodalna, bahlahna","meaning":"Mistake, error"},{"karbi":"Ninghang","mizo":"Duh","meaning":"Want"},{"karbi":"Ninghang/ningdok","mizo":"Duh","meaning":"Want / Like"},{"karbi":"Ning kehang / ning kedok","mizo":"Duhna","meaning":"Desire"},{"karbi":"Ke-ik","mizo":"Dum","meaning":"Black"},{"karbi":"dampijuk","mizo":"Dumde","meaning":""},{"karbi":"Barpi kedam/hijang","mizo":"E (daikal)","meaning":"Defecate (Polite term)"},{"karbi":"Kolo abang","mizo":"Eng ber hi nge?","meaning":"Which one"},{"karbi":"Penang an","mizo":"Engemaw zat","meaning":"Several / a good amount"},{"karbi":"Kopi","mizo":"Eng nge","meaning":"What"},{"karbi":"Thang ta kali","mizo":"Engmah lo","meaning":"Nothing"},{"karbi":"Komantu","mizo":"Engtikah","meaning":"When"},{"karbi":"Kopuson","mizo":"Engtin","meaning":"How"},{"karbi":"Kopi apot","mizo":"Engvangin","meaning":"Why"},{"karbi":"Cho","mizo":"Ei","meaning":"Eat"},{"karbi":"Kecho kejun","mizo":"Ei leh in","meaning":"Food"},{"karbi":"Kecho kejun","mizo":"Ei leh in","meaning":"Eat and drink"},{"karbi":"Pe-ik","mizo":"Ei ral (tiriral)","meaning":"Consume / Destroy"},{"karbi":"Ketun kedang","mizo":"Ei rawngbawl, chaw chhum","meaning":"Serve, cook food"},{"karbi":"Hi","mizo":"Ek","meaning":"Dunk"},{"karbi":"Ahi aphe","mizo":"Ek","meaning":"Excrement"},{"karbi":"Li","mizo":"Ek","meaning":"Feces / Stool"},{"karbi":"Aju","mizo":"Ek chhia (a tak ni lo)","meaning":"Fake"},{"karbi":"Pu","mizo":"Ek (ek phel)","meaning":"Feces"},{"karbi":"Barpihem","mizo":"Ekin","meaning":"Toilet"},{"karbi":"Barpi Ahem","mizo":"Ekin","meaning":"Toilet / Latrine"},{"karbi":"Chepate, chebai","mizo":"El","meaning":"Competition"},{"karbi":"Kalite","mizo":"Emaw","meaning":"Or"},{"karbi":"Pik","mizo":"Em em/lutuk","meaning":"Very"},{"karbi":"Khangra","mizo":"Em(paikawng)","meaning":"Back basket"},{"karbi":"Ingtong","mizo":"Emping","meaning":"Large back basket"},{"karbi":"Hak","mizo":"Empingte","meaning":"Small back basket"},{"karbi":"Klan/lang","mizo":"En","meaning":"Shine / Look"},{"karbi":"Lana","mizo":"Enkawl","meaning":"Care"},{"karbi":"Lana/vi","mizo":"Enkawl","meaning":"Look after / Guard"},{"karbi":"Lana lahon","mizo":"Enkawl","meaning":"Take care of, manage"},{"karbi":"Pi pholongpo pholong","mizo":"Enkawl tunei lo","meaning":"Neglect"},{"karbi":"So (sopi; sopo;)","mizo":"Fa","meaning":"Child"},{"karbi":"Thoithe-rampre","Mizo":"Fanghma","meaning":"Cucumber"},{"karbi":"Miso","mizo":"Fanghmir","meaning":"Ant"},{"karbi":"Miso","mizo":"Fanghmir","meaning":"Ant"},{"karbi":"Miso Ahom","mizo":"Fanghmir Bu","meaning":"Ant nest / Anthill"},{"karbi":"Phuri","mizo":"Fang (tlawh kual)","meaning":"Tour / Wander"},{"karbi":"Jangre,jangreng","mizo":"Fahrah","meaning":"Orphan"},{"karbi":"Jangre jangreng","mizo":"Fahrah","meaning":"Poverty"},{"karbi":"Kangthir","mizo":"Faina","meaning":"Cleanliness"},{"karbi":"Ro","mizo":"Fak","meaning":"Praise"},{"karbi":"Kero karcho","mizo":"Fak, chawimawi","meaning":"Praise, glorify"},{"karbi":"Kero","mizo":"Fakna","meaning":"Praise"},{"karbi":"Sopi","mizo":"Fanu","meaning":"Daughter"},{"karbi":"Sopo","mizo":"Fapa","meaning":"Son"},{"karbi":"Thengjangthu","mizo":"Far","meaning":"Pine"},{"karbi":"Ingjir arlo","mizo":"Farnu","meaning":"?"},{"karbi":"Klo","mizo":"Far (tla)","meaning":"Drip / Fall"},{"karbi":"Pharche","mizo":"Fartuah","meaning":"Firewood"},{"karbi":"Nokerangso","mizo":"Favah","meaning":"Weeding dao / Small hoe"},{"karbi":"Plingplang","mizo":"Fawk (tui fawk)","meaning":"Splash water"},{"karbi":"Pangrum","mizo":"Fawm (fawm khawm)","meaning":"Gather / Collect"},{"karbi":"Potani, lang apotani, lang atarthui","mizo":"Fawn (tui fawn)","meaning":"Ripple / Wave"},{"karbi":"Ingjup","mizo":"Fawp","meaning":"Kiss"},{"karbi":"Che-i","mizo":"Feng (pawnfen)","meaning":"Wear (skirt)"},{"karbi":"Rit kedam","mizo":"Feh (lova kal)","meaning":"Go to farm"},{"karbi":"Chir","mizo":"Fei","meaning":"Spear"},{"karbi":"Dharmikota","mizo":"Felna","meaning":"Righteousness"},{"karbi":"Samus","mizo":"Fian","meaning":"Spoon"},{"karbi":"Chere","mizo":"Fimkhur","meaning":"Careful"},{"karbi":"Bidi sore","mizo":"Finna","meaning":"Wisdom"},{"karbi":"Bidi sore","mizo":"Finna, ngaihtuahthiamna","meaning":"Wisdom, understanding"},{"karbi":"Nok","mizo":"Fu","meaning":"Sugarcane"},{"karbi":"Pinkhat/ning chorung","mizo":"Fuih","meaning":"Encourage / Incite"},{"karbi":"Chorung chojar","mizo":"Fuihpawrh","meaning":"Blow air"},{"karbi":"Bor","mizo":"Fun","meaning":"Wrap up"},{"karbi":"Vecheng veri","mizo":"Fur","meaning":"Monsoon"},{"karbi":"Barla","mizo":"Fur","meaning":"Rainy"},{"karbi":"Vecheng veri","mizo":"Furtui tlak lai","meaning":"Rainfall"},{"karbi":"Inghu","mizo":"Fu (sava fu)","meaning":"Land / Perch"},{"karbi":"Drakha","mizo":"Grep","meaning":"Grape"},{"karbi":"Chingtung","mizo":"Ngai","meaning":"Miss"},{"karbi":"Matha/Matha jadi","mizo":"Ngaihtuah","meaning":"Think, consider"},{"karbi":"Chingtung","mizo":"Ngai (lungleng)","meaning":"Miss"},{"karbi":"Chingtung char-eh","mizo":"Ngai, lungleng","meaning":"Love, affection"},{"karbi":"Ning(ke)dok","mizo":"Ngaina","meaning":"Attached / Like / Fond of "},{"karbi":"Ningdok","mizo":"Ngaina","meaning":"Like / fond of / attach to / love"},{"karbi":"Keng-arkong","mizo":"Ngal","meaning":"Shinbone / Lower leg"},{"karbi":"Perem, hai","mizo":"Ngam (hneh)","meaning":"Dare / Overcome"},{"karbi":"Hai","mizo":"Ngam / huai","meaning":"Dare / brave"},{"karbi":"Misang","mizo":"Ngau","meaning":"cattle"},{"karbi":"Dojoi","mizo":"Ngawi","meaning":"Silent / Quiet"},{"karbi":"Nampi/habit","mizo":"Ngaw / ramngaw","meaning":"Forest"},{"karbi":"Langselet","mizo":"Ngei/Hmusit","meaning":"Hate"},{"karbi":"Lang selet","mizo":"Ngei (duh lo)","meaning":"Dislike / Hate"},{"karbi":"(Cho) ningri","mizo":"Ngen","meaning":"Request"},{"karbi":"Ningri","mizo":"Ngen","meaning":"Request / Beg"},{"karbi":"Choningri choninglak","mizo":"Ngen, dil","meaning":"Beg, plead"},{"karbi":"Inghong","mizo":"Nghak","meaning":"Wait"},{"karbi":"Phit","mizo":"Nghal","meaning":"Fast"},{"karbi":"Menthu","mizo":"Nghathu","meaning":"Fermented fish paste / Dry fish"},{"karbi":"Ingphum/chethok","mizo":"Nghawng","meaning":"Neck"},{"karbi":"Cherchung","mizo":"Ngheng (hnaih, si)","meaning":"Lean against"},{"karbi":"Hum","mizo":"Nghei","meaning":"Fast / Abstain"},{"karbi":"Haiduk, klemhur, klemher","mizo":"Nghing","meaning":"Shake / Tremble"},{"karbi":"Ningkeme","mizo":"Ngilneihna","meaning":"Conscience"},{"karbi":"Roi","mizo":"Ngun","meaning":"Silver / Silver coin/ornament"},{"karbi":"Nokjir","mizo":"Ngunhnam","meaning":"Sword / Long dao"},{"karbi":"Munthi munlak","mizo":"Ngunthluk taka ngaihtuah","meaning":"Think deeply"},{"karbi":"Che-i","mizo":"Ha","meaning":"Wear"},{"karbi":"Chingchoi","mizo":"Ha","meaning":"Wear (shirt/pants)"},{"karbi":"So","mizo":"Ha","meaning":"Tooth"},{"karbi":"Ove chale","mizo":"Ṭhangthar","meaning":"A generation"},{"karbi":"Kelak keleng","mizo":"Hah, chau","meaning":"Tired, weak"},{"karbi":"Somunphrang","mizo":"Ha-hmai","meaning":"Incisor / Front tooth"},{"karbi":"Phur","mizo":"Hai chhuak (phawrh)","meaning":"Uncover / Expose"},{"karbi":"Chingchoi","mizo":"Ha, inthuam","meaning":"Dress"},{"karbi":"Pachethuk","mizo":"Hak (thil ei hak)","meaning":"Choke (on food)"},{"karbi":"Kei/me pecho","mizo":"Hal","meaning":"Light (lamp) / Burn"},{"karbi":"But","mizo":"Ham","meaning":"Blow / Scratch"},{"karbi":"Ham ","mizo":"Han (ruah han)","meaning":"Cease (rain)"},{"karbi":"Somunpi","mizo":"Hapui","meaning":"Molar tooth"},{"karbi":"Sung","mizo":"Harsa / Khirh","meaning":"Difficult / Hard / Tough / Complex"},{"karbi":"Kesung ","mizo":"Harsatna","meaning":"Difficulty"},{"karbi":"Ingchek","mizo":"Hau","meaning":"Scold"},{"karbi":"Ingchek","mizo":"Hau","meaning":"Scold / Threaten"},{"karbi":"Hoidu(kenghoidu)","mizo":"Hauhuk","meaning":""},{"karbi":"Plang","mizo":"Hausa","meaning":"Rich / wealthy"},{"karbi":"Keplang kephi","mizo":"Hausa, neinung","meaning":"Rich, prosperous"},{"karbi":"Kangton kangthi","mizo":"Hau, ṭawngkam ṭha lova an khum","meaning":"Wealthy, boat-side place where they sleep"},{"karbi":"Chevoi, hem chedam","mizo":"Haw","meaning":"Return home"},{"karbi":"Ingpu","mizo":"Hawng","meaning":"Open"},{"karbi":"Rong","mizo":"Hawh","meaning":"Borrow / Lend"},{"karbi":"Keram, kerong","mizo":"Hawh, puk","meaning":"Swallow, cave"},{"karbi":"Chetevar","mizo":"Hawi","meaning":"Turn head / Look around"},{"karbi":"Chut, tok","mizo":"Hawlh","meaning":"Poke / Stir"},{"karbi":"Hem chevan","mizo":"Hawn (inah)","meaning":"Reach home"},{"karbi":"Lahei hei","mizo":"Hengho hi","meaning":"Those / they / them"},{"karbi":"Jo!","mizo":"Hei! (en teh)","meaning":"Hey"},{"karbi":"Labangso","mizo":"Hei hi","meaning":"This / That"},{"karbi":"Adai tin","mizo":"Hek","meaning":"Accuse / Sue"},{"karbi":"Cheni","mizo":"Hem","meaning":"Wedge / Axe head"},{"karbi":"Sap, theng","mizo":"Hem (hlap)","meaning":"Hit / Strike"},{"karbi":"Tang","mizo":"Hem (meialh hem)","meaning":"Burn / Flame"},{"karbi":"Tevar","mizo":"Her (herh)","meaning":"Turn / Twist"},{"karbi":"Ladak","mizo":"Hetah","meaning":"Here"},{"karbi":"Lason","mizo":"Hetiangin / Hetianghi","meaning":"In this way / Like this / This kind"},{"karbi":"Athe nang keklang","mizo":"Hngawng chhuah","meaning":"Result Consequence"},{"karbi":"Heje, cheheje","mizo":"Hial","meaning":"Even / indeed"},{"karbi":"Lum","mizo":"Hik (lip)","meaning":"Peel off"},{"karbi":"Ingsip, vung","mizo":"Hip (hnuk)","meaning":"Inhale / Pull"},{"karbi":"Lun","mizo":"Hla","meaning":"Song"},{"karbi":"Rore","mizo":"Hlah (fuh lo)","meaning":"Miss (target)"},{"karbi":"Leng","mizo":"Hlai (hnanghlai)","meaning":"Spread out"},{"karbi":"Luntomo","mizo":"Hla leh thawnthu","meaning":"Song and story"},{"karbi":"Lam","mizo":"Hlam","meaning":"Fathom"},{"karbi":"Hodai","mizo":"Hlan","meaning":"Offer / dedicate"},{"karbi":"Kethok kejir","mizo":"Hlan, inthawi","meaning":"Sacrifice, offer"},{"karbi":"Hodai, pechon","mizo":"Hlan (pe chhawng)","meaning":"Offer / Hand over"},{"karbi":"Sap, theng","mizo":"Hlap (vua)","meaning":"Beat / Whip"},{"karbi":"Lun","mizo":"Hla sa","meaning":"Sing / song"},{"karbi":"Phere","mizo":"Hlau","meaning":"Fear / Afraid"},{"karbi":"Nongnam","mizo":"Hlawh","meaning":"Wage"},{"karbi":"Kelet kephet","mizo":"Hlawhchhamna","meaning":"Poverty"},{"karbi":"Tum, padum","mizo":"Hlawm, hlawmkhawm","meaning":"Heap together / Gather"},{"karbi":"Than, rot","mizo":"Hlep (tan)","meaning":"Profit / Slice"},{"karbi":"Areng peso, amek pedo","mizo":"Hliam","meaning":"Wound / Injure"},{"karbi":"Kok","mizo":"Hling","meaning":"Thorn"},{"karbi":"Ingsu","mizo":"Hling","meaning":"Thorn"},{"karbi":"Ingsu arang","mizo":"Hling leh buar","meaning":"Thorn and thorny"},{"karbi":"Kok","mizo":"Hling (thlung)","meaning":"Thorn"},{"karbi":"Ning(k)arong","mizo":"Hlim","meaning":"Happy"},{"karbi":"Lum","mizo":"Hlim (keu)","meaning":"Joyful / Uncover"},{"karbi":"Phlok","mizo":"Hlip (thiat)","meaning":"Remove / Strip off"},{"karbi":"Bahak, paprek","mizo":"Hlir (thiar)","meaning":"All / Entirely"},{"karbi":"Inglit","mizo":"Hlit","meaning":"Leech"},{"karbi":"Bap (bap pi)","mizo":"Hlo / hlobet","meaning":"Weed"},{"karbi":"Kangbo kevir","mizo":"Hlohna, channa","meaning":"Loss, defeat"},{"karbi":"Inghan","mizo":"Hlum / chirh","meaning":"Clay"},{"karbi":"Bop","mizo":"Hlum (thi)","meaning":"Die"},{"karbi":"En","mizo":"Hmang","meaning":"Use"},{"karbi":"En, akam, pedo","mizo":"Hmang","meaning":"Use"},{"karbi":"Inghon","mizo":"Hmangaih","meaning":"Love"},{"karbi":"Kanghon","mizo":"Hmangaihna","meaning":"Love"},{"karbi":"Pen","mizo":"Hmangin, a tangin","meaning":"With / from"},{"karbi":"Aphrang / aphrang anat","mizo":"Hma / hma lam","meaning":"Front / ahead"},{"karbi":"Mahang","mizo":"Hmai","meaning":"Face"},{"karbi":"Hijap","mizo":"Hmaizah","meaning":"Bamboo hand fan"},{"karbi":"Hijap","mizo":"Hmaizah","meaning":"Face towel / Handkerchief"},{"karbi":"Ale keri","mizo":"Hmakhawngai","meaning":"Sympathize"},{"karbi":"Serak","mizo":"Hmanhmawh","meaning":"Quickly"},{"karbi":"Tong sarmong,tongprop","mizo":"Hmanhmawh, hnawhsarum","meaning":"Urgent, emergency"},{"karbi":"Tongso/tongru tonghap","mizo":"Hmanhmawh, hnawhsarum","meaning":"Urgent, emergency"},{"karbi":"Chinghkan chingire","mizo":"Hmanhmawhthlak","meaning":"Urgent, hurried"},{"karbi":"Loban lobi","mizo":"Hman hnu paih","meaning":"Discarded after use"},{"karbi":"Hormu/hormu hortar","mizo":"Hmanrua","meaning":"Instrument / tool"},{"karbi":"Nitur","mizo":"Hmar","meaning":"South"},{"karbi":"Birik","mizo":"Hmarcha","meaning":"Chilli"},{"karbi":"Birikso","mizo":"Hmarchatê","meaning":"Small chilli / Bird's eye chilli"},{"karbi":"Nilip","mizo":"Hmarchhak","meaning":"North-east"},{"karbi":"Nirep nitur","mizo":"Hmar leh chhim","meaning":"North and south"},{"karbi":"Thoithe-keik","mizo":"Hmazil","meaning":"Muskmelon / Melon variety"},{"karbi":"Kaibong","mizo":"Hmawlh / hmawlhte","meaning":"Twig / small stick"},{"karbi":"Om, ingomlut","mizo":"Hmawm, hmuam","meaning":"Hold in mouth"},{"karbi":"Mak","mizo":"Hmeichhe zahmawh sawina","meaning":"Vagina"},{"karbi":"Arloso","mizo":"Hmeichhia","meaning":"Woman"},{"karbi":"Arloso/so arlo)","mizo":"Hmeichhia","meaning":"Female"},{"karbi":"Hemepi","mizo":"Hmeithai","meaning":"Widow"},{"karbi":"Heme/jangre","mizo":"Hmeithai","meaning":"Widow"},{"karbi":"Arje","mizo":"Hmel","meaning":"Appearance / face"},{"karbi":"Arje abolon","mizo":"Hmelhmang","meaning":"Facial"},{"karbi":"Arje kelangme","mizo":"Hmelṭha","meaning":"Beautiful"},{"karbi":"Langme langdok","mizo":"Hmelṭha, duhawm","meaning":"Beautiful, attractive"},{"karbi":"Tum (kut emaw, zungtang emawa thil nem chu bera ni)","mizo":"Hmet","meaning":"Press / Click"},{"karbi":"Men","mizo":"Hming","meaning":"Name"},{"karbi":"Anong athang","mizo":"Hmingthanna","meaning":"Fame, renown"},{"karbi":"Theklong","mizo":"Hmu","meaning":"See"},{"karbi":"Theklong","mizo":"Hmu","meaning":"See / find"},{"karbi":"Thek, theklong","mizo":"Hmu","meaning":"See / Find"},{"karbi":"Inghong, ingthum","mizo":"Hmuak","meaning":"Meet / Welcome"},{"karbi":"Long","mizo":"Hmuchhuak","meaning":"Found"},{"karbi":"Long","mizo":"Hmuchhuak ","meaning":"Find / found"},{"karbi":"Ingtur/angtur","mizo":"Hmui","meaning":"Lip"},{"karbi":"Angmum","mizo":"Hmuihmul","meaning":"Moustache"},{"karbi":"Angmi","mizo":"Hmul","meaning":"Hair"},{"karbi":"Angmi","mizo":"Hmul","meaning":"Body hair / Fur"},{"karbi":"Ingmum","mizo":"Hmumum","meaning":"Lip / Mouth area"},{"karbi":"Adim / ajo","mizo":"Hmun","meaning":"Place / area"},{"karbi":"Dim klong","mizo":"Hmun","meaning":"Place"},{"karbi":"Arphek","mizo":"Hmunphhiah","meaning":"Broom"},{"karbi":"Arphek","mizo":"Hmunphiah","meaning":"Broom"},{"karbi":"Arkok arphek","mizo":"Hmun phiat","meaning":"Place to stay"},{"karbi":"Kam","mizo":"Hna","meaning":"Work / task"},{"karbi":"Kam","mizo":"Hna","meaning":"Work / job"},{"karbi":"Jintak","mizo":"Hnang","meaning":"Rattan"},{"karbi":"Jintak","mizo":"Hnang","meaning":"Rafter / Bamboo tie"},{"karbi":"Arvo","mizo":"Hnah","meaning":"Leaf / paper"},{"karbi":"Akam ajam","mizo":"Hna, hnathawh","meaning":"Work, activity"},{"karbi":"Patebok","mizo":"Hnaih","meaning":"Near"},{"karbi":"Khei/kur","mizo":"Hnam","meaning":"Nation / tribe / race"},{"karbi":"Singnam/Namphet","mizo":"Hnam","meaning":"Traditional woven cloth / Wrapper"},{"karbi":"Bikar","mizo":"Hnamtur","meaning":"Poison"},{"karbi":"Riti niti","mizo":"Hnamzia","meaning":"Custom, tradition"},{"karbi":"Riti niti","mizo":"Hnam ziarang","meaning":"Culture"},{"karbi":"Nap","mizo":"Hnap","meaning":"Nasal mucus / Snot"},{"karbi":"Nokan/langmek","mizo":"Hnar","meaning":"Nose / source (of a river)"},{"karbi":"Khang","mizo":"Hnar","meaning":"Nose / Snore"},{"karbi":"Nokan","mizo":"Hnar","meaning":"Nose"},{"karbi":"Nokan angkok","mizo":"Hnarkua","meaning":"Nostril"},{"karbi":"Kamklem","mizo":"Hna thawk","meaning":"Work"},{"karbi":"Vit","mizo":"Hnawih","meaning":"Paint / apply"},{"karbi":"Mirjangthu","mizo":"Hnawih rimtui","meaning":"Cosmetics"},{"karbi":"Sa-ur","mizo":"Hnawk/tawp","meaning":"Chaos, Messy"},{"karbi":"Hai, perem","mizo":"Hneh","meaning":"Overcome / Defeat"},{"karbi":"Chu","mizo":"Hne (hnute hne)","meaning":"Suck (milk)"},{"karbi":"Teng","mizo":"Hnek","meaning":"Punch "},{"karbi":"Teng","mizo":"Hnek","meaning":"Punch / Hit"},{"karbi":"Ning pepli, ning pangsam","mizo":"Hnem","meaning":"Comfort / Console"},{"karbi":"Ningpangsam","mizo":"Hnem, rilru tidam","meaning":"Comfort / relieve"},{"karbi":"Aphan","mizo":"Hnenah, atan","meaning":"For him/her / for the sake of / for it"},{"karbi":"Kecholong kejunlong","mizo":"Hnianghnarna","meaning":"Saficient"},{"karbi":"Kegbot / abot","mizo":"Hniak","meaning":"Footprint / track"},{"karbi":"Apiphi kedun, akengbot kengkeng kedun","mizo":"Hniakhnung zui","meaning":"Follow footsteps"},{"karbi":"Bap/bap pi","mizo":"Hnim","meaning":"Grass / weed"},{"karbi":"Ingnim","mizo":"Hnim","meaning":"Smell / Sniff"},{"karbi":"Bap bi","mizo":"Hnim, hnimhna, hnamtur","meaning":"Grass, grassland, herb"},{"karbi":"Parbib","mizo":"Hnim phum (tuiah)","meaning":"Submerge / Soak"},{"karbi":"Arum","mizo":"Hnuaiah","meaning":"Below"},{"karbi":"Anung","mizo":"Hnungah","meaning":"Back (my back hurts)"},{"karbi":"Nung/moi","mizo":"Hnung/hnungzang","meaning":"Back"},{"karbi":"Aphi anat","mizo":"Hnung lam","meaning":"Back / behind"},{"karbi":"Paphi, aphi kacherui","mizo":"Hnungtawlh","meaning":"Retreat / Step back"},{"karbi":"Vung","mizo":"Hnuk (pawt)","meaning":"Pull / Drag"},{"karbi":"O-tekang, che-o-tekang","mizo":"Hnutchhiah","meaning":"Leave behind"},{"karbi":"Mok/kumbuk","mizo":"Hnute","meaning":"Breast / Udder"},{"karbi":"Mok-athe","mizo":"Hnute hmur","meaning":"Nipple"},{"karbi":"Hemphu","mizo":"Hotu","meaning":"Leader / chief"},{"karbi":"Ove barim","mizo":"Hranghlui","meaning":"Ancient / old times"},{"karbi":"Pecho/phin","mizo":"Hrai (chawm)","meaning":"Feed / Nourish"},{"karbi":"Ingreng","mizo":"Hram","meaning":"Roar / Cry (animal)"},{"karbi":"Langjoi/chethok","mizo":"Hrawk/awr","meaning":"Throat / Neck"},{"karbi":"Langjoi","mizo":"Hrawkhrawl","meaning":"Windpipe / Esophagus"},{"karbi":"Chinine","mizo":"Hre lo","meaning":"Mistake / Forget"},{"karbi":"Aduk inghoi,","mizo":"Hrem","meaning":"Punish"},{"karbi":"Norokot","mizo":"Hremhmun","meaning":"Hell"},{"karbi":"Rikong","mizo":"Hrenpereng","meaning":"Belt / Sash"},{"karbi":"Ning do, tengnene","mizo":"Hre reng","meaning":"Remember"},{"karbi":"Buji","mizo":"Hrethiam","meaning":"Understand"},{"karbi":"Kachobei ahaki","mizo":"Hretu der","meaning":"False witness"},{"karbi":"Chini","mizo":"Hria","meaning":"Know"},{"karbi":"Jangthu","mizo":"Hriak","meaning":"Oil"},{"karbi":"Ingprim","mizo":"Hriau","meaning":"Needle"},{"karbi":"Kelir","mizo":"Hring","meaning":"Green"},{"karbi":"Pirthe pahache","mizo":"Hring (nau/no nei)","meaning":"Give birth / Alive"},{"karbi":"Mavur / avur","mizo":"Hri / hrileng","meaning":"Epidemic / disease"},{"karbi":"Avur akrem","mizo":"Hri, hri leng","meaning":"Disease, infectious disease"},{"karbi":"Vorek","mizo":"Hrik","meaning":"Louse / bug"},{"karbi":"Rek","mizo":"Hrik","meaning":"Louse"},{"karbi":"Pachetak","mizo":"Hril","meaning":"Tell / Preach"},{"karbi":"Than","mizo":"Hrilh","meaning":"Tell"},{"karbi":"Than/pachini","mizo":"Hrilh","meaning":"Tell / Inform"},{"karbi":"Than peklar","mizo":"Hrilhfiah","meaning":"Explain"},{"karbi":"Pranmui","mizo":"Hriselna","meaning":"Health"},{"karbi":"Pran mui","mizo":"Hriselna","meaning":"Health"},{"karbi":"Simjam / singjam","mizo":"Hritlang","meaning":"Common cold"},{"karbi":"Ven","mizo":"Hru","meaning":"Carry"},{"karbi":"Ven","mizo":"Hru","meaning":"Wipe"},{"karbi":"Ven","mizo":"Hru","meaning":"Guard / Watch"},{"karbi":"Ja","mizo":"Hruai","meaning":"Lead"},{"karbi":"Ja","mizo":"Hruai, kaihruai","meaning":"Lead / guide"},{"karbi":"Pharlem","mizo":"Hrual","meaning":"Twist / Roll together"},{"karbi":"Ri / rikang","mizo":"Hrui / hrui zam","meaning":"Rope / cord / vine"},{"karbi":"Hing","mizo":"(Hrui) thlung","meaning":"Tie"},{"karbi":"Rikang rinui","mizo":"Hruizam","meaning":"Peace"},{"karbi":"Ingsu-Apok","mizo":"Hruizik","meaning":"Creeping edible vine"},{"karbi":"Langselet langhijim","mizo":"Hua, ngei","meaning":"Indeed, certainly"},{"karbi":"Nokbe/Hai","mizo":"Huaisen","meaning":"Brave"},{"karbi":"Biri","mizo":"Huan","meaning":"Garden"},{"karbi":"Biri bithung","mizo":"Huan, chuktuahhuan","meaning":"Garden, cultivated garden"},{"karbi":"Ingkai, pai ingkai","mizo":"Hung (pal)","meaning":"Fence / Wall"},{"karbi":"Jengtoi jengni","mizo":"Huhova kawngzawh","meaning":"Way of worship"},{"karbi":"Hongkup","mizo":"Hulhliap","meaning":"Verandah / porch"},{"karbi":"Chekip/rai","mizo":"Hum","meaning":"Grasp / Protect"},{"karbi":"Chepachong","mizo":"Humhim","meaning":"Peaceful/protect"},{"karbi":"Apor","mizo":"Hun","meaning":"Time"},{"karbi":"Apor","mizo":"Hun","meaning":"Time / season"},{"karbi":"Pangji patehong","mizo":"Hun rei tak chhung na, natna benvawn","meaning":"Long-lasting illness"},{"karbi":"Chedam chevong","mizo":"Imtlawh pawh, inkawmmgeih","meaning":"Exchange visits, social visiting"},{"karbi":"Hem","mizo":"In","meaning":"House"},{"karbi":"Jun","mizo":"In","meaning":"Drink"},{"karbi":"Arbung arphe","mizo":"In","meaning":"House"},{"karbi":"Isivet","mizo":"Inang","meaning":"Same"},{"karbi":"Chinglit","mizo":"Inang","meaning":"Same / Similar"},{"karbi":"Chingri chingdon","mizo":"Inang tlang, rualtlang","meaning":"Same age, peers"},{"karbi":"Angden anghoi","mizo":"Inanohna, danglamna","meaning":"Difference, distinction"},{"karbi":"Chekokthat","mizo":"Inawkhlum","meaning":"Hang oneself"},{"karbi":"Chingki","mizo":"Inbia","meaning":"Talk to each other"},{"karbi":"Chinglu chingthi","mizo":"Inbuai, insilfai","meaning":"Fight, quarrel"},{"karbi":"Langchinglu","mizo":"Inbual","meaning":"Bathe together"},{"karbi":"Pindeng sumpot","mizo":"Incheina silhfen","meaning":"Dress,clothing"},{"karbi":"Hormu hort ar","mizo":"In chhung bungrua","meaning":"Household utensils"},{"karbi":"Pakongdeng","mizo":"Inchhuih","meaning":"Tear"},{"karbi":"Kapatekung","mizo":"Inchhuih, petek","meaning":"Tear, break"},{"karbi":"Jarbop","mizo":"In chhun","meaning":"House extension / Annex"},{"karbi":"Chelem chekurki","mizo":"Inchul inkhal","meaning":"Argue, dispute"},{"karbi":"Hemprek","mizo":"Indang","meaning":"Separate / Part"},{"karbi":"Ron chedan","mizo":"Indo","meaning":"War / Battle"},{"karbi":"Ron mai","mizo":"Indona","meaning":"War"},{"karbi":"Ron mai","mizo":"Indona","meaning":"War, conflict"},{"karbi":"Chepangri chepangdon","mizo":"Inei; rorel","meaning":"Marriage; rule"},{"karbi":"Chingjup","mizo":"Infawp","meaning":"Kiss each other"},{"karbi":"Kapathu","mizo":"Infiam/inkhel","meaning":"Play"},{"karbi":"Chepebi, chepebihek","mizo":"Inngaitlawm","meaning":"Humble oneself"},{"karbi":"Ningkachedok","mizo":"Inngaizawng","meaning":"Love eachother"},{"karbi":"Che une, chelang selet","mizo":"Inngeihlo (inhua)","meaning":"Disagree / Quarrel"},{"karbi":"Chington chingthi","mizo":"Inhau","meaning":"Quarrel"},{"karbi":"Charvo chingchek","mizo":"Inhau, inhni al","meaning":"Quarrel, dispute"},{"karbi":"Chongdat chotelo","mizo":"Inhlawhfa","meaning":"Servant/worker"},{"karbi":"Chethek cheni","mizo":"Inhmelhriat","meaning":"Recognition, acquaintance"},{"karbi":"Amei/mei","mizo":"Inhmuhkhawmna, intawhkhawmna","meaning":"Meeting, gathering"},{"karbi":"Longlephelang","mizo":"In hmun lo ram","meaning":"Land/place"},{"karbi":"Adak","mizo":"Inkarah","meaning":"Between"},{"karbi":"Ningcherui","mizo":"In lam let","meaning":"Turning back, reverse"},{"karbi":"Hem rit","mizo":"In leh lo, chhungkua","meaning":"House and land, household"},{"karbi":"Pharlep pharlo","mizo":"Inlet, rilru thiak","meaning":"Depressed, sad"},{"karbi":"Chedek","mizo":"Inlu","meaning":"Live together"},{"karbi":"Angri angdon","mizo":"Inlungrualna, inantlanna","meaning":"Unity, togetherness"},{"karbi":"Cheton","mizo":"Inmil","meaning":"Get along / Agree"},{"karbi":"Cheton","mizo":"Inmil (inhmu)","meaning":"Meet"},{"karbi":"Chepangri, cheen","mizo":"Innei","meaning":"Marry"},{"karbi":"Chepangri, cheen chedo","mizo":"Innei","meaning":"Marry"},{"karbi":"Chē-en chedo","mizo":"Innei","meaning":"Be married"},{"karbi":"Adam asar","mizo":"Inneihna (karbi hnam tihdan bnik)","meaning":"Marriage"},{"karbi":"Kim","mizo":"(In) sa","meaning":"Build"},{"karbi":"Chethu chethat","mizo":"Insat inthat","meaning":"Exchange/settle among themselves"},{"karbi":"Chethak","mizo":"Insem","meaning":"Distribute / share"},{"karbi":"Chebohong","mizo":"Insual","meaning":"Fight / wrestle"},{"karbi":"Chekor chedit","mizo":"Insual, inhau","meaning":"Quarrel, fight"},{"karbi":"Ajir aroi","mizo":"Intanpuintawn, inlawm","meaning":"Helping one another, friendship"},{"karbi":"Cherap cheto","mizo":"Intanpui tawn","meaning":"Help one another"},{"karbi":"Chetong","mizo":"Intawng (inhmu)","meaning":"Meet each other"},{"karbi":"Athok ajir","mizo":"Inthawina thilhlan","meaning":"Sacrificial offering"},{"karbi":"Arkli phejo","mizo":"Inthawi, thilhlan","meaning":"Sacrifice, offering"},{"karbi":"Arong aje/arong bohong","mizo":"Intihlhimna","meaning":"Disgrace, shame"},{"karbi":"Jarong / jamborong","mizo":"Ip / ipte","meaning":"Bag / pocket"},{"karbi":"Jamborong/Jarong","mizo":"Ipte","meaning":"Pocket / Bag"},{"karbi":"Chon","mizo":"Irh","meaning":"Spring forth / hiccup"},{"karbi":"Ingho","mizo":"Kâ","meaning":"Mouth"},{"karbi":"Arnu/me kecho","mizo":"Kang","meaning":"Fry / burn"},{"karbi":"Thekma, there, therama, the","mizo":"Ka hre nang! ...","meaning":"I have no idea / beats me"},{"karbi":"Ja/vung","mizo":"Kai","meaning":"Lead / pull"},{"karbi":"Chikung","mizo":"Kaikuang","meaning":"Crab / Crustacean"},{"karbi":"Chikung","mizo":"Kaikuang","meaning":"Crab"},{"karbi":"Dam","mizo":"Kal","meaning":"Go"},{"karbi":"Dam, dun","mizo":"Kal","meaning":"Go / walk"},{"karbi":"Hambi","mizo":"Kal","meaning":"Kidney"},{"karbi":"Chorolo","mizo":"Ka lawm e","meaning":"Thank you"},{"karbi":"Ingkirkling/khinde","mizo":"Kalh","meaning":"Lock / oppose"},{"karbi":"Tovar","mizo":"Kalkawng","meaning":"Path / road"},{"karbi":"Tot, pham ketot","mizo":"Kam (thang kam)","meaning":"Set a trap"},{"karbi":"Angdam","mizo":"Kan","meaning":"Visit"},{"karbi":"Ap","mizo":"Kap","meaning":"Shoot / fire"},{"karbi":"Ap","mizo":"Kap, perh","meaning":"Shoot / sling shot"},{"karbi":"Adam asar","mizo":"Karbi dan anga inneihna, hlen chhuah tur bung hrang hrang zinga a hnuhnung ber","meaning":"Karbi customary marriage, final part among the various stages"},{"karbi":"Duksang dukjir","mizo":"Karbi hmeichhia","meaning":"Karbi woman"},{"karbi":"Karbi karbak","mizo":"Karbi mi","meaning":"Karbi person"},{"karbi":"Vam","mizo":"Kawng","meaning":"Waist"},{"karbi":"Vamkok","mizo":"Kawnghren(Hmeichhe puan hrenna)","meaning":"Traditional women's waist belt"},{"karbi":"Inghap","mizo":"Kawngka / kawngkhar","meaning":"Door / gate"},{"karbi":"Akrong alat","mizo":"Kawng, kalkawng","meaning":"Road, path"},{"karbi":"Anghap","mizo":"Kawngkhar","meaning":"Door / Gate"},{"karbi":"Dampri dampro","mizo":"Kawng lakah (khawiah pawh)","meaning":"On the way (anywhere)"},{"karbi":"Thehu","mizo":"Kawngvawn","meaning":"Belt / Waist band"},{"karbi":"Santok/Kokterak","mizo":"Kawhtebel","meaning":"Pitcher plant / Vegetable"},{"karbi":"Jong","mizo":"Kawk","meaning":"Point at / indicate"},{"karbi":"Ani","mizo":"Kawl","meaning":"Iron / metal"},{"karbi":"Ruidok","mizo":"Kawlbahra","meaning":"Yardlong bean / Long bean"},{"karbi":"Pirthe atok / akona","mizo":"Kawlkil","meaning":"Horizon / edge of the world"},{"karbi":"Maduram/Soprim","mizo":"Kawlthei","meaning":"Passion fruit"},{"karbi":"Rim, aro, lana","mizo":"Kawl (vawng)","meaning":"Keep / possess"},{"karbi":"Hember hemthak","mizo":"Kawmchhak kawmthlang, ṭhenawm khawveng","meaning":"Neighbourhood, surrounding area"},{"karbi":"Kekek kangkang","mizo":"Kawm, kawi","meaning":"Bend, curve"},{"karbi":"Achor alok","mizo":"Kawppui, khingpui","meaning":"Partner, companion"},{"karbi":"Choi","mizo":"Kawr","meaning":"Shirt"},{"karbi":"Choi","mizo":"Kawr","meaning":"Shirt / Blouse / Clothes"},{"karbi":"Dong, langadong","mizo":"Kawr (luikawr)","meaning":"Stream / gully"},{"karbi":"Dong chan","mizo":"Kawr, luikawr","meaning":"Valley, river valley"},{"karbi":"Plimplam","mizo":"Kawrthindeng","meaning":"Centipede / Millipede"},{"karbi":"Rongbong","mizo":"Kawtthler","meaning":"Street / courtyard"},{"karbi":"Keng","mizo":"Ke","meaning":"Leg"},{"karbi":"Keng","mizo":"Ke","meaning":"Leg / Foot"},{"karbi":"Kengti","mizo":"Keartui","meaning":"Ankle"},{"karbi":"Kengtak","mizo":"Kea vaivut kai","meaning":"Dusty foot"},{"karbi":"Tekok teki","mizo":"Kebai","meaning":"Basket"},{"karbi":"Van","mizo":"Keng","meaning":"Bring"},{"karbi":"Pon/van","mizo":"Keng","meaning":"Carry / bring"},{"karbi":"Neli","mizo":"Keimah","meaning":"Myself"},{"karbi":"Ili, ilitum","mizo":"Keimahni","meaning":"Our / us"},{"karbi":"Netum, nelitum","mizo":"Keimahni, keini, kan","meaning":"We / us"},{"karbi":"Bongkrui","mizo":"Keite","meaning":""},{"karbi":"Ongpen","mizo":"Kekawr","meaning":"Trousers / Pants"},{"karbi":"Bi","mizo":"Kel","meaning":"Goat"},{"karbi":"Biroi","mizo":"Kel in","meaning":"Goat pen / Goat shed"},{"karbi":"Kengpak","mizo":"Kephah","meaning":"Sole of the foot"},{"karbi":"Chamburuksoanorik","mizo":"Ketaminu","meaning":"Centipede"},{"karbi":"Bip","mizo":"Khabe","meaning":"Chin"},{"karbi":"Kecheng","mizo":"Khabekual","meaning":"Jaw / Jawline"},{"karbi":"Hala hei hei","mizo":"Khangho kha","meaning":"That / they / them"},{"karbi":"Vek","mizo":"Khai","meaning":"Hang"},{"karbi":"Chingnak","mizo":"Khak","meaning":"Phlegm / Sputum"},{"karbi":"Hanthar","mizo":"Khaûm","meaning":"Bitter leaf vegetable"},{"karbi":"Thepai thereng","mizo":"Kham, lengkir","meaning":"Ornament/jewellery"},{"karbi":"Pengdang","mizo":"Khanchhuk","meaning":"Roof rafter / Crossbeam"},{"karbi":"Kroikre","mizo":"Khap","meaning":"Forbid"},{"karbi":"Ingkir","mizo":"Khar","meaning":"Close"},{"karbi":"Ingkir","mizo":"Khar","meaning":"Close / shut"},{"karbi":"Chumang","mizo":"Khasi hnam","meaning":"Khasi tribe"},{"karbi":"Phelong","mizo":"Khau","meaning":""},{"karbi":"Longpok-kang","mizo":"Khauhriang","meaning":""},{"karbi":"Nihang","mizo":"Khawchhak","meaning":"East"},{"karbi":"Jiroi jusung","mizo":"Khawchhak lam Karbi sawina","meaning":"Eastern Karbi dialect"},{"karbi":"Arni arve","mizo":"Khaw chin, khaw awm dan","meaning":"Village characteristics, village condition"},{"karbi":"Ingjinso","mizo":"Khawngaih","meaning":"Pity / feel sorry"},{"karbi":"Kangjinso","mizo":"Khawngaih","meaning":"Pityful/please"},{"karbi":"Chingho chingjinso","mizo":"Khawngaihna leh lainatna","meaning":"Compassion and sympathy"},{"karbi":"Chonchotshot","mizo":"Khawngkhawbai","meaning":"Limp"},{"karbi":"Sar lar","mizo":"Khaw hotu","meaning":"Village headman"},{"karbi":"Konat","mizo":"Khawi","meaning":"Where"},{"karbi":"Ot","mizo":"Khawih, chelh, Vuan","meaning":"Touch / hold"},{"karbi":"Ingthum","mizo":"Khawihli","meaning":"Boil / abscess"},{"karbi":"Jopi","mizo":"Khawipui","meaning":""},{"karbi":"Jove","mizo":"Khawivah","meaning":""},{"karbi":"Mesin","mizo":"Khawl","meaning":"Machine"},{"karbi":"Pangrung, rim","mizo":"Khawl (khawnkhawm)","meaning":"Gather / collect"},{"karbi":"Hon","mizo":"Khawlla/la","meaning":"Thread / Yarn"},{"karbi":"Thesibu(h)/Chenho","mizo":"Khawmhma","meaning":"Chinese persimmon / Wild fruit"},{"karbi":"Lem(Lamp)/Melur","mizo":"Khawnvar","meaning":"Lamp / Lantern"},{"karbi":"Rongsopi","mizo":"Khawpui","meaning":"Town / city"},{"karbi":"Rongman","mizo":"Khawram","meaning":"Jungle village / wilderness"},{"karbi":"Hor","mizo":"Khawrh","meaning":"Dig"},{"karbi":"Kedo kethak","mizo":"Khawsakna, khawsa, cheng","meaning":"Livelihood, inhabitant, live"},{"karbi":"Rongsoso","mizo":"Khaw te","meaning":"Small village"},{"karbi":"Rongber rongthak","mizo":"Khaw ṭhenawm","meaning":"Neighbourhood"},{"karbi":"Nichi, nijang","mizo":"Khawthlang","meaning":"West"},{"karbi":"Rong asar rup asar","mizo":"Khawtlang hotu","meaning":"Village/community leader"},{"karbi":"Rong rup","mizo":"Khawtlang, vantlang","meaning":"Society, community"},{"karbi":"Pirthe","mizo":"Khawvel","meaning":"World"},{"karbi":"Pirthe mindar","mizo":"Khawvel","meaning":"World"},{"karbi":"Sak, sakhet","mizo":"Kheng (khengbet)","meaning":"Press / nail"},{"karbi":"Tur","mizo":"Kheng (pet, chhuih)","meaning":"Push / kick"},{"karbi":"Hek","mizo":"Kheh (thil kawr)","meaning":"Skin / peel"},{"karbi":"Phi","mizo":"Khei","meaning":"Burn"},{"karbi":"Kenghambi","mizo":"Kheimit","meaning":"Toe"},{"karbi":"Pathu","mizo":"Khel (infiamna)","meaning":"Play / game"},{"karbi":"Pathu-aklam","mizo":"Khelmual","meaning":"Playgound / field"},{"karbi":"Chengnan","mizo":"Khiang","meaning":"Needlewood tree"},{"karbi":"Hoton","mizo":"Kho","meaning":"Village / Community"},{"karbi":"Karke","mizo":"Khote","meaning":"Hamlet / Small village"},{"karbi":"Rong","mizo":"Khua","meaning":"Village / weather"},{"karbi":"Cheng","mizo":"Khuang","meaning":"Drum"},{"karbi":"Ku","mizo":"Khuang (ar khuang)","meaning":"Crow / beat drum"},{"karbi":"Chanrik","mizo":"Khuangchiri","meaning":""},{"karbi":"Duhuid duhidujan","mizo":"Khuangpui, khuangvtu","meaning":"Drum, drummer"},{"karbi":"Pijo","mizo":"Khuai","meaning":""},{"karbi":"Joram","mizo":"Khuaite","meaning":""},{"karbi":"Rat det","mizo":"Khua leh tui te","meaning":"Villagers"},{"karbi":"Hilik","mizo":"Khuarkhurum","meaning":"Cave / pit"},{"karbi":"Thap","mizo":"Khung (thun)","meaning":"Put / insert"},{"karbi":"Chingsok, chu chingsok","mizo":"Khuih (sam khuih)","meaning":"Comb hair"},{"karbi":"Palong/Masang","mizo":"Khum","meaning":"Bed"},{"karbi":"Arbe","mizo":"Khumfa","meaning":""},{"karbi":"Kup","mizo":"Khum (lukhum)","meaning":"Cover head / hat"},{"karbi":"Kengphu","mizo":"Khup","meaning":"Knee"},{"karbi":"Klem, klemhur","mizo":"Khur","meaning":"Dig / tremble"},{"karbi":"Adung arei","mizo":"Kiang, bul hnai","meaning":"Near, nearby"},{"karbi":"Sak","mizo":"Kilh","meaning":"Hummer"},{"karbi":"Cherui, aphi kacherui","mizo":"Kir","meaning":"Return / go back"},{"karbi":"Pi","mizo":"Kit (thing)","meaning":"Fell tree"},{"karbi":"Ripong","mizo":"Kiu","meaning":"Elbow"},{"karbi":"Ritumde","mizo":"Kiukhuar/kiu kawn","meaning":"Elbow pit / Depression of the elbow"},{"karbi":"Hang","mizo":"Ko","meaning":"Call"},{"karbi":"Phangkor","mizo":"Koki","meaning":"Shoulder"},{"karbi":"Angkok angki","mizo":"Kua","meaning":"Hole"},{"karbi":"Bakos","mizo":"Kuang","meaning":"Box / coffin"},{"karbi":"Kove","mizo":"Kuhva","meaning":"Betel nut"},{"karbi":"Paisong","mizo":"Kulh","meaning":"Fort / stockade"},{"karbi":"Ningkan","mizo":"Kum","meaning":"Year"},{"karbi":"Ningkan/sengkan/arta","mizo":"Kum","meaning":"Year / age"},{"karbi":"Chingbar chingdon","mizo":"Kum inrualkhat tlang","meaning":"Same age group"},{"karbi":"Sarru sarhang","mizo":"Kum upa","meaning":"Elderly person"},{"karbi":"Ingkup","mizo":"Kun","meaning":"Bend"},{"karbi":"Noklang","mizo":"Kurtai","meaning":"Jaggery"},{"karbi":"Ri","mizo":"Kut, ban","meaning":"Hand / arm"},{"karbi":"A-mei","mizo":"Kut (festival)","meaning":"Festival / celebration"},{"karbi":"Rîpak","mizo":"Kutphah","meaning":"Palm of the hand"},{"karbi":"Ripak ang-ang","mizo":"Kutzia","meaning":"Gesture"},{"karbi":"Ripakang-ang","mizo":"Kutzia","meaning":"Fingerprint / Palm lines"},{"karbi":"Rimunjong","mizo":"Kutzungchal","meaning":"Index finger"},{"karbi":"Rimunthokvam","mizo":"Kutzunglai","meaning":"Middle finger"},{"karbi":"Rimunpo","mizo":"Kutzungpui","meaning":"Thumb"},{"karbi":"Nichimun","mizo":"Kutzungtang","meaning":"Finger"},{"karbi":"Rimunso","mizo":"Kutzungte","meaning":"Little finger"},{"karbi":"Rimun-arman","mizo":"Kutzung(te)u","meaning":"Ring finger"},{"karbi":"Pon","mizo":"La","meaning":"Take"},{"karbi":"Hon","mizo":"La","meaning":"Thread"},{"karbi":"En, pon","mizo":"La","meaning":"Take"},{"karbi":"Churi","mizo":"La","meaning":"Blood / Vital fluid"},{"karbi":"Chete","mizo":"Lai","meaning":"Navel / Belly button"},{"karbi":"Tak/tuk","mizo":"Lai/cho","meaning":"Read / eat"},{"karbi":"Ureng","mizo":"Laiking","meaning":""},{"karbi":"Chepho/chepho chero","mizo":"Laina","meaning":"Relative / relation"},{"karbi":"Pon","mizo":"La, keng","meaning":"Take"},{"karbi":"Pangrum pangsom","mizo":"La khawm, seng khawm","meaning":"Collect, gather"},{"karbi":"Parok-Jangphong","mizo":"Lakhuihthei","meaning":"Pineapple"},{"karbi":"Recho","mizo":"Lal","meaning":"King"},{"karbi":"Recho","mizo":"Lal","meaning":"King / ruler"},{"karbi":"Recho aphutup","mizo":"Lallukhum","meaning":"Crown"},{"karbi":"Vaikang","mizo":"Lallukhum","meaning":"Crown / Traditional ceremonial headgear"},{"karbi":"Recho-anghoi","mizo":"Lalṭhuthleng","meaning":"Throne"},{"karbi":"Kan","mizo":"Lam","meaning":"Dance"},{"karbi":"Kan","mizo":"Lam","meaning":"Dance / walk"},{"karbi":"Longkam longhat","mizo":"Lamhian zin","meaning":"Road, journey"},{"karbi":"Jangphong","mizo":"Lamkhuang","meaning":"Drum"},{"karbi":"Anat/anatthu","mizo":"Lampang","meaning":"Towards"},{"karbi":"Arje abolon","mizo":"Lan dan, hmelhmang leh nih phung","meaning":"Custom, appearance and manner"},{"karbi":"Tiso","mizo":"Lasi","meaning":"Spirit of the wild / nymph"},{"karbi":"Telong","mizo":"Lawng","meaning":"Boat"},{"karbi":"Lurchi lurcha","mizo":"Lawng akip akawi","meaning":"Boat/ship"},{"karbi":"Chelong","mizo":"Lawi","meaning":"Buffalo"},{"karbi":"Beng (vo kebeng)","mizo":"Lawi (ar lawi)","meaning":"Enter / fly in"},{"karbi":"Kethuke-ui","mizo":"Lawih","meaning":"Agree"},{"karbi":"Ajir","mizo":"Lawm (hnathawhnaah)","meaning":"Cooperative labor group"},{"karbi":"Nongeh","mizo":"Lawmman","meaning":"Reward"},{"karbi":"Nong-e","mizo":"Lawmman","meaning":"Prize / reward"},{"karbi":"Arlu","mizo":"Lawn","meaning":"Climb"},{"karbi":"Arlu","mizo":"Lawn","meaning":"Climb / harvest"},{"karbi":"Kejui","mizo":"Leng","meaning":"Roam"},{"karbi":"Jui","mizo":"Leng, teihawi","meaning":"Roam"},{"karbi":"Lapen","mizo":"Leh","meaning":"And"},{"karbi":"Kitap","mizo":"Lehkhabu","meaning":"Book"},{"karbi":"Buhi","mizo":"Lehkhabu","meaning":"Book"},{"karbi":"Thu","mizo":"Leh / nawn","meaning":"Also / and"},{"karbi":"Nam","mizo":"Lei","meaning":"Buy"},{"karbi":"Longle","mizo":"Lei","meaning":"Soil"},{"karbi":"Pirthe/dolong/de","mizo":"Lei","meaning":"Earth / bridge / tongue"},{"karbi":"Kenam keret","mizo":"Lei","meaning":"Buy"},{"karbi":"De","mizo":"Lei","meaning":"Tongue"},{"karbi":"Preng arvo","mizo":"Leiba","meaning":"Debt"},{"karbi":"Dung, chor","mizo":"Leih","meaning":"Pour water"},{"karbi":"Dondon","mizo":"Leihlawn","meaning":"Ladder / stairs"},{"karbi":"Ade angtur","mizo":"Lei leh ka, thusawi theihna","meaning":"Mouth and tongue, ability to speak"},{"karbi":"Hidi","mizo":"Leilet","meaning":"Paddy field"},{"karbi":"Adai areng","mizo":"Le, leichawi","meaning":"And, also"},{"karbi":"Joilut","mizo":"Lem (dawlh)","meaning":"Swallow / imitate"},{"karbi":"Prengpreng","mizo":"Lemlawi(phaiphuleng)","meaning":"Music mouth organ"},{"karbi":"Lan","mizo":"Len","meaning":"Net"},{"karbi":"Lep","mizo":"Lep (zai lep)","meaning":"Sing softly"},{"karbi":"Mekphrok","mizo":"Lerh","meaning":"Blink / flirt"},{"karbi":"Cherui/lar","mizo":"Let","meaning":"Return / change"},{"karbi":"Arphe","mizo":"Liang","meaning":"Main beam / Ridge pole"},{"karbi":"Inglok","mizo":"Liak","meaning":"Lick"},{"karbi":"Kethe","mizo":"Lian","meaning":"Big / large"},{"karbi":"Lum","mizo":"Lip","meaning":"Lie down"},{"karbi":"Konglong","mizo":"Lir (lum)","meaning":"Roll"},{"karbi":"Rit","mizo":"Lo","meaning":"Field / farm"},{"karbi":"Lik","mizo":"Lo","meaning":"Pick / harvest fruit"},{"karbi":"Vang","mizo":"Lo kal","meaning":"Come"},{"karbi":"Rit jai","mizo":"Lo, thlawhhma","meaning":"Field, cultivation"},{"karbi":"Phu","mizo":"Lu","meaning":"Head"},{"karbi":"Harlong","mizo":"Lung","meaning":"Rock / stone"},{"karbi":"Arlong/harlong","mizo":"Lung","meaning":"Rock / stone"},{"karbi":"Harlong","mizo":"Lung","meaning":"Stone"},{"karbi":"Vibong","mizo":"Lung","meaning":"Heart"},{"karbi":"Ning ingsam, ning oi-e","mizo":"Lungawi","meaning":"Satisfied / pleased"},{"karbi":"Ning(ke)oi","mizo":"Lungawi lo","meaning":"Unhappy / Dissatisfied / Angry / Upset / Unhappy"},{"karbi":"Ningduk, ninglak","mizo":"Lungngai","meaning":"Sad / worried"},{"karbi":"Monduk monlak","mizo":"Lungngai","meaning":"Sad"},{"karbi":"Rup","mizo":"Lunghlu","meaning":"Silver"},{"karbi":"Long-e longchong","mizo":"Lungpui","meaning":"Mainland"},{"karbi":"Hijim","mizo":"Lungten","meaning":"Disgusted / loathing"},{"karbi":"Langroi","mizo":"Lui","meaning":"River"},{"karbi":"Langroi langjeng","mizo":"Lui","meaning":"River"},{"karbi":"Kora mara","mizo":"Luikam","meaning":"Backward"},{"karbi":"Parai harai","mizo":"Luiral lehlam lehlam","meaning":"Opposite side of river"},{"karbi":"Langso langmek","mizo":"Lui te","meaning":"Water flowing from the hills"},{"karbi":"Puhui","mizo":"Lukham","meaning":"Pillow"},{"karbi":"Phutup","mizo":"Lukhum","meaning":"Hat / Cap"},{"karbi":"Phangok","mizo":"Lum","meaning":"Hot"},{"karbi":"Phubongkok","mizo":"Luruh","meaning":"Skull"},{"karbi":"Vir, jut","mizo":"Bo, Zo","meaning":"Perish / vanish"},{"karbi":"Ningsiksak","mizo":"Mangang / rilrubuai","meaning":"Worried / desperate"},{"karbi":"Ning kasiksak","mizo":"Manganna","meaning":"Trouble / worry"},{"karbi":"Jeng jati","mizo":"Mahni chi leh kuang","meaning":"One's clan and lineage"},{"karbi":"Chonpro chonjam","mizo":"Mahni duh ang anga tal mai mai","meaning":"Do as one pleases"},{"karbi":"Bonsetame","mizo":"Mahse","meaning":" But"},{"karbi":"Bonghom","mizo":"Mai","meaning":"Pumpkin"},{"karbi":"Bonghom-Arvo","mizo":"Maian","meaning":"Pumpkin leaves"},{"karbi":"Dovan dopat","mizo":"Maicham","meaning":"Offering/altar"},{"karbi":"Sangman","mizo":"Maimawm","meaning":""},{"karbi":"Bonghom-Renglu","mizo":"Maipawl","meaning":"Yellow pumpkin"},{"karbi":"Kangkaroi","mizo":"Maitamtawk","meaning":"Pumpkin variety"},{"karbi":"Manghu","mizo":"Mak","meaning":"Surprise"},{"karbi":"Osa","mizo":"Makpa","meaning":"Son-in-law"},{"karbi":"Ingto, inglok","mizo":"Mal (lo, thlawn, thliak)","meaning":"Wasteful / vain"},{"karbi":"Kengtham","mizo":"Malpui","meaning":"Thigh"},{"karbi":"Ahirjume kepi","mizo":"Malsawm","meaning":"Bless"},{"karbi":"Ahirjume, hirme,","mizo":"Malsawmna","meaning":"Blessing"},{"karbi":"Bor kan","mizo":"Malsawmna","meaning":"Blessing"},{"karbi":"(A)dor","mizo":"Man","meaning":"Price"},{"karbi":"Nep/buji","mizo":"Man","meaning":"Catch / understand"},{"karbi":"Anam amui","mizo":"Man leh mual","meaning":"Price and value"},{"karbi":"Cheti (piso kacheti – nupui ma)","mizo":"Ma (nupa inkar ah)","meaning":"Divorce / separation"},{"karbi":"Artho","mizo":"Marphu","meaning":"Pulse"},{"karbi":"Chek","mizo":"Mau","meaning":"Bamboo"},{"karbi":"Abi apan","mizo":"Mau hmanga thil siam, thiamthil chi hrang hrang","meaning":"Things made from bamboo, various handicrafts"},{"karbi":"Muphang","mizo":"Maupa","meaning":"Bamboo shoot variety"},{"karbi":"Chek-kaipho","mizo":"Maurua","meaning":"Bamboo variety"},{"karbi":"Hen-Up","mizo":"Mautuai","meaning":"Bamboo shoot"},{"karbi":"Amilumbong","mizo":"Mawng","meaning":"Buttocks"},{"karbi":"Hidam","mizo":"Mawngkua","meaning":"Anus"},{"karbi":"Aden","mizo":"Mawng (mawngphah)","meaning":"Bottom / buttocks"},{"karbi":"Alir acham","mizo":"Mawi, cheimawi","meaning":"Beautiful, decorate"},{"karbi":"Kelu kekom","mizo":"Mawlna","meaning":"Foolishness"},{"karbi":"Kachinine","mizo":"Mawlna (hriatlohna)","meaning":"Ignorance / foolishness"},{"karbi":"Ingchang","mizo":"Mawn","meaning":"Clitoris"},{"karbi":"Mek chechar","mizo":"Meng","meaning":"Open eyes"},{"karbi":"Me","mizo":"Mei","meaning":"Fire"},{"karbi":"Me/arme","mizo":"Mei","meaning":"Fire / tail"},{"karbi":"Hokvai","mizo":"Meihawl","meaning":"Charcoal"},{"karbi":"Mong","mizo":"Mei zu","meaning":"Smoke"},{"karbi":"Mail","mizo":"Mel","meaning":"Mile"},{"karbi":"Meng, langding, lang et","mizo":"Melh (en reng)","meaning":"Gaze / stare"},{"karbi":"Ingtìp","mizo":"Met","meaning":"Clip / trim"},{"karbi":"Bang","mizo":"Mi","meaning":"Person / people"},{"karbi":"Nokbe chaibe","mizo":"Mi chak, pasalṭha","meaning":"Strong person, brave man"},{"karbi":"Kethe kere","mizo":"Mi fing, finna","meaning":"Wise, wisdom"},{"karbi":"Kiri kirot","mizo":"Mi hausa","meaning":"Rich person"},{"karbi":"Monit","mizo":"Mihring","meaning":"Person / Human"},{"karbi":"Monit","mizo":"Mihring","meaning":"Human being"},{"karbi":"Monit munor","mizo":"Mihring","meaning":"Human being"},{"karbi":"Akrom ajom","mizo":"(Mihring) pian hman","meaning":"Human birth"},{"karbi":"Arleng","mizo":"Mikir","meaning":"Karbi"},{"karbi":"Arjan","mizo":"Milem","meaning":"Idol / statue"},{"karbi":"Kethe keding","mizo":"Mi lian, mi pawimawh","meaning":"Important person"},{"karbi":"Kumlin","mizo":"Milim","meaning":"Image / idol"},{"karbi":"Ingrei","mizo":"Min (leimin)","meaning":"Landslide / collapse"},{"karbi":"Pinso","mizo":"Mipa","meaning":"Man"},{"karbi":"Sonu sokleng","mizo":"Mipa fa upa ber","meaning":"Eldest son"},{"karbi":"Poho","mizo":"Mipa luhren","meaning":"Men's head turban / Headgear"},{"karbi":"Bum","mizo":"Mipa zahmawh sawina","meaning":"Penis"},{"karbi":"Armu","mizo":"Mipui","meaning":"People"},{"karbi":"Pit-pit khai-khai","mizo":"Mipui tamtak, innek nulh nulh","meaning":"Many people, crowded"},{"karbi":"Mek","mizo":"Mit","meaning":"Eye"},{"karbi":"Meksung","mizo":"Mithmul","meaning":"Eyelash"},{"karbi":"Mek-kung","mizo":"Mitkohmul","meaning":"Eyebrow"},{"karbi":"Mekkri meklang","mizo":"Mittui","meaning":"Tears"},{"karbi":"Mekkri/meklang","mizo":"Mittui","meaning":"Tears"},{"karbi":"Ot dur","mizo":"Mizia ","meaning":"Character"},{"karbi":"Aot adur","mizo":"Mizia, nungchang","meaning":"Character, nature"},{"karbi":"Munpi","mizo":"Mo","meaning":"Bride"},{"karbi":"Piso ke-enmi","mizo":"Moneitu","meaning":"Groom"},{"karbi":"I/mekjang","mizo":"Mu","meaning":"Sleep / lie down"},{"karbi":"Inglen, pejo","mizo":"Muang","meaning":"Slow"},{"karbi":"Inglong arjon","mizo":"Mual","meaning":"Ridge / hill"},{"karbi":"Ingsamjin","mizo":"Muanawm","meaning":"Peaceful"},{"karbi":"Mekjang","mizo":"Muhil","meaning":"Sleep"},{"karbi":"Mekjang","mizo":"Muhil","meaning":"Sleeping"},{"karbi":"Bonglong","mizo":"Mum","meaning":"Round"},{"karbi":"Mang","mizo":"Mumang","meaning":"Dream"},{"karbi":"Vomu","mizo":"Mupui","meaning":"Vulture / Eagle"},{"karbi":"Mang mun","mizo":"Murmang","meaning":"Dream"},{"karbi":"Bebe","mizo":"Mu, tlu zal","meaning":"Laying down / lounging / relaxing"},{"karbi":"Bebe, i","mizo":"Mu, tlu zal","meaning":"Sleep / relax"},{"karbi":"I","mizo":"Mu, tlu zal","meaning":"Relax/ sleep"},{"karbi":"Bebe","mizo":"Mu, tlu zal","meaning":"Relax / sleep"},{"karbi":"Keso (pain)","mizo":"Na","meaning":"Pain / ache"},{"karbi":"Nangli","mizo":"Nangmah","meaning":"You"},{"karbi":"Nang, nangli","mizo":"Nangmah, nang","meaning":"You"},{"karbi":"Nangtum, nanglitum","mizo":"Nangmahni, nangni","meaning":"You (plural)"},{"karbi":"Mo-an","mizo":"Nakin deuhah","meaning":" Later on / shortly"},{"karbi":"Reptak","mizo":"Nakruh","meaning":"Rib"},{"karbi":"Penap","mizo":"Naktuk","meaning":"Tomorrow"},{"karbi":"Inglit","mizo":"Nal","meaning":"Slippery"},{"karbi":"Ingdoi","mizo":"Nam (nawr)","meaning":"Push / press"},{"karbi":"Keso ke-un-e","mizo":"Natna, damlohna","meaning":"Illness"},{"karbi":"Sovei sovoi","mizo":"Nau nei, nau hring","meaning":"Having a child, giving birth"},{"karbi":"Oso","mizo":"Naupang","meaning":"Child / Children"},{"karbi":"Oso","mizo":"Naupang","meaning":"Child"},{"karbi":"Aklim angphar","mizo":"Naupang te te, thlai iak tir","meaning":"Small children, young plants"},{"karbi":"Oso thi-i","mizo":"Nausen (naute)","meaning":"Infant / baby"},{"karbi":"Me aso, medan, mekoichet","mizo":"Nawhalh","meaning":"Matchstick / lighter"},{"karbi":"Rengdok rengni","mizo":"Nawmsakna","meaning":"Comfort / luxury"},{"karbi":"Akove","mizo":"Nawn (sai nawn)","meaning":"Trunk"},{"karbi":"Henot","mizo":"Nawt (nuai)","meaning":"Rub / wipe"},{"karbi":"Kangnep","mizo":"Nel (fei)","meaning":"Soft"},{"karbi":"Ingduk","mizo":"Nem","meaning":"Soft"},{"karbi":"Pen pen","mizo":"Nen","meaning":"Together"},{"karbi":"E-ne","mizo":"Nep(engmah lo)","meaning":"Insignificant"},{"karbi":"Arni","mizo":"Ni","meaning":"Sun / day"},{"karbi":"Arni/ni","mizo":"Ni","meaning":"Sun / day / aunt"},{"karbi":"Nudeng","mizo":"Nihliap","meaning":"Umbrella"},{"karbi":"Chiklo arni","mizo":"Ni leh thla, hun leh ni","meaning":"Day and month, time and date"},{"karbi":"Kali","mizo":"Ni lo / aih","meaning":"No"},{"karbi":"Atumi","mizo":"Nimin","meaning":"Yesterday"},{"karbi":"Barla chala","mizo":"Nipui","meaning":"Summer"},{"karbi":"Jo padap","mizo":"Nitin, tukzan","meaning":"Every day, morning and evening"},{"karbi":"Tove","mizo":"Nizan","meaning":"Tonight"},{"karbi":"Harlung","mizo":"No","meaning":"Cup"},{"karbi":"Aso","mizo":"No","meaning":"Offspring / young of an animal"},{"karbi":"Harlung","mizo":"No","meaning":"Cup / Glass"},{"karbi":"Pei","mizo":"Nu","meaning":"Mother"},{"karbi":"Pei/pi","mizo":"Nu","meaning":"Mother"},{"karbi":"Kengpak arum kebi, langrop","mizo":"Nuaichhiah","meaning":"Oppress / Humiliate"},{"karbi":"Rengme","mizo":"Nuam","meaning":"Comfortable"},{"karbi":"Rengdok rengni","mizo":"Nuam sa, ralmuang","meaning":"Peaceful, pleasant"},{"karbi":"Reng","mizo":"Nung","meaning":"Alive"},{"karbi":"Mek langno langno","mizo":"Nungchang mawi lo, hmeichhiat mipat thil","meaning":"Immoral character/sexual behaviour"},{"karbi":"Ingnek","mizo":"Nui","meaning":"Laugh"},{"karbi":"Kangnek / ingnek","mizo":"Nui","meaning":"Laught"},{"karbi":"Ingnek (nuihzat/nuihsawh – ingnekchoi)","mizo":"Nui","meaning":"Laugh / mock"},{"karbi":"Chingnek chingni","mizo":"Nui, hlim","meaning":"Laugh, happy"},{"karbi":"Okarjang","mizo":"Nula","meaning":"Unmarried girl / maiden"},{"karbi":"Chethe","mizo":"Nunna","meaning":"Life"},{"karbi":"Penanso","mizo":"Nupa","meaning":"Couple / husband and wife"},{"karbi":"Saidu","mizo":"Nuphal","meaning":"Widow"},{"karbi":"Piso","mizo":"Nupui","meaning":"Wife"},{"karbi":"Chet i chevar","mizo":"(Nupui) ma, ṭhen","meaning":"Wife's mother"},{"karbi":"Achor arup","mizo":"Nupui pasal, thil inkawp tuak","meaning":"Husband and wife, pair"},{"karbi":"Sarpi anglok","mizo":"Nu valai","meaning":"Middle-aged woman"},{"karbi":"Po","mizo":"Pa","meaning":"Father"},{"karbi":"Kimu","mizo":"Pa","meaning":"Crab"},{"karbi":"Muaman","mizo":"Pachang","meaning":"Dried fish / Crab variety"},{"karbi":"Pharkong","mizo":"Pang","meaning":"Local tree/timber"},{"karbi":"Ingki","mizo":"Pangang","meaning":"Caterpillar"},{"karbi":"Ingki","mizo":"Pangang","meaning":""},{"karbi":"Ruipharong","mizo":"Pangbal","meaning":"Chayote / Squash variety"},{"karbi":"Tampijuk","mizo":"Pangkai","meaning":"Mantis / Praying mantis"},{"karbi":"Mir","mizo":"Pangpar","meaning":"Flower"},{"karbi":"Var","mizo":"Paih, vawm","meaning":"Throw / discard"},{"karbi":"Isi","mizo":"Pakhat","meaning":"One"},{"karbi":"Pai","mizo":"Pal (huanpal)","meaning":"Fence / hedge"},{"karbi":"Punu","mizo":"Pami","meaning":"Paternal uncle"},{"karbi":"Bithi, bikron","mizo":"Pan hnah","meaning":"Betel leaf"},{"karbi":"Chepangno","mizo":"Pan (lam hawi)","meaning":"Head towards"},{"karbi":"Muchinglule","mizo":"Papuanveng","meaning":"Edible plant/herb"},{"karbi":"Mirherei","mizo":"Par-arsi","meaning":"Parboiled"},{"karbi":"Mulokso","mizo":"Paårdang","meaning":"Wild bird / Wildlife (or specific edible insect/item)"},{"karbi":"Pangphar","mizo":"Par (parchuak, parparh)","meaning":"Bloom / flower"},{"karbi":"Vothung","mizo":"Parva / mipa zahmawh sawina","meaning":"Pigion / penis"},{"karbi":"Penan","mizo":"Pasal","meaning":"Husban"},{"karbi":"Penan","mizo":"Pasal","meaning":"Husband"},{"karbi":"Pateng paju","mizo":"Pasal vawihnih neihna","meaning":"Second marriage"},{"karbi":"Muplong","mizo":"Pasawntlung","meaning":"Wild plant/herb"},{"karbi":"Musi","mizo":"Pasi","meaning":"Wild seed/plant"},{"karbi":"Buruk","mizo":"Pate","meaning":"Small basket / Pouch"},{"karbi":"Arnam","mizo":"Pathian","meaning":"Lord / God"},{"karbi":"Hemepo","mizo":"Pathlawi","meaning":"Widower"},{"karbi":"Sarmar","mizo":"Patling","meaning":"Adult man / elder"},{"karbi":"Sar anglok","mizo":"Pavalai","meaning":"Middle-aged man"},{"karbi":"Kelangrem","mizo":"Pawngsual","meaning":"Rape"},{"karbi":"Tangka maha","mizo":"Pawisa","meaning":"Money"},{"karbi":"Asong","mizo":"Pawl","meaning":"Association / group"},{"karbi":"Kelu","mizo":"Pawl","meaning":"Blue"},{"karbi":"Jalang","mizo":"Pawl","meaning":"Fellowship / associate"},{"karbi":"Arbak/bam/deng","mizo":"Pawm","meaning":"Hold in arms / accept"},{"karbi":"Angtan","mizo":"Pawn","meaning":"Outside"},{"karbi":"Vakdak","mizo":"Pawp","meaning":"Hollow"},{"karbi":"Vung","mizo":"Pawt","meaning":"Pull"},{"karbi":"Mung","mizo":"Pawt (hnuk)","meaning":"Pull / drag"},{"karbi":"Pi","mizo":"Pe","meaning":"Give"},{"karbi":"Pi, hodai","mizo":"Pe","meaning":"Give"},{"karbi":"Pechon","mizo":"Pechhawng","meaning":"Hand over / pass on"},{"karbi":"Arnam Vokongkang","mizo":"Pengleng","meaning":"Oriole / Golden oriole"},{"karbi":"Pechan","mizo":"Peipung (tipung)","meaning":"Multiply / increase"},{"karbi":"Par","mizo":"Pel","meaning":"Pass by / bypass"},{"karbi":"Chinglok, chelit","mizo":"Pelh (pelhsawlh)","meaning":"Miss step / slip"},{"karbi":"Areng amek","mizo":"Pem","meaning":"Wound / injury"},{"karbi":"Kebe keche","mizo":"Pem","meaning":"Migrate"},{"karbi":"Cheterek","mizo":"Pem/sawn","meaning":"Shift"},{"karbi":"Kengkam chejor","mizo":"Pen/hmasawn","meaning":"Develop"},{"karbi":"Kolom","mizo":"Pen (thil ziahna)","meaning":"Pen"},{"karbi":"Gojal","mizo":"Perek","meaning":"Nail"},{"karbi":"Ap","mizo":"Perh (kap)","meaning":"Spring / flick"},{"karbi":"Chanrong","mizo":"Perhpawng","meaning":"Moth"},{"karbi":"Lim","mizo":"Phah (awng phah)","meaning":"Spread out (mat)"},{"karbi":"Thoi (arlok)","mizo":"Phai (ruam)","meaning":"Valley / plain"},{"karbi":"Phik","mizo":"Phak","meaning":"Reach"},{"karbi":"Si-i kecho","mizo":"Phar","meaning":"Leprosy"},{"karbi":"Ri cherung","mizo":"Phar (ban phar)","meaning":"Spread arms"},{"karbi":"Chekorbe, chekrongkre","mizo":"Phat","meaning":"Deny / refuse"},{"karbi":"Chong","mizo":"Phaw","meaning":"Shield"},{"karbi":"Phu, sat","mizo":"Phawi","meaning":"Pull out / uproot"},{"karbi":"Chalaitai amonit","mizo":"Phawk (fiamthu duh)","meaning":"Joker"},{"karbi":"Pongsi","mizo":"Phenglawng","meaning":"Flute"},{"karbi":"Phliphli","mizo":"Phengphehlep","meaning":"Butterfly"},{"karbi":"Kengop","mizo":"Pheikhawk","meaning":"Shoes / Footwear"},{"karbi":"Phlak","mizo":"Phel","meaning":"Split / divide"},{"karbi":"Phlok","mizo":"Phelh, hlip","meaning":"Untie"},{"karbi":"Phri","mizo":"Phelh (thiat)","meaning":"Untie / undo"},{"karbi":"Karlo","mizo":"Phelsep","meaning":"Split bamboo plank / Wall lath"},{"karbi":"Tar","mizo":"Pher","meaning":"Mat (bamboo/cane mat)"},{"karbi":"Phi-ing abong","mizo":"Phing","meaning":"Bladder"},{"karbi":"Oso akcherop (twin)","mizo":"Phir","meaning":"Twin"},{"karbi":"Te","mizo":"Pho (puan pho)","meaning":"Sun / dry in sun"},{"karbi":"Rak","mizo":"Phuar","meaning":"Bind / tie up"},{"karbi":"Kekok kangnang","mizo":"Phuar, man","meaning":"Arrest, catch"},{"karbi":"Pharklung","mizo":"Phuihnam","meaning":"Blumea balsamifera leaves"},{"karbi":"Pip","mizo":"Phum","meaning":"Bury"},{"karbi":"Pasimu/paselur","mizo":"Phun","meaning":"Complain / plant"},{"karbi":"Ke-e kesom","mizo":"Phun, tuh","meaning":"Plant, sow"},{"karbi":"Inghor","mizo":"Phur","meaning":"Carry / load"},{"karbi":"Inghor","mizo":"Phur","meaning":"Carry load"},{"karbi":"Aduk","mizo":"Phut (dip)","meaning":"Fine"},{"karbi":"Phi/Sangpi","mizo":"Pi","meaning":"Grandmother"},{"karbi":"Mahang kethek","mizo":"Piang","meaning":"Be born"},{"karbi":"Tekokjok","mizo":"Piangsual","meaning":"Deformed"},{"karbi":"Apar","mizo":"Piahah","meaning":"Beyond / further"},{"karbi":"Longpak","mizo":"Pialtlep","meaning":"Flat rock / slab"},{"karbi":"Kangthin, kamarthu, kebang","mizo":"Ping (ti ping)","meaning":"Block / obstruct"},{"karbi":"Singnam","mizo":"Pik (bawn)","meaning":"Rough"},{"karbi":"Sarpi","mizo":"Pi (pasal nei tawh)","meaning":"Grandmother"},{"karbi":"Vophri","mizo":"Pit","meaning":"Quail"},{"karbi":"Sarphu sarphi","mizo":"Pitar putar","meaning":"Father/parent"},{"karbi":"Phu/Sar","mizo":"Pu","meaning":"Grandfather / Mr."},{"karbi":"Peklang","mizo":"Puang","meaning":"Announce / proclaim"},{"karbi":"Ingbob","mizo":"Puak","meaning":"Explode / burst"},{"karbi":"Piba","mizo":"Puakpuan","meaning":"Baby-carrying cloth"},{"karbi":"Inglong akasenun","mizo":"Puallawi (tlang bul ṭhut)","meaning":"Foothill"},{"karbi":"Pe","mizo":"Puan","meaning":"Cloth / blanket"},{"karbi":"Pe","mizo":"Puan","meaning":"Cloth / Traditional wrapper"},{"karbi":"Ba","mizo":"Pua (nau pua)","meaning":"Carry on back"},{"karbi":"Pekok","mizo":"Puanbah(Hmeichhe bah)","meaning":"Women's wrap-around cloth tied under the arm"},{"karbi":"Pini","mizo":"Puan bih","meaning":"Wrap around"},{"karbi":"Therang","mizo":"Puanbu","meaning":"Cloth bundle / Textile"},{"karbi":"Pe-Um","mizo":"Puan sin","meaning":"Bed sheet / Blanket / Wrapper for sleeping"},{"karbi":"Ingkrang","mizo":"Puar (tlai)","meaning":"Full"},{"karbi":"Chan","mizo":"Pung","meaning":"Increase / multiply"},{"karbi":"Chanri chanjai","mizo":"Pung, inthlahpung","meaning":"Increase, multiplication"},{"karbi":"Bok","mizo":"Puh","meaning":"Accuse / blame"},{"karbi":"Rap","mizo":"Pui (tanpui)","meaning":"Help / assist"},{"karbi":"Longku","mizo":"Puk","meaning":"Cave"},{"karbi":"Ram","mizo":"Puk","meaning":"Borrow"},{"karbi":"Longku longdang","mizo":"Puk","meaning":"Cave"},{"karbi":"Ram","mizo":"Puk, hawh","meaning":"Borrow"},{"karbi":"Parphang","mizo":"Pu (kokiah)","meaning":"Carry on shoulder"},{"karbi":"Avur pen kethi","mizo":"Pul (thi)","meaning":"Epidemic / spread of disease"},{"karbi":"Pok","mizo":"Pum","meaning":"Stomach"},{"karbi":"Pok","mizo":"Pum/dul","meaning":"Belly / Stomach / Abdomen"},{"karbi":"Phektung","mizo":"Pumpui","meaning":"Stomach"},{"karbi":"Kechan kejar","mizo":"Punna, ṭhanna","meaning":"Growth"},{"karbi":"Sar","mizo":"Pu (nupui nei tawh)","meaning":"Grandfather"},{"karbi":"Harsun Keer","mizo":"Purunsen","meaning":"Red onion"},{"karbi":"Harsun Kelok","mizo":"Purunvâr","meaning":"Garlic"},{"karbi":"Ong nihu","mizo":"Putea","meaning":"Maternal uncle"},{"karbi":"Prap","mizo":"Rang","meaning":"Fast"},{"karbi":"Ser","mizo":"Rangkachak","meaning":"Gold"},{"karbi":"Ser rup","mizo":"Rangkachak leh tangka, ro hlu","meaning":"Gold, money, valuable property"},{"karbi":"Athe kapethe","mizo":"Rah","meaning":"Yield results"},{"karbi":"Areng angsese","mizo":"Raipuar","meaning":"Pregnant"},{"karbi":"Hotur","mizo":"Ral (hmelma)","meaning":"Enemy"},{"karbi":"Achar","mizo":"Ral khat","meaning":"Far away"},{"karbi":"Parai","mizo":"Ral lehlam","meaning":"Other side"},{"karbi":"Jakhor","mizo":"Ralthuam","meaning":"Weapon"},{"karbi":"Chir nok","mizo":"Ralthuam","meaning":"Weapon"},{"karbi":"Det, havar","mizo":"Ram","meaning":"Country / land"},{"karbi":"Vohar","mizo":"Ramar","meaning":"Pheasant / Jungle fowl"},{"karbi":"Longri","mizo":"Rambial","meaning":"District"},{"karbi":"Nampi","mizo":"Ramngaw","meaning":"Forest / jungle"},{"karbi":"Habit","mizo":"Ramhnuai","meaning":"Deep jungle / wilderness"},{"karbi":"Ingnam arlok","mizo":"Ramhnui","meaning":"Forest, jungle"},{"karbi":"Nampi namdur","mizo":"Ramhnui, ramngaw","meaning":"Forest, jungle"},{"karbi":"Hi-i","mizo":"Ramhuai","meaning":"Demon / evil spirit"},{"karbi":"Sirim, temot","mizo":"Ram/mawih","meaning":"Old"},{"karbi":"Ahoi adui","mizo":"Ramri","meaning":"Boundary"},{"karbi":"Habit api","mizo":"Ramsa","meaning":"Wild animal"},{"karbi":"Marat mareng","mizo":"Ramsa","meaning":"Animal"},{"karbi":"Teke ingnar","mizo":"Ramsa kawlh","meaning":"Animal trapping"},{"karbi":"Mehek hanthu","mizo":"Ramthlai","meaning":"Vegetation"},{"karbi":"Ingki ingket","mizo":"Rannung","meaning":"Animal"},{"karbi":"Phirui sangman","mizo":"Rannung hlauhawm","meaning":"Dangerous animal"},{"karbi":"Musit miso","mizo":"Rannung mi seh chi; fanghmir","meaning":"Small animal/insect"},{"karbi":"Chelong chainong","mizo":"Ran, ranvulh","meaning":"Animal, beast"},{"karbi":"Kapangreng api","mizo":"Ran (vulh chi)","meaning":"Domestic animal"},{"karbi":"Dong","mizo":"Rap","meaning":"Step on"},{"karbi":"Dong","mizo":"Rap (kea rap)","meaning":"Step on / tread"},{"karbi":"Rong","mizo":"Rawng","meaning":"Colour"},{"karbi":"Kerukethai","mizo":"Rawngbawlna","meaning":"Service"},{"karbi":"Keru kethai abang","mizo":"Rawngbawltu","meaning":"Servant / minister"},{"karbi":"Angthin keho, aning keho","mizo":"Rawng (nun chhia)","meaning":"Cruel"},{"karbi":"Phi/me kephri (hal)","mizo":"Rawh","meaning":"Explode / burn"},{"karbi":"Risomar","mizo":"Rawlthar","meaning":"Young man / youth"},{"karbi":"Van","mizo":"Rawn","meaning":"Let"},{"karbi":"Vang","mizo":"(Rawn) kal","meaning":"Come"},{"karbi":"Van","mizo":"Rawn (keng)","meaning":"Bring / carry"},{"karbi":"Van, thon","mizo":"Rawn la","meaning":"Bring / send here"},{"karbi":"Pathikoi","mizo":"Rawt (thilum teuh)","meaning":"Massacre / exterminate"},{"karbi":"Ver","mizo":"Reng","meaning":"Always"},{"karbi":"Ingsamri","mizo":"Reh","meaning":"Quiet"},{"karbi":"Ajir keding","mizo":"Rei","meaning":"Long time"},{"karbi":"Tum","mizo":"Rek (hrawka rek)","meaning":"Choke / strangle"},{"karbi":"Ghari keding","mizo":"Rel","meaning":"Train"},{"karbi":"Sorsa","mizo":"Rel (sawi chhia)","meaning":"Criticize / speak ill"},{"karbi":"Apor keme","mizo":"Remchang","meaning":"Convenient"},{"karbi":"Aning kapangsam, kachepangsam","mizo":"Rem (inremna sawipui)","meaning":"Negotiate peace / agree"},{"karbi":"Kim","mizo":"Rem khawm","meaning":"Gather / reconcile"},{"karbi":"Ningarong ningkangsam","mizo":"Remna leh muanna","meaning":"Peace and harmony"},{"karbi":"Chere","mizo":"Ren (renchem)","meaning":"Economize / frugal"},{"karbi":"Pakreng","mizo":"Rep (tiro)","meaning":"Shoot / fire"},{"karbi":"Keduk, dukdet","mizo":"Rethei","meaning":"Poor"},{"karbi":"Bebe, sa","mizo":"Riak","meaning":"Spend the night / stay"},{"karbi":"Vohamlam","mizo":"Riakmaw","meaning":"Hornbill variety"},{"karbi":"Herei","mizo":"Rial","meaning":"Hailstone"},{"karbi":"Tomon herei","mizo":"Rial leh thlipui","meaning":"Storm and wind"},{"karbi":"Kroi","mizo":"Ring","meaning":"Believe"},{"karbi":"Arki kethe, se kethe","mizo":"Ring","meaning":"Loud"},{"karbi":"Kroihoi","mizo":"Ringhlel","meaning":"Doubt / suspect"},{"karbi":"Phekjir","mizo":"Ril","meaning":"Intestine / Gut"},{"karbi":"Kangchir kalang-it","mizo":"Rilam tuihal","meaning":"Thirsty"},{"karbi":"Aning anghthin","mizo":"Rilru, thinlung","meaning":"Mind, heart"},{"karbi":"An kangchir","mizo":"Rilṭam","meaning":"Hunry"},{"karbi":"Karsik","mizo":"Ril (thuk)","meaning":"Deep"},{"karbi":"Nemthu nemthor","mizo":"Rimchhia","meaning":"Bad smell"},{"karbi":"Nempru nemlang","mizo":"Rimtui","meaning":"Fragrant"},{"karbi":"Ningso ningi","mizo":"Rinawm lo, mitsik, phunnawi","meaning":"Unreliable, jealous, complaining"},{"karbi":"Kekroi","mizo":"Rinna","meaning":"Faith / belief"},{"karbi":"Ardik","mizo":"Rit","meaning":"Heavy"},{"karbi":"Tak kreng kreng, vuk","mizo":"Rit (hai)","meaning":"Heavy / hard"},{"karbi":"Jakhor","mizo":"Râlthuam","meaning":"Weapon / Armament"},{"karbi":"Khi","mizo":"Ro","meaning":"Treasure / wealth"},{"karbi":"Kreng","mizo":"Ro","meaning":"Dry"},{"karbi":"A hir do ","mizo":"Ropui","meaning":"Glorious"},{"karbi":"A hir do, anong the","mizo":"Ropui","meaning":"Grand/Glorious"},{"karbi":"Adak atur","mizo":"Ropuina","meaning":"Glory"},{"karbi":"Adak atur","mizo":"Ropuina","meaning":"Glory / majesty"},{"karbi":"Adak atur","mizo":"Ropuina","meaning":"Beauty"},{"karbi":"Ahir asang","mizo":"Ropuina, khunkhan","meaning":"Beauty, elegance"},{"karbi":"Ingsaia","mizo":"Rorel","meaning":"Discuss / judge"},{"karbi":"Bisar kidar","mizo":"Rorelna","meaning":"Judgment, administration"},{"karbi":"Chingvaichingsai","mizo":"Rorel, sawiho","meaning":"Discuss, deliberate"},{"karbi":"Kangsai abang","mizo":"Roreltu","meaning":"Judge / ruler"},{"karbi":"Akhi adat","mizo":"Ro sum, khawvel hausakna","meaning":"Wealth, worldly prosperity"},{"karbi":"Inghu","mizo":"Ru","meaning":"Steal"},{"karbi":"Chek, buluka","mizo":"Rua","meaning":"Bamboo shoot"},{"karbi":"Arvak,","mizo":"Ruang","meaning":"Corpse / deadbody"},{"karbi":"Arve","mizo":"Ruah","meaning":"Rain"},{"karbi":"Inghun arve","mizo":"Ruah","meaning":"Rain"},{"karbi":"Chojun amei","mizo":"Ruai","meaning":"Feast / banquet"},{"karbi":"Chojun choku","mizo":"Ruai, ruaitheh","meaning":"Feast, feast gathering"},{"karbi":"Chojun ame i","mizo":"Ruaitheh","meaning":"Feast / banquet"},{"karbi":"Angse","mizo":"Ruak","meaning":"Empty"},{"karbi":"Angse, kejoi (Asom. khali)","mizo":"Ruak","meaning":"Empty"},{"karbi":"Nei, cheklam","mizo":"Rual (mam)","meaning":"Even/Smooth"},{"karbi":"Nei, cheklam","mizo":"Rual (mam)","meaning":"Equal / Smooth"},{"karbi":"Arlok","mizo":"Ruam","meaning":"Valley"},{"karbi":"Reppi","mizo":"Ruh","meaning":"Bone"},{"karbi":"Reppi asek","mizo":"Ruhchuktuah","meaning":"Joint"},{"karbi":"Ingri","mizo":"Rui (lirthei, zu)","meaning":"Drunk / intoxicated"},{"karbi":"Ingri / kangri","mizo":"Rui / motor rui","meaning":"Drunk / car sick"},{"karbi":"Kangri kangkrang","mizo":"Rui, zurui","meaning":"Dance, dancing"},{"karbi":"Kanghu","mizo":"Rukru","meaning":"Thief"},{"karbi":"Tu","mizo":"Rul","meaning":"Repay / snake"},{"karbi":"Phirui","mizo":"Rul","meaning":"Snake"},{"karbi":"Ruipheleting","mizo":"Rulngan","meaning":"Cobra"},{"karbi":"Ruivoru","mizo":"Rulmuk","meaning":""},{"karbi":"Phelangjule","mizo":"Rulral","meaning":""},{"karbi":"Ruiphe","mizo":"Rulrial/Chawngkawr","meaning":""},{"karbi":"Rui-ingku","mizo":"Rultuha","meaning":""},{"karbi":"Ar-em","mizo":"Rum (hreawm tuar)","meaning":"Groan / moan"},{"karbi":"Ron kedam","mizo":"Run (do)","meaning":"Attack / invade"},{"karbi":"Chonghu chonghi","mizo":"Ru, rukru","meaning":"Corpse, dead body"},{"karbi":"Hum","mizo":"Rut (chhar)","meaning":"Pick up / gather"},{"karbi":"Kim","mizo":"Sa","meaning":"Built"},{"karbi":"Ok","mizo":"Sa","meaning":"Meat"},{"karbi":"So, keso","mizo":"Sa","meaning":"Hot/Fierce"},{"karbi":"So, keso (Lc.soluk sodak - buaina, innghirnghona)","mizo":"Sa","meaning":"Hot / Meat / Dispute"},{"karbi":"Kim/lun","mizo":"Sa","meaning":"Build / sing"},{"karbi":"Gadha","mizo":"Sabengtung","meaning":"Donkey / Ass"},{"karbi":"Kekim, kerang","mizo":"Sa, din","meaning":"Build"},{"karbi":"Ingtui, keding","mizo":"Sang","meaning":"High/Tall"},{"karbi":"Ingtui, keding (keding hi chu sei sawina atan pawh hman a ni)","mizo":"Sang","meaning":"Tall / High"},{"karbi":"Lang-aok","mizo":"Sangha","meaning":"Fish"},{"karbi":"Phakleng/habit aphak","mizo":"Sanghal","meaning":""},{"karbi":"Kethoi","mizo":"Sanghar","meaning":""},{"karbi":"Ka-ut","mizo":"Sanghawngsei","meaning":"Giraffe"},{"karbi":"Sirim","mizo":"Sahram","meaning":"Wild boar"},{"karbi":"Ingren","mizo":"Sahuai","meaning":"Civet cat / Wild cat"},{"karbi":"Ingnaar","mizo":"Sai","meaning":"Elephant"},{"karbi":"Bapthali","mizo":"Sairawkherh","meaning":"Slingshot"},{"karbi":"Lobongkengtong","mizo":"Saisu","meaning":"Wild root/vegetable"},{"karbi":"Losei","mizo":"Sakawr","meaning":"Horse"},{"karbi":"Kesi","mizo":"Sakawrbakcheh","meaning":"Scissor"},{"karbi":"Ingtang","mizo":"Sak (chang)","meaning":"Hard/Firm"},{"karbi":"Ingtang","mizo":"Sak (chang)","meaning":"Hard / Stiff"},{"karbi":"Teke","mizo":"Sakei","meaning":"Tiger"},{"karbi":"Hingho/Sinkong ingraar","mizo":"Sakeibaknei","meaning":"Lion"},{"karbi":"Dhoromi","mizo":"Sakhawmi","meaning":"Religious person"},{"karbi":"Ok-hi","mizo":"Sakhi","meaning":"Sambar deer / Deer"},{"karbi":"Dhorom","mizo":"Sakhua","meaning":"Religion"},{"karbi":"Ok-hi-bonghom","mizo":"Sakuh","meaning":"Porcupine"},{"karbi":"Ban","mizo":"Sal","meaning":"Slave"},{"karbi":"Chu","mizo":"Sam","meaning":"Hair"},{"karbi":"Chu","mizo":"Sam","meaning":"Hair (head)"},{"karbi":"Kindu","mizo":"Samak","meaning":"Serow / Wild goat"},{"karbi":"Theso Keho","mizo":"Samţawkte","meaning":"Small mushroom variety"},{"karbi":"Pan","mizo":"Sam (samfai)","meaning":"Comb hair / clear"},{"karbi":"Hepi Keho","mizo":"Samtawk","meaning":"Mushroom variety"},{"karbi":"Ghori","mizo":"Sana","meaning":"Watch / clock"},{"karbi":"Birikman","mizo":"Saphmarcha","meaning":"Bell pepper / Capsicum"},{"karbi":"Huni","mizo":"Sarthi","meaning":"Widow"},{"karbi":"Huni","mizo":"Sarthi","meaning":"Time of death"},{"karbi":"Honi kanti","mizo":"Sarthi","meaning":"Driver"},{"karbi":"Than, chor","mizo":"Sat","meaning":"Cut / slash"},{"karbi":"Chitung","mizo":"Satel","meaning":"Tortoise / Turtle"},{"karbi":"Karlu","mizo":"Sathår","meaning":"Gayal / Mithun (wild bovine)"},{"karbi":"Vo","mizo":"Sava","meaning":"Bird"},{"karbi":"Votek voso","mizo":"Sava","meaning":"Tomorrow"},{"karbi":"Vo Atar","mizo":"Sava Bu","meaning":"Bird nest"},{"karbi":"Thokvam","mizo":"Savawm","meaning":"Bear"},{"karbi":"Karju","mizo":"Saza","meaning":"Hog deer / Barking deer variety"},{"karbi":"Kaselet","mizo":"Sazaw","meaning":"Weasel / Ferret badger"},{"karbi":"Phiju","mizo":"Sazu","meaning":"Mouse"},{"karbi":"Phiju","mizo":"Sazu","meaning":"Rat"},{"karbi":"Phiju","mizo":"Sazu","meaning":"Rat / Mouse"},{"karbi":"Thijok","mizo":"Sazuk","meaning":"Sambar deer"},{"karbi":"Phiju Angthor","mizo":"Sazu kua","meaning":"Rat hole"},{"karbi":"Mengserang","mizo":"Sazupui","meaning":"Giant squirrel"},{"karbi":"Hanso","mizo":"Sawhthing","meaning":"Ginger"},{"karbi":"Pu","mizo":"Sawi","meaning":"Say"},{"karbi":"Pinrem","mizo":"Sawichhia","meaning":"Speak ill / defame"},{"karbi":"Putot pusit","mizo":"Sawi chhia","meaning":"Speak badly"},{"karbi":"Sorsa","mizo":"Sawisel, rel","meaning":"Criticize / speak ill"},{"karbi":"Chekip","mizo":"Sawk (tham)","meaning":"Grasp / clutch"},{"karbi":"Hang","mizo":"Sawm","meaning":"Invite"},{"karbi":"Terek","mizo":"Sawn","meaning":"Move"},{"karbi":"So rongro","mizo":"Sawn (khawlai fa)","meaning":"Illegitimate child"},{"karbi":"Teplong","mizo":"Sawntlung (pawng)","meaning":"Orphan / foundling"},{"karbi":"Sor","mizo":"Sawr (hnute/puansuk)","meaning":"Suck"},{"karbi":"Halabangso","mizo":"Saw saw","meaning":"That"},{"karbi":"Chon","mizo":"Sawt","meaning":"Jump"},{"karbi":"Haladak","mizo":"Sawtah","meaning":"There"},{"karbi":"Halason","mizo":"Sawtiang sawn","meaning":"Like that"},{"karbi":"Oi","mizo":"Seng (puan)","meaning":"Laundry"},{"karbi":"Kor","mizo":"Seh","meaning":"Bite"},{"karbi":"Kor/chek","mizo":"Seh","meaning":"Bite / sting"},{"karbi":"Keding","mizo":"Sei","meaning":"Long"},{"karbi":"Thak","mizo":"Sem","meaning":"Distribute / share"},{"karbi":"Keron, kebak","mizo":"Sem","meaning":"Distribute"},{"karbi":"Ke-er","mizo":"Sen","meaning":"Red"},{"karbi":"Hilingdum","mizo":"Sephung","meaning":""},{"karbi":"Kajilemu","mizo":"Serfang","meaning":"Lemon"},{"karbi":"Ruibap","mizo":"Sertawk","meaning":"Grapefruit / Pomelo"},{"karbi":"Thesere","mizo":"Ser (thei)","meaning":"Orange / citrus fruit"},{"karbi":"Theso kedok","mizo":"Serthlum","meaning":"Orange"},{"karbi":"Thesokedok","mizo":"Serthlum","meaning":"Orange / Mandarin"},{"karbi":"Chai","mizo":"Sial","meaning":"Mithun / Gayal"},{"karbi":"Selam","mizo":"Siam","meaning":"Make / Made"},{"karbi":"Selam","mizo":"Siam","meaning":"Made / make"},{"karbi":"Pinchong","mizo":"Siam","meaning":"Create"},{"karbi":"Selam/pinchong","mizo":"Siam","meaning":"Make / create"},{"karbi":"Pinchong pinthi","mizo":"Siam, din","meaning":"Create"},{"karbi":"Dorde rire","mizo":"Siamthat ngaihna awm lo","meaning":"Cannot be repaired"},{"karbi":"Ji","mizo":"Sih","meaning":"Spring / water source"},{"karbi":"Sirung","mizo":"Sihal","meaning":"Fox / Jackal"},{"karbi":"Nochan-Amehek","mizo":"Sihneh","meaning":"Fern variety / Edible shoot"},{"karbi":"Botor bokan","mizo":"Sik leh sa","meaning":"Flesh and blood"},{"karbi":"Dit","mizo":"Sil","meaning":"Rub"},{"karbi":"Hile","mizo":"Silai","meaning":"Gun / Rifle"},{"karbi":"Kecham kangthi","mizo":"Silfai, su","meaning":"Wash, bathe"},{"karbi":"Pe ri","mizo":"Silhfen inthlakna","meaning":"Spare clothes"},{"karbi":"Pe sele risele","mizo":"Silhfen inthlakna","meaning":"Spare clothes"},{"karbi":"Cham, ingthi","mizo":"Sil (thil sil)","meaning":"Wash"},{"karbi":"Ning cherui, chekirla","mizo":"Sim (lungchhir in)","meaning":"Regret / repent"},{"karbi":"Cheum/che-i","mizo":"Sin","meaning":"Wear"},{"karbi":"Jitso","mizo":"Sin(te)","meaning":"Thin"},{"karbi":"Jitso","mizo":"Sin (te)","meaning":"Thin"},{"karbi":"Arei, akung","mizo":"Sir","meaning":"Side/Edge"},{"karbi":"Arei, akung","mizo":"Sir","meaning":"Side"},{"karbi":"Vosokpi","mizo":"Siruk","meaning":"Wolf / jackal"},{"karbi":"Tong","mizo":"Si, tauh","meaning":"-"},{"karbi":"Arklok","mizo":"So (tui so)","meaning":"Boil"},{"karbi":"Belcha","mizo":"Suahdur","meaning":"Spade / Shovel"},{"karbi":"Pap","mizo":"Sual","meaning":"Sin"},{"karbi":"Chonep","mizo":"Sual","meaning":"Sin / do wrong"},{"karbi":"Pap","mizo":"Sualna","meaning":"Sin / evil"},{"karbi":"Pap pun","mizo":"Sualna","meaning":"Sin, wrongdoing"},{"karbi":"Rung","mizo":"Suan","meaning":"Carry on back"},{"karbi":"Lengpum","mizo":"Suk","meaning":"Pestle (for pounding rice)"},{"karbi":"Long","mizo":"Sum","meaning":"Mortar (for pounding rice)"},{"karbi":"Thelu","mizo":"Sunhlu","meaning":"Gooseberry"},{"karbi":"Thelu","mizo":"Sunhlu","meaning":"Indian jujube / Plum"},{"karbi":"Chok","mizo":"Su (puan su)","meaning":"Wash clothes"},{"karbi":"Ingnang/phatek keing","mizo":"Tang","meaning":"Stand / hang"},{"karbi":"Tangka","mizo":"Tangka","meaning":"Money / rupee"},{"karbi":"Kenangsot","mizo":"Ṭangkai","meaning":"Far apart / Wide"},{"karbi":"Chehang","mizo":"Tangkawng","meaning":"Pangolin / Scaly anteater"},{"karbi":"Bu/thak","mizo":"Tah","meaning":"Pound"},{"karbi":"Sokkarjang","mizo":"Ṭai(buh)","meaning":"Paddy / unhusked rice"},{"karbi":"Hidam","mizo":"Tai","meaning":"Lower abdomen"},{"karbi":"Chepeduk, seletle","mizo":"Taima","meaning":"Diligent"},{"karbi":"Chepeduk, seletle","mizo":"Taima","meaning":"Diligent / Hardworking"},{"karbi":"Bang","mizo":"Taksa","meaning":"Body"},{"karbi":"Ok","mizo":"Taksa","meaning":"Body"},{"karbi":"Ningni ningot","mizo":"Taksa bal","meaning":"Body weight"},{"karbi":"Aphu aphang","mizo":"Taksa pumpui","meaning":"Whole body"},{"karbi":"Arpum arjon","mizo":"Taksa pumpui","meaning":"Whole body"},{"karbi":"That, thu","mizo":"Talh","meaning":"Strike"},{"karbi":"Kaibong","mizo":"Talhtum","meaning":"Club / mallet"},{"karbi":"Kaibong","mizo":"Talhtum/Hmawlh","meaning":"Wooden mallet / Club"},{"karbi":"Chardak","mizo":"Tal (leng)","meaning":"Climb"},{"karbi":"Keong","mizo":"Tam","meaning":"Many/Much"},{"karbi":"Keong","mizo":"Tam tak","meaning":"Many / alot"},{"karbi":"Amon adang","mizo":"Tam tham tak","meaning":"Very much"},{"karbi":"Cheng, pangcheng","mizo":"Ṭan","meaning":"Start"},{"karbi":"Rot","mizo":"Tan","meaning":"Cut"},{"karbi":"Phatek, hem kangsam","mizo":"Tan in","meaning":"Prison / jail"},{"karbi":"Rap","mizo":"Ṭanpui","meaning":"Help"},{"karbi":"Cheng, pangcheng","mizo":"Tan (thil tan)","meaning":"Start / begin"},{"karbi":"Than, rot","mizo":"Tan, zai","meaning":"Cut / slice"},{"karbi":"Chiru","mizo":"Ṭap","meaning":"Cry"},{"karbi":"Chiru","mizo":"Tap","meaning":"Squeeze / express"},{"karbi":"Chirucharnap","mizo":"Tap, lungchhiatna leh lungngaihna","meaning":"Sorrow, sadness and grief"},{"karbi":"Chiru taram","mizo":"Tap, lungchhiatna leh lungngaihna","meaning":"Sorrow, sadness and grief"},{"karbi":"Sar","mizo":"Tar","meaning":"Old (person)"},{"karbi":"Sar-u","mizo":"Tar","meaning":"Old (person)"},{"karbi":"Tar","mizo":"Tar","meaning":"Stretch"},{"karbi":"Sosma/Mekturbin","mizo":"Tarmit","meaning":"Spectacles / Eyeglasses"},{"karbi":"Arso","mizo":"Tat hriam","meaning":"Sharpen"},{"karbi":"Tong","mizo":"Tauh, si","meaning":"Meet / touch"},{"karbi":"Ningje, pu","mizo":"Ṭawng","meaning":"Speak / talk"},{"karbi":"Alam aki","mizo":"Ṭawng","meaning":"Language"},{"karbi":"Pho","mizo":"Tawng (phak)","meaning":"Speak / reach"},{"karbi":"Ningje","mizo":"Tawng / sawi","meaning":"Speak"},{"karbi":"Arnam ardom","mizo":"Ṭawngṭai","meaning":"Pray"},{"karbi":"Ardom ardi","mizo":"Ṭawngṭai","meaning":"Pray"},{"karbi":"Kardom kardi","mizo":"Ṭawngṭaina","meaning":"Boat journey"},{"karbi":"Alam kave, lamve","mizo":"Ṭawngthei lo","meaning":"Unshakable"},{"karbi":"Pudinghak","mizo":"Tawng, thing","meaning":"Loose / Shaking"},{"karbi":"Kethi","mizo":"Tawi","meaning":"Short"},{"karbi":"Thi, thihek","mizo":"Tawi","meaning":"Short"},{"karbi":"Thu","mizo":"Tawih","meaning":"Believe / obey"},{"karbi":"Siming","mizo":"Tawitaw","meaning":"Dragonfly"},{"karbi":"Chetong","mizo":"Tawk","meaning":"Meet"},{"karbi":"Kongtelong","mizo":"Tawlailir","meaning":"Cart / carriage"},{"karbi":"Chetut","mizo":"Tawlh","meaning":"Slide / move back"},{"karbi":"Rak","mizo":"Tawn, phuar","meaning":"Tide"},{"karbi":"Kejut, akejut","mizo":"Tawp (a tawp)","meaning":"End / limit"},{"karbi":"Kesung keboi","mizo":"Tawrna, harsatna","meaning":"Suffering, difficulty"},{"karbi":"Kesung kelak","mizo":"Tawrna, harsatna","meaning":"Suffering, difficulty"},{"karbi":"Pongut","mizo":"Tawtawrawt","meaning":"Trumpet / horn"},{"karbi":"Kebi","mizo":"Te","meaning":"Small"},{"karbi":"Bi, bihek","mizo":"Te","meaning":"Small"},{"karbi":"Hangser, hangjo","mizo":"Ṭe","meaning":"To scream / shout"},{"karbi":"Kebi kethi","mizo":"Te","meaning":"Small"},{"karbi":"Tantili","mizo":"Tengtere","meaning":"Tamarind"},{"karbi":"Tantili","mizo":"Tengtere","meaning":"Cicada"},{"karbi":"Pun","mizo":"Teh","meaning":"Measure"},{"karbi":"Apun achak","mizo":"Tehna","meaning":" Measurement"},{"karbi":"Juithap","mizo":"Teihawi","meaning":"Paddle"},{"karbi":"Jangthu","mizo":"Tel ","meaning":"Oil ( cooking oil / petrol )"},{"karbi":"Jangthu","mizo":"Tel","meaning":"Oil"},{"karbi":"Jok, jokdun","mizo":"Telh","meaning":"Add"},{"karbi":"Jangthu","mizo":"Tel (hriak)","meaning":"Oil / fat"},{"karbi":"Chomat","mizo":"Tem","meaning":"Taste"},{"karbi":"Chomat","mizo":"Tem","meaning":"Pinch / taste"},{"karbi":"Hijim","mizo":"Ten","meaning":"Disgust / loathing"},{"karbi":"Hijimmeme, saur","mizo":"Tenawm","meaning":"Disgusting"},{"karbi":"Hijimmeme, saur","mizo":"Tenawm","meaning":"Despicable / Filthy"},{"karbi":"Po dok dok","mizo":"Ṭep","meaning":"Almost / Nearly"},{"karbi":"Mesen","mizo":"Ṭha","meaning":"Good /  Fine"},{"karbi":"Keme kechok","mizo":"Ṭha famkim","meaning":"Perfect, complete"},{"karbi":"Pham","mizo":"Thang","meaning":"Trap / snare"},{"karbi":"Vosobiku","mizo":"Thangfenpabawp","meaning":"Bird variety"},{"karbi":"Mekprang, mekbur","mizo":"Ṭhangharh","meaning":"Wide awake"},{"karbi":"Chethang, men kachethang","mizo":"Thang (hmingthang)","meaning":"Become famous"},{"karbi":"Pham ketot","mizo":"Thang kam","meaning":"Set a trap"},{"karbi":"Theponbom, dingbom, chanbom","mizo":"Ṭhang, pung","meaning":"Swell / bulge"},{"karbi":"Ove kimi","mizo":"Ṭhangṭhar","meaning":"New / modern"},{"karbi":"Vocherok","mizo":"Thaiberh","meaning":"Bird variety"},{"karbi":"Siri","mizo":"Thai (rin)","meaning":"Draw / line"},{"karbi":"Birik keso/ingthak","mizo":"Thak","meaning":"Hot (spicy) / Itchy"},{"karbi":"Birik keso,ingthak","mizo":"Thak","meaning":"Spicy / Itchy"},{"karbi":"Thengkeching","mizo":"Thakthing","meaning":"Cinnamon"},{"karbi":"Thai","mizo":"Thal","meaning":"Bow / arrow"},{"karbi":"Thai","mizo":"Thal","meaning":"Bow and arrow"},{"karbi":"Riso nimso","mizo":"Ṭhalai, nula tlangval","meaning":"Young people"},{"karbi":"Chekip","mizo":"Tham","meaning":"Grasp / clutch"},{"karbi":"Vir","mizo":"Thamral","meaning":"Disappear"},{"karbi":"Poisa kethok","mizo":"Tham (thamna pe)","meaning":"Bribe / lend"},{"karbi":"Tharmam, neine","mizo":"Thap","meaning":"Rough (texture)"},{"karbi":"Tharmam, peine","mizo":"Thap","meaning":"Rough"},{"karbi":"Ingrap","mizo":"Thap","meaning":"Slap / smack"},{"karbi":"Khadot pathu","mizo":"Thap(pawisa inthap)","meaning":"Deposit / put in"},{"karbi":"Akimi","mizo":"Thar","meaning":"New"},{"karbi":"Athe pathe","mizo":"Thar chhuak","meaning":"Emerge / produce"},{"karbi":"That/pethi","mizo":"That","meaning":"Kill / murder"},{"karbi":"Selet","mizo":"Thatchhia/Peih lo","meaning":"Lazy"},{"karbi":"Athu","mizo":"Thau","meaning":"Fat / grease"},{"karbi":"Akrom kethe","mizo":"Thau","meaning":"Fat"},
+            {"karbi":"Chethe cheen","mizo":"Thaw","meaning":"Breathe"},{"karbi":"Panong, pi","mizo":"Thawh (hlan)","meaning":"Contribute / offer"},{"karbi":"Chepaduk chepalak","mizo":"Thawhkrim","meaning":"Work together"},{"karbi":"Dan","mizo":"Thawhlawm","meaning":"Offering / contribution"},{"karbi":"Chepatum chepani","mizo":"Thawhpui","meaning":"Partner, companion"},{"karbi":"Arkli","mizo":"Thawi","meaning":"Sacrifice / appease"},{"karbi":"Klem","mizo":"Thawk","meaning":"Work"},{"karbi":"Sovai, jang","mizo":"Thawl","meaning":"Spacious"},{"karbi":"Sovai, jang","mizo":"Thawl (leng)","meaning":"Spacious / Loose"},{"karbi":"Semarthu, selamthu","mizo":"Thawm (a chhe siam)","meaning":"Repair"},{"karbi":"Pe-ri","mizo":"Thawmhnaw","meaning":"Clothing / garment"},{"karbi":"Lo","mizo":"Thawn","meaning":"Send"},{"karbi":"Tomo","mizo":"Thawnthu","meaning":"Story / tale"},{"karbi":"Karle","mizo":"Thehlei","meaning":"Gibbon / Hoolock gibbon"},{"karbi":"Un","mizo":"Thei","meaning":"Can / Able / Possible"},{"karbi":"Ingkrung","mizo":"Thei","meaning":"To shif rice"},{"karbi":"Tharve","mizo":"Theihai","meaning":"Mango"},{"karbi":"Torte","mizo":"Theiherawt","meaning":"Star fruit / Carambola"},{"karbi":"Ingle","mizo":"Theihmu","meaning":"Indian blackberry / Jamun"},{"karbi":"Un an","mizo":"Theihtawp","meaning":"Most effort"},{"karbi":"Bor-i bor-a","mizo":"Theih tawp chhuah, bei hram hram","meaning":"Try one's utmost, strive hard"},{"karbi":"Angpong, butlangpong","mizo":"Thei (mauthei, chemthei)","meaning":"Fire blow pipe"},{"karbi":"Thebo","mizo":"Theipui","meaning":"Fig"},{"karbi":"Thevothung","mizo":"Theiria","meaning":"Wild berry"},{"karbi":"Parok-Abokuri","mizo":"Theite","meaning":"Small fruit / Plum variety"},{"karbi":"Un, thek","mizo":"Thei (thilengemaw ti thei)","meaning":"Understand / can"},{"karbi":"Soi, lep, ti","mizo":"Thel (vel)","meaning":""},{"karbi":"Aduk aprot","mizo":"Them nawi, te reuh te te","meaning":"Small pieces, tiny bits"},{"karbi":"Tebok terei","mizo":"Ṭhenawm khawveng","meaning":"Neighbourhood"},{"karbi":"Ajahak","mizo":"Ṭhenkhat","meaning":"Some"},{"karbi":"Bahak, thakdak","mizo":"Ṭhen,ṭhensawm","meaning":"Tear to pieces"},{"karbi":"Thep","mizo":"Thep (puar lo)","meaning":"Flat / Thin"},{"karbi":"Bengcheret","mizo":"Thereng","meaning":""},{"karbi":"Thi, vir, apran kedamjui","mizo":"Thi","meaning":"Die"},{"karbi":"Lek","mizo":"Ṭhi","meaning":"Necklace / Beads"},{"karbi":"Kangthir","mizo":"Thianghlimna","meaning":"Purity / holiness"},{"karbi":"Thek","mizo":"Thiam","meaning":"Able/Skilled"},{"karbi":"Thek","mizo":"Thiam","meaning":"Able / Know"},{"karbi":"Bipan","mizo":"Thiamhnang","meaning":"Skill / art"},{"karbi":"Bipan bijon","mizo":"Thiamhnang","meaning":"Skill, expertise"},{"karbi":"Thek","mizo":"Thiam, thei","meaning":"Know / can"},{"karbi":"Jirpiji rpo","mizo":"Thian","meaning":"Friend"},{"karbi":"Jirpi","mizo":"Thian nu","meaning":"Female friend"},{"karbi":"Jirpi","mizo":"Thiannu","meaning":"Female friend"},{"karbi":"Jirpo","mizo":"Thianpa","meaning":"Male friend"},{"karbi":"Thi","mizo":"Thi, boral","meaning":"Die"},{"karbi":"Sedeng","mizo":"Thichhhia","meaning":"Displeased"},{"karbi":"(Ning) sedeng","mizo":"Thichhhia","meaning":"Displeased"},{"karbi":"Thengpi","mizo":"Thing","meaning":"Tree"},{"karbi":"Theng, kapat","mizo":"Thing","meaning":"Tree / wood"},{"karbi":"Hijir/hijuk","mizo":"Thing","meaning":"Shake"},{"karbi":"Thengpi thengphrang","mizo":"Thing","meaning":"Trees"},{"karbi":"Thengtut thengiong","mizo":"Thingbul, thingluang, enthlatu","meaning":"Spy/scout"},{"karbi":"Nemsopi","mizo":"Thingfanghma","meaning":"Papaya"},{"karbi":"Ingki","mizo":"Thingnget","meaning":"A wood boring by insect"},{"karbi":"Thengkroi","mizo":"Thingkhawn","meaning":"Bundle of firewood"},{"karbi":"Thengpi","mizo":"Thingkung","meaning":"Tree"},{"karbi":"Thengpi arong","mizo":"Thingkung","meaning":"Tree trunk"},{"karbi":"Thengtak thengro","mizo":"Thingnawi","meaning":"Forest tree"},{"karbi":"Sa","mizo":"Thingpui","meaning":"Tea"},{"karbi":"Sakhuni (Asom)","mizo":"Thingpuifethlitna","meaning":"Tea strainer"},{"karbi":"Him sangpher","mizo":"Thingpui ruai","meaning":"Refreshments"},{"karbi":"Bakos/Sindup","mizo":"Thingrem","meaning":"Wooden box / Chest"},{"karbi":"Mirjove","mizo":"Thingri","meaning":"Echo"},{"karbi":"Phongrong","mizo":"Thingsia","meaning":"Chesnut"},{"karbi":"Kengphu patong","mizo":"Ṭhingṭhi","meaning":"Shiver / tremble"},{"karbi":"Korot","mizo":"Thingzaina","meaning":"Saw / Wood saw"},{"karbi":"Thengpi aro","mizo":"Thingzar","meaning":"Tree branch"},{"karbi":"Jangthu kachethit/patip","mizo":"Thih (hriak thih)","meaning":"Anoint"},{"karbi":"Kethi","mizo":"Thihna","meaning":"Death"},{"karbi":"Langrem, lang un-e","mizo":"Thik (itsik)","meaning":"Envy / jealous"},{"karbi":"Abui angsom","mizo":"Thil chek khawm, thil tian khawm","meaning":"Things gathered, collected things"},{"karbi":"Ason amung","mizo":"Thil chi hrang hrang","meaning":"Different kinds of things"},{"karbi":"Aru arang","mizo":"Thil hlui, thil hlui vawn ṭhat","meaning":"Old things, preserving old things"},{"karbi":"Angthun ave","mizo":"Thil indawt chawng, inkahpukchaw","meaning":"Leftover food, food scraps"},{"karbi":"Kethi kejang","mizo":"Thilna","meaning":"Act, action"},{"karbi":"Adan adi","mizo":"Thilpek, thilhlan","meaning":"Gift, offering"},{"karbi":"Jun","mizo":"(Thil turi li) in","meaning":"Drink"},{"karbi":"Ingting","mizo":"Thim","meaning":"Dark"},{"karbi":"Ingting siring","mizo":"Thim","meaning":"Dark"},{"karbi":"Klolin thengkok","mizo":"Thimra","meaning":"Darkness"},{"karbi":"Ingthin","mizo":"Thin","meaning":"Liver"},{"karbi":"Ning kethi, ning keso","mizo":"Thinur","meaning":"Angry / furious"},{"karbi":"Thokvai","mizo":"Thip (na)","meaning":"Stinging pain"},{"karbi":"Ingchin","mizo":"Thir","meaning":"Iron"},{"karbi":"Hemai honsere","mizo":"Thir deng","meaning":"Iron smith"},{"karbi":"Samus","mizo":"Thirfian","meaning":"Metal spoon"},{"karbi":"Nui","mizo":"Thirkhen","meaning":"Iron nail"},{"karbi":"Chinjor","mizo":"Thirtiang","meaning":"Iron rod"},{"karbi":"Ingchin-Achinjor","mizo":"Thirtiang","meaning":"Iron rod / Walking stick with metal tip"},{"karbi":"Vi","mizo":"Thisen","meaning":"Blood"},{"karbi":"Artho","mizo":"Thisenzam","meaning":"Blood vessel / vein"},{"karbi":"Artho","mizo":"Thisenzâm","meaning":"Blood vessel / Vein / Artery"},{"karbi":"Chingmoi chingche","mizo":"Thi (thinur/ṭawngkam)","meaning":"Die (anger)"},{"karbi":"Chiklo","mizo":"Thla","meaning":"Moon / month"},{"karbi":"Chiklo/arveng/harchi","mizo":"Thla","meaning":"Moon / month / wing / shadow"},{"karbi":"Klopleng","mizo":"Thla bial zan / thla arkaiden zan","meaning":" Fullmoon"},{"karbi":"Ingvai","mizo":"Thlang","meaning":"Choose / select / elect / vote"},{"karbi":"Ingvai","mizo":"Thlang","meaning":"Choose / select"},{"karbi":"Aber","mizo":"Thlangah","meaning":"Across"},{"karbi":"Beleng","mizo":"Thlangra","meaning":"Winnowing tray"},{"karbi":"Chethang","mizo":"Thlangra awng","meaning":"Hole in winnowing tray"},{"karbi":"Lo/lophlot/che-o/thondam","mizo":"Thlah","meaning":"Release / give up / escort"},{"karbi":"Hi-i","mizo":"Thlahrang","meaning":"Ghost / spirit"},{"karbi":"Phisar phusar","mizo":"Thlahtute","meaning":"Ancestors"},{"karbi":"Hen phurui","mizo":"Thlai","meaning":"Vegetable"},{"karbi":"Achom aphang","mizo":"Thlai emaw thing emaw chi khat hung/mihring pawl khat fuan khawm","meaning":"A group/bunch of plants or people"},{"karbi":"Lar","mizo":"Thlak","meaning":"Change"},{"karbi":"Lar","mizo":"Thlakthleng","meaning":"Change"},{"karbi":"Lar, panglar","mizo":"Thlakthleng","meaning":"Change / replace"},{"karbi":"Mandu","mizo":"Thlam","meaning":"Field hut / shelter"},{"karbi":"Mendu","mizo":"Thlam / bawkte","meaning":"Hut"},{"karbi":"Ning pepli, ning pangsam","mizo":"Thlamuan","meaning":"Comfort / console"},{"karbi":"Ing-i","mizo":"Thlan","meaning":"Sweat / perspiration"},{"karbi":"Theri","mizo":"Thlan (thlanmual)","meaning":"Graveyard / cemetery"},{"karbi":"Karjong","mizo":"Thlarau","meaning":"Soul / spirit"},{"karbi":"Ningkreng","mizo":"Thlasik","meaning":"Winter"},{"karbi":"Ningkreng atovar","mizo":"Thlasikkawng","meaning":"Winter path / season route"},{"karbi":"Ningkreng ningthi","mizo":"Thlasik, ṭhal","meaning":"Cold, chilly"},{"karbi":"Peklo","mizo":"Thlauh","meaning":"Drop / let fall"},{"karbi":"Rot ahem","mizo":"Thlawhtheihna","meaning":"Airplane"},{"karbi":"Pangjar","mizo":"Thlawhtir","meaning":"Cause to fly / launch"},{"karbi":"Ingjar","mizo":"Thlawk","meaning":"Fly"},{"karbi":"Cherap, chedon","mizo":"Thlawp","meaning":"Support / back up"},{"karbi":"Parbe","mizo":"Thlawr","meaning":"Strain / filter"},{"karbi":"Kasu","mizo":"Thleng","meaning":"Plate"},{"karbi":"Lar","mizo":"Thleng","meaning":"Change"},{"karbi":"Kasu","mizo":"Thleng","meaning":"Plate / Dish"},{"karbi":"Asat lang","mizo":"Thlem","meaning":"Flatter / tempt"},{"karbi":"Pele","mizo":"Thlen","meaning":"Fulfill / complete"},{"karbi":"Du","mizo":"Thlep","meaning":"Fold"},{"karbi":"Rak, rakdak","mizo":"Thler","meaning":"Split / Crack"},{"karbi":"Chingsek, ingsek","mizo":"Thler (pawtthler)","meaning":"Tear / split"},{"karbi":"Tomon","mizo":"Thli","meaning":"Wind"},{"karbi":"Inglok","mizo":"Thliak","meaning":"Break off / pluck"},{"karbi":"Ingvai","mizo":"Thliar, thlang","meaning":"Sort / separate"},{"karbi":"Angkling","mizo":"Thling","meaning":"Bone marrow"},{"karbi":"Le, chi, dung","mizo":"Thli (leih)","meaning":"Pour"},{"karbi":"Tomon tepri","mizo":"Thlipui","meaning":"Windstorm"},{"karbi":"Tomon arve","mizo":"Thlipui ruahpui","meaning":"Storm"},{"karbi":"Langding, langphrong","mizo":"Thlir","meaning":"Gaze / look afar"},{"karbi":"Ingreng-u ingrengklung","mizo":"Thli thaw vuk vuk ri","meaning":"Sound of strong blowing wind"},{"karbi":"Voleng","mizo":"Thloh","meaning":"Drongo"},{"karbi":"Phu, bap kephu","mizo":"Thlo (hlo thlo)","meaning":"Weed / hoe"},{"karbi":"Phuratlok","mizo":"Thluak","meaning":"Brain"},{"karbi":"Hing","mizo":"Thlung, zar","meaning":"Hang / tie"},{"karbi":"Sini kedok","mizo":"Thlum","meaning":"Sweet"},{"karbi":"Kedok","mizo":"Thlum/al","meaning":"Sweet / salty"},{"karbi":"Dok(ingti)","mizo":"Thlum(al)","meaning":"Salty"},{"karbi":"Dok (sini kedok)","mizo":"Thlum (chini telh)","meaning":"Sweet"},{"karbi":"Thur","mizo":"Tho","meaning":"Wake-up / stand-up"},{"karbi":"Bitu","mizo":"Tho","meaning":"Fly"},{"karbi":"Thur","mizo":"Tho","meaning":"Rise up / wake up"},{"karbi":"Bitu","mizo":"Tho","meaning":""},{"karbi":"Thur","mizo":"Tho / ding","meaning":"Rise"},{"karbi":"Bituso","mizo":"Thomitchhaih","meaning":""},{"karbi":"Chitim","mizo":"Those","meaning":""},{"karbi":"Chitim","mizo":"Thosi","meaning":"Mosquito"},{"karbi":"Mosuri/Chitim ape","mizo":"Thosilen","meaning":"Mosquito net"},{"karbi":"Bitukili","mizo":"Thotle","meaning":""},{"karbi":"Lam","mizo":"Thu","meaning":"Word"},{"karbi":"Ingni","mizo":"Ṭhu","meaning":"Sit"},{"karbi":"Lam","mizo":"Thu","meaning":"Word / tongue"},{"karbi":"Hiruk","mizo":"Thuah","meaning":"Smell / sniff"},{"karbi":"Heveng","mizo":"Thuai","meaning":""},{"karbi":"Choi","mizo":"Thuamhnaw","meaning":"Clothes"},{"karbi":"Chok","mizo":"(Thuamhnaw) su","meaning":"Wash clothes"},{"karbi":"Pindeng","mizo":"Thuam, thuam bel","meaning":"Dress / outfit"},{"karbi":"Alar hui","mizo":"Thungrul","meaning":"Retaliate / revenge"},{"karbi":"Roi","mizo":"Thui","meaning":""},{"karbi":"Sangho","mizo":"Thuihruai","meaning":"Bear"},{"karbi":"Ri sele keng sele","mizo":"Thuitruai, tanpuitu","meaning":"Guide, helper"},{"karbi":"Patu","mizo":"Thukru","meaning":"Hide"},{"karbi":"Patu, patujoi","mizo":"Thukru, thup","meaning":"Hide / conceal"},{"karbi":"Hakmarjong","mizo":"Thul","meaning":"Cane basket with lid"},{"karbi":"Chepu","mizo":"Thum","meaning":""},{"karbi":"Thap","mizo":"Thun, ak","meaning":"Stuff / insert"},{"karbi":"Hukhum hora","mizo":"Thupek","meaning":"Command, order"},{"karbi":"Vothung/Thungpharlo","mizo":"Ṭhuro/Vathu","meaning":"Dove / Wild pigeon"},{"karbi":"Kapatu alam","mizo":"Thuruk","meaning":"Secret"},{"karbi":"Menmen","mizo":"Thut","meaning":"Suddenly"},{"karbi":"Suki","mizo":"Ṭhutthleng ","meaning":"Chair"},{"karbi":"Suki","mizo":"Ṭhutthleng(chair)","meaning":"Chair / Stool"},{"karbi":"Inghoi","mizo":"Ṭhutthleng(hniam)","meaning":"Low stool / Bench"},{"karbi":"Chin","mizo":"Tiang","meaning":"Walking stick / staff"},{"karbi":"Chin","mizo":"Tiang","meaning":"Walking stick / Staff"},{"karbi":"Bui","mizo":"Tiang (tiang khawm)","meaning":"Gather / accumulate"},{"karbi":"Arong kevang, amek kevang","mizo":"Tiak (To)","meaning":""},{"karbi":"Chechak","mizo":"Tiam, tiamkam","meaning":"Promise / vow"},{"karbi":"Mehek","mizo":"Tiarrep","meaning":"Dried flower/plant item"},{"karbi":"Prat","mizo":"Tiau, darh","meaning":"Scatter / spread"},{"karbi":"Parlin parlo","mizo":"Tibuaichhuar, thila indawt dan ni lova sawi","meaning":"Speak without order"},{"karbi":"Peme","mizo":"Tidam","meaning":"Heal"},{"karbi":"Kum","mizo":"Ṭingṭang","meaning":"Guiter"},{"karbi":"Chenek holo","mizo":"Tihduhdah, tirethei","meaning":"Oppress, torture"},{"karbi":"Phere, therik","mizo":"Tih, hlau","meaning":"Afraid / fearful"},{"karbi":"Ingsi/artho","mizo":"Tihrawl/tha","meaning":"Muscle / Tendon"},{"karbi":"Chingjui","mizo":"Til","meaning":""},{"karbi":"Ti","mizo":"Til mu","meaning":" Testes"},{"karbi":"Arlen","mizo":"Tin","meaning":"Aim / intend"},{"karbi":"Chimi","mizo":"Tin","meaning":"Nail (fingernail/toenail)"},{"karbi":"Chekak","mizo":"Tin, bang","meaning":"Separate / part"},{"karbi":"Toi","mizo":"Tir","meaning":"Send"},{"karbi":"Toi","mizo":"Tir","meaning":"Send / order"},{"karbi":"Ban, sakor","mizo":"Tirhchhhiah","meaning":"Servant / messenger"},{"karbi":"Tekala","mizo":"Tirhkoh","meaning":"Angel / apostle"},{"karbi":"Tekala","mizo":"Tirhkoh","meaning":"Apostle / messenger"},{"karbi":"Te","mizo":"Tiro/zar","meaning":"Dry"},{"karbi":"Angsi","mizo":"Ti (sa ti)","meaning":"Flesh / meat"},{"karbi":"Pu","mizo":"Ti, sawi","meaning":"Say / tell"},{"karbi":"Ruitiki","mizo":"Tit","meaning":""},{"karbi":"Klo","mizo":"Tla","meaning":"Fall"},{"karbi":"Inglong","mizo":"Tlang","meaning":"Mountain"},{"karbi":"Inglong","mizo":"Tlang","meaning":"Hill / mountain"},{"karbi":"Inglong arlok","mizo":"Tlang leh ruam","meaning":"Hills and valleys"},{"karbi":"Risomar, riso","mizo":"Tlangval","meaning":"Young man / bachelor"},{"karbi":"Chopan chojui","mizo":"Tla, hnim pet","meaning":"Fall, grass blade"},{"karbi":"Der (late)","mizo":"Tlai","meaning":"Late"},{"karbi":"Kat","mizo":"Tlan","meaning":"Run"},{"karbi":"Kekat kangplong","mizo":"Tlan","meaning":"Run"},{"karbi":"Chongvir chongtham","mizo":"Tlan bo","meaning":"Run away"},{"karbi":"Vur","mizo":"Tlawh","meaning":"Visit"},{"karbi":"Vur","mizo":"Tlawh","meaning":"Visit / kick"},{"karbi":"Humri humpat","mizo":"Tlawh","meaning":"Visit"},{"karbi":"Ador ave, ador kom","mizo":"Tlawm","meaning":"Humble / Low"},{"karbi":"Klarbong, doilar","mizo":"Tle","meaning":"Gleam / Shine"},{"karbi":"Okarjangmir","mizo":"Tleirawl (hmeichhia)","meaning":"Teenage girl / maiden"},{"karbi":"Asap, cherso, ong-e (Asom. kom)","mizo":"Tlem","meaning":"Few / Little"},{"karbi":"Asap","mizo":"Tlem te","meaning":"Little"},{"karbi":"Lek roi","mizo":"Tlereuh","meaning":"Suddenly"},{"karbi":"Tuhop","mizo":"Tlip","meaning":""},{"karbi":"Adin do, arni do","mizo":"Tlo","meaning":"Lasting / Durable"},{"karbi":"Chingkoi, krep","mizo":"Tlu","meaning":"Fall down/collape"},{"karbi":"Mesen","mizo":"Tluang","meaning":"Smooth / Successful"},{"karbi":"Karlo","mizo":"Tlumpi","meaning":""},{"karbi":"Dorso, ador do, ador kethe","mizo":"To","meaning":"High / Raised"},{"karbi":"Ateri","mizo":"Tobul","meaning":"Beginning / source"},{"karbi":"Bokbok","mizo":"Tomato","meaning":"Tomato"},{"karbi":"Komat","mizo":"Tu","meaning":"Who"},{"karbi":"Su","mizo":"Tu","meaning":"Grandchild"},{"karbi":"Ingchai, bim","mizo":"Tuai (piai)","meaning":"Rub / smooth"},{"karbi":"Telom, per","mizo":"Tuam, vet","meaning":"Wrap / cover"},{"karbi":"Chechak","mizo":"Tuar","meaning":"Endure / suffer"},{"karbi":"Chechakthek, ning chepaningding thek","mizo":"Tuarchhel","meaning":"Enduring / Patient"},{"karbi":"Kibu","mizo":"Tuboh","meaning":"Hammer"},{"karbi":"Kibu","mizo":"Tuboh","meaning":"Hammer / Mallet"},{"karbi":"Ningri ninglak","mizo":"Tungngai, riluhah","meaning":"Hungry, hunger"},{"karbi":"E, rik","mizo":"Tuh (chi tuh)","meaning":"Plant / sow"},{"karbi":"E","mizo":"Tuh (thlai chi)","meaning":"Sow"},{"karbi":"Lang","mizo":"Tui","meaning":"Water"},{"karbi":"Sok","mizo":"(Tui) chawi","meaning":"Draw / fetch water"},{"karbi":"Langtuk","mizo":"Tuichhunchhuah","meaning":"Ring well"},{"karbi":"Angru","mizo":"Tuiek","meaning":"Saliva / Spit"},{"karbi":"Langthepi","mizo":"Tuifinriat","meaning":"Ocean / sea"},{"karbi":"Jarop","mizo":"Tuikep","meaning":"Otter"},{"karbi":"Talo","mizo":"Tuipui","meaning":"Sea / ocean"},{"karbi":"Todap","mizo":"Tukin zing","meaning":"Morning"},{"karbi":"Bengtarlok","mizo":"Tuklo","meaning":"Cuckoo / Koel"},{"karbi":"Aso asu","mizo":"Tu leh fate","meaning":"Parent and child"},{"karbi":"Tung","mizo":"Tulh","meaning":"Swallow whole"},{"karbi":"Ok-akron/Primsok","mizo":"Tul/Tulthir","meaning":"Crowbar / Iron bar"},{"karbi":"Sotele","mizo":"Tum","meaning":"Palm tree"},{"karbi":"Langdung","mizo":"Tumbu","meaning":"Banana flower / Plantain heart"},{"karbi":"Chon, kapakadak","mizo":"Tum, zuang","meaning":"Jump"},{"karbi":"Non","mizo":"Tunah","meaning":"Now"},{"karbi":"Pini penap","mizo":"Tunlai","meaning":"Modern, present-day"},{"karbi":"Supi","mizo":"Tunu","meaning":"Granddaughter"},{"karbi":"Supo","mizo":"Tupa","meaning":"Grandson"},{"karbi":"Bikar","mizo":"Tur","meaning":"Poison"},{"karbi":"Mane mana","mizo":"Tu (te) emaw","meaning":"Someone"},{"karbi":"Chinjor","mizo":"Tuṭhulh","meaning":"Wedge / Chisel"},{"karbi":"Ik(mipa)/ni(hmeichhia)","mizo":"U","meaning":"Elder sibling"},{"karbi":"Chalaitai","mizo":"Uang","meaning":"Joking / Boastful"},{"karbi":"Chepindak","mizo":"Uang","meaning":"Boastful / joking"},{"karbi":"Chingok","mizo":"Uak","meaning":"Gag / vomit"},{"karbi":"Khelan","mizo":"Ualau","meaning":"Extravagant"},{"karbi":"Kebek kesin","mizo":"Uanna, chapona","meaning":"Leave, abandon"},{"karbi":"Par-om","mizo":"Uap, uaplum","meaning":"Brood / cover"},{"karbi":"Ok ak","mizo":"Uchang","meaning":"Boar / Wild pig"},{"karbi":"Iksang, ik thirthar","mizo":"Ung (uk)","meaning":"Brown"},{"karbi":"Methan","mizo":"Ui","meaning":"Dog"},{"karbi":"Methan","mizo":"Ui","meaning":"Dog"},{"karbi":"Nemthu","mizo":"Uih","meaning":"Stinking / Rotten"},{"karbi":"Chikli","mizo":"Uihli","meaning":""},{"karbi":"Chingchom, angthin kelangno","mizo":"Uikawm","meaning":"Stingy / Miserly"},{"karbi":"Inghon, kroikre","mizo":"Ui, phallo","meaning":"Stingy / reluctant"},{"karbi":"Beisa daro","mizo":"Uirena","meaning":"Infidelity"},{"karbi":"Ok-langhan","mizo":"Ulawng","meaning":"Wild ox / Gaur"},{"karbi":"Bonglang","mizo":"Umei","meaning":"Taro / Yam variety"},{"karbi":"Korte murti","mizo":"Unaute","meaning":"Brotherhood"},{"karbi":"Sar","mizo":"Upa","meaning":"Elder / senior"},{"karbi":"Sekhak, sekhok","mizo":"Urh (ut, kang)","meaning":"Scorched / Burned"},{"karbi":"Ok-ak","mizo":"Usial","meaning":""},{"karbi":"Chongho phroksenok","mizo":"Utawk","meaning":"Frog"},{"karbi":"Chongho-prosonok","mizo":"Utawk","meaning":""},{"karbi":"Ong-e","mizo":"Vang (tam lo)","meaning":"Rare / Scarce"},{"karbi":"Ingphat","mizo":"Vangvat","meaning":""},{"karbi":"Vo-ingkek","mizo":"Vahai","meaning":"Parrot / Parakeet"},{"karbi":"Vokakrit","mizo":"Vahlah","meaning":"Bird variety"},{"karbi":"Tarlut","mizo":"Vahluk","meaning":"Bird variety"},{"karbi":"Vo-ut","mizo":"Vahmim","meaning":"Wild bird variety"},{"karbi":"Vorek","mizo":"Vahrit","meaning":"Partridge"},{"karbi":"Chehivik","mizo":"Vai (ban vai)","meaning":"Wave hand"},{"karbi":"Duma","mizo":"Vaihlo","meaning":"Tobacco"},{"karbi":"Timsik","mizo":"Vaihmitê","meaning":""},{"karbi":"Parok","mizo":"Vai/hnam dang","meaning":"Foreigner / outsider"},{"karbi":"Thengthe","mizo":"Vaimim","meaning":"Maize / Corn"},{"karbi":"Maino","mizo":"Vaiva","meaning":"Myna"},{"karbi":"Vosaru","mizo":"Vaiva(Phaivaiva Uk)","meaning":"Jungle myna"},{"karbi":"Sangti","mizo":"Vaivut","meaning":"Dust"},{"karbi":"Kadokave, do-an","mizo":"Vai,zawng zawng","meaning":"All / Entire"},{"karbi":"Arkum","mizo":"Vak (bawkvak)","meaning":"Crawl / creep"},{"karbi":"Vokek","mizo":"Vaki","meaning":"Barking deer / Muntjac"},{"karbi":"Vojaru","mizo":"Vakul","meaning":"Coucal / Crow pheasant"},{"karbi":"Chongvir, chongvirthap","mizo":"Vakvai","meaning":"Wandering"},{"karbi":"Chongvir","mizo":"Vak vai","meaning":"Wander / roam"},{"karbi":"Sining","mizo":"Van","meaning":"Sky / heaven"},{"karbi":"Kopai langno","mizo":"Vanduai","meaning":"Unlucky / unfortunate"},{"karbi":"Kopailangno","mizo":"Vanduai","meaning":"Unfortunate"},{"karbi":"Kopai kelangno","mizo":"Vanduaina","meaning":"Misfortune / bad luck"},{"karbi":"Jangre jangre","mizo":"Vanlaia tla","meaning":"Meteor / Falling star"},{"karbi":"Bari-the bari-eh","mizo":"Van mite","meaning":"Heavenly beings"},{"karbi":"Kopai keme","mizo":"Vanneihna","meaning":"Good luck / fortune"},{"karbi":"Sining atekala","mizo":"Vantirhkoh","meaning":"Angel"},{"karbi":"Kelok","mizo":"Var","meaning":"White"},{"karbi":"Lok, kelok","mizo":"Var","meaning":"White"},{"karbi":"Vokak","mizo":"Varak","meaning":"Duck"},{"karbi":"Vonam","mizo":"Varihaw","meaning":"Green pigeon / Dove"},{"karbi":"Arnam-vothaiso","mizo":"Varmur","meaning":"Vulture"},{"karbi":"Klirdap","mizo":"Varparh","meaning":"White pigeon / dove"},{"karbi":"Voham","mizo":"Varung","meaning":"Hornbill"},{"karbi":"Vochet","mizo":"Vasuih","meaning":"Sunbird / Flowerpecker"},{"karbi":"Vopithunghar","mizo":"Vatawk","meaning":"Woodpecker"},{"karbi":"Pan","mizo":"Vat (lo vat)","meaning":"Clear forest / slash and burn"},{"karbi":"Ther","mizo":"Vau","meaning":"Threaten"},{"karbi":"Chingkrin chingchap","mizo":"Vau, inghirngho","meaning":"Threaten, intimidate"},{"karbi":"Kether kehap","mizo":"Vauna","meaning":"To threaten"},{"karbi":"Ingku","mizo":"Vau (vaube)","meaning":"Bank / shore"},{"karbi":"Rim (Lc. kerim kebi)","mizo":"Vawng","meaning":"Keep / store"},{"karbi":"Kerim kebi","mizo":"Vawng, dah ṭha","meaning":"Keep, preserve well"},{"karbi":"Phe","mizo":"Vawih","meaning":"fart"},{"karbi":"Pini","mizo":"Vawiin","meaning":"Today"},{"karbi":"Phak","mizo":"Vawk","meaning":"Pig"},{"karbi":"Phak/Rum-api","mizo":"Vawk","meaning":"Pig / Domestic pig"},{"karbi":"Phak-Um","mizo":"Vawkawt","meaning":"Pigsty / Pigpen"},{"karbi":"Phakroi","mizo":"Vawkin","meaning":"Pigsty"},{"karbi":"Var","mizo":"Vawm, paih","meaning":"Throw / toss"},{"karbi":"Ingsamhek, chung","mizo":"Vawt","meaning":"Cold"},{"karbi":"Che-i (puan veng); ton","mizo":"Veng","meaning":"Wear skirt / guard"},{"karbi":"Helat heleng","mizo":"Vei tawn","meaning":"Visit each other"},{"karbi":"Cherui chelhen","mizo":"Vei tawn sek","meaning":"Visit frequently"},{"karbi":"Helat","mizo":"Vei, veivak","meaning":"Wander / roam about"},{"karbi":"Ti, hek","mizo":"Vel (kheh)","meaning":"Skin / peel"},{"karbi":"Pachiru","mizo":"Vel (ti lap)","meaning":"Beat / strike"},{"karbi":"Et","mizo":"Verh","meaning":"Drill / bore"},{"karbi":"Et","mizo":"Verh","meaning":"Drill"},{"karbi":"Hon","mizo":"Vil, nghak","meaning":"Watch / wait"},{"karbi":"Se serang","mizo":"Vin (aw)","meaning":"Sharp / Loud voice"},{"karbi":"Ington, inchek, ketam","mizo":"Vin, hrawk","meaning":"Scold / speak sharply"},{"karbi":"Boho","mizo":"Vir (koham, heh)","meaning":"Greedy / Fierce"},{"karbi":"Theng","mizo":"Vua","meaning":"Beat"},{"karbi":"Theng","mizo":"Vua","meaning":"Hit / beat"},{"karbi":"Ot","mizo":"Vuan / chelh","meaning":"Hold"},{"karbi":"Kang","mizo":"Vung","meaning":"Swollen"},{"karbi":"Ingthu","mizo":"Vul (parvul)","meaning":"Bloomed / Flourished"},{"karbi":"Reng","mizo":"Vun","meaning":"Skin / bark"},{"karbi":"Reng","mizo":"Vun/pang","meaning":"Skin / Body surface"},{"karbi":"Ar-e ","mizo":"Vur","meaning":"Snow / ice"},{"karbi":"Theklo","mizo":"Vut","meaning":"Ash"},{"karbi":"Theklo","mizo":"Vut (vutduk)","meaning":"Ash"},{"karbi":"Arjang ardi kave","mizo":"Zang","meaning":"Light (weight)"},{"karbi":"Bum","mizo":"Zang","meaning":"Penis"},{"karbi":"Vojarupi","mizo":"Zangkhua","meaning":"Backbone / spine"},{"karbi":"Man peng","mizo":"Zahawm","meaning":"Respectable"},{"karbi":"Chiri pharkong","mizo":"Zah, zahawmna","meaning":"Respect, honour"},{"karbi":"Lun","mizo":"Zai, (hla) sa","meaning":"Sing / song"},{"karbi":"Kelun, kekan","mizo":"Zai leh lam, intihlhimna","meaning":"Singing and dancing, entertainment"},{"karbi":"Lunsepi/lunsepo","mizo":"Zaithiam","meaning":"Singer"},{"karbi":"Therak ingring","mizo":"Zak","meaning":"Vomit"},{"karbi":"Jingkep","mizo":"Zakhnuai/nak","meaning":"Armpit / Rib / Flank"},{"karbi":"Therak, therakju","mizo":"Zak, zakzum","meaning":"Shy / Bashful"},{"karbi":"Therik, phere","mizo":"Zam, hlau","meaning":"Afraid / Fearful"},{"karbi":"Solong","mizo":"Zamir","meaning":"Guava"},{"karbi":"Mir-ang","mizo":"Zamzo","meaning":"Fern"},{"karbi":"Aningve/ajo","mizo":"Zan","meaning":"Night"},{"karbi":"Voku voki","mizo":"(Zana) ar khuan hun","meaning":"Time of chicken crowing"},{"karbi":"Mekbur mekthang","mizo":"Zan hun, mut hlan","meaning":"Night time, before sleeping"},{"karbi":"Paningve","mizo":"Zanin","meaning":"Tonight"},{"karbi":"Jirlo phirlo","mizo":"Zanlai","meaning":"Midnight"},{"karbi":"Ajo phir lo","mizo":"Zan lai, zan thilthu","meaning":"Night time, nighttime matter"},{"karbi":"Aro arim","mizo":"Zar, peng","meaning":"Part, branch"},{"karbi":"Adang kethe","mizo":"Zau","meaning":"Wide / Broad"},{"karbi":"Thero","mizo":"Zawng","meaning":"Monkey"},{"karbi":"Ri","mizo":"Zawng","meaning":"Search"},{"karbi":"Keri karlan","mizo":"Zawng","meaning":"Deer"},{"karbi":"Thero","mizo":"Zawng","meaning":"Monkey"},{"karbi":"Themuke","mizo":"Zawngṭah","meaning":"Parkia timoriana / Stink bean"},{"karbi":"Kadokave","mizo":"Zawng zawng","meaning":"All"},{"karbi":"Meng","mizo":"Zawhte","meaning":"Cat"},{"karbi":"Meng/Mengkalu","mizo":"Zawhte","meaning":"Cat"},{"karbi":"Aini","mizo":"Zawi","meaning":"Quiet / Tired"},{"karbi":"Pejo","mizo":"Zawi muang","meaning":"Slowly"},{"karbi":"Cheklam","mizo":"Zawl (hmun)","meaning":"Level ground"},{"karbi":"Montri","mizo":"Zawlnei","meaning":"Prophet"},{"karbi":"Ingjir","mizo":"Zawp, zawr","meaning":"Thin / Worn out"},{"karbi":"Krenghak","mizo":"Zeng","meaning":"Paralyzed / Numb"},{"karbi":"Thekser","mizo":"Zei, thiam","meaning":"Skilful"},{"karbi":"Volangdung","mizo":"Zetzet/Kireuh","meaning":"Swift / Swallow"},{"karbi":"Tok","mizo":"Ziak","meaning":"Write"},{"karbi":"Adap","mizo":"Zing","meaning":"Morning"},{"karbi":"Angbong","mizo":"Zingah","meaning":"Among / between"},{"karbi":"Hepu chetam","mizo":"Zilhhau","meaning":"Learn, study"},{"karbi":"Adang kebi","mizo":"Zim","meaning":"Narrow"},{"karbi":"Charli","mizo":"Zir","meaning":"Learn / study"},{"karbi":"Kethan kemum","mizo":"Zirtirna","meaning":"Instruction"},{"karbi":"Tang","mizo":"Zo","meaning":"Finish / done / complete"},{"karbi":"Kejut, kepleng","mizo":"Zo fel, kimchang taka a tawp thleng","meaning":"Complete, finish properly"},{"karbi":"Un","mizo":"Zo (thei)","meaning":"Able / Can"},{"karbi":"Inglong kangtui","mizo":"Zo (zokhawsang)","meaning":"Victory / Conquering"},{"karbi":"Hor","mizo":"Zu","meaning":"Rice beer / liquor"},{"karbi":"Jor","mizo":"Zuar","meaning":"Sell"},{"karbi":"Arman","mizo":"Zungbun","meaning":"Ring (finger ring)"},{"karbi":"Ingchim","mizo":"Zuih, zum","meaning":"Narrowing down"},{"karbi":"Chek","mizo":"Zuk (khuai zuk)","meaning":"Sting"},{"karbi":"Phi-ing","mizo":"Zun","meaning":"Urine"},{"karbi":"Barso ahem","mizo":"Zun in","meaning":"Toilet (urinal)"},{"karbi":"Barso Ahem","mizo":"Zunin","meaning":"Urinal / Restroom"},{"karbi":"Barpi barso","mizo":"Zun ram","meaning":"Country/land of excrement"},{"karbi":"Akur ajon","mizo":"Chi leh kuang, chi bil bik (Teron, Terang etc.)","meaning":"Clan and lineage, main clan"},{"karbi":"Longri","mizo":"District / area","meaning":"District"},{"karbi":"Sondon/Sajona","mizo":"Drumstick","meaning":"Drumstick / Moringa"},{"karbi":"Chekok","mizo":"Hreng (kawnghren etc.)","meaning":"Belt / Tie"},{"karbi":"Tur","mizo":"Lawk (suahwur lawk)","meaning":"Spit"},{"karbi":"Soi","mizo":"Suih (thing etc. suih)","meaning":"Pierce"},{"karbi":"Cherung cherek","mizo":"Thawhlawm, pawisa etc. khawn","meaning":"Contribution, collection of money"},{"karbi":"Soktepli","mizo":"Wheat","meaning":"Wheat"},{"karbi":"ingro","mizo":"saphihrik","meaning":"tick"},{"karbi":"","mizo":"","meaning":""},];
+
+
+
+
+
+
+
+
+
+const $ = id => document.getElementById(id);
+
+/* =========================================================
+   KARDOM V2 — SEARCH / FAVORITES / HISTORY / SPEECH / QUIZ
+   This block replaces the old dictionary/search/quiz runtime.
+   The original DATA array above is preserved unchanged.
+   ========================================================= */
+
+(() => {
+  'use strict';
+
+  const STORAGE = {
+    theme: 'kardom-theme',
+    direction: 'kardom-direction',
+    favorites: 'kardom-favorites',
+    history: 'kardom-history',
+    stats: 'kardom-stats'
+  };
+
+  const state = {
+    direction: localStorage.getItem(STORAGE.direction) || 'mizo-karbi',
+    favorites: loadJSON(STORAGE.favorites, []),
+    history: loadJSON(STORAGE.history, []),
+    stats: loadJSON(STORAGE.stats, {
+      quizzes: 0,
+      questions: 0,
+      correct: 0,
+      best: 0,
+      bestTotal: 0,
+      streak: 0,
+      lastStudyDate: ''
+    }),
+    quizItems: [],
+    quizDirections: [],
+    quizIndex: 0,
+    quizScore: 0,
+    quizAnswered: false,
+    quizTimer: null,
+    quizTimeLeft: 10,
+    quizDuration: Number(localStorage.getItem("kardom-quiz-duration")) || 10,
+    quizDeadline: 0
+  };
+
+  function loadJSON(key, fallback) {
+    try {
+      const value = JSON.parse(localStorage.getItem(key));
+      return value ?? fallback;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  function saveJSON(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {}
+  }
+
+  // Migrate older saved stats safely.
+  state.stats = {
+    quizzes: Number(state.stats?.quizzes) || 0,
+    questions: Number(state.stats?.questions) || 0,
+    correct: Number(state.stats?.correct) || 0,
+    best: Number(state.stats?.best) || 0,
+    bestTotal: Number(state.stats?.bestTotal) || 0,
+    streak: Number(state.stats?.streak) || 0,
+    lastStudyDate: String(state.stats?.lastStudyDate || '')
+  };
+
+  function normalize(value) {
+    return String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[’']/g, '')
+      .replace(/[^\p{L}\p{N}]+/gu, ' ')
+      .trim();
+  }
+
+  function escapeHTML(value) {
+    const div = document.createElement('div');
+    div.textContent = String(value ?? '');
+    return div.innerHTML;
+  }
+
+  function completeDictionary() {
+    if (!Array.isArray(DATA)) return [];
+    const seen = new Set();
+    return DATA.filter(d => {
+      if (!d || !String(d.mizo || '').trim() || !String(d.karbi || '').trim()) return false;
+      const key = normalize(d.mizo) + '|' + normalize(d.karbi);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  function getSource(item) {
+    return state.direction === 'mizo-karbi' ? item.mizo : item.karbi;
+  }
+
+  function getTarget(item) {
+    return state.direction === 'mizo-karbi' ? item.karbi : item.mizo;
+  }
+
+  function directionLabel() {
+    return state.direction === 'mizo-karbi' ? 'Mizo → Karbi' : 'Karbi → Mizo';
+  }
+
+  function itemKey(item) {
+    return normalize(item.mizo) + '|' + normalize(item.karbi);
+  }
+
+  function isFavorite(item) {
+    return state.favorites.includes(itemKey(item));
+  }
+
+  function toggleFavorite(key) {
+    if (state.favorites.includes(key)) {
+      state.favorites = state.favorites.filter(x => x !== key);
+    } else {
+      state.favorites.push(key);
+    }
+    saveJSON(STORAGE.favorites, state.favorites);
+    renderFavoritesPanel();
+    const active = document.querySelector(`[data-fav-key="${CSS.escape(key)}"]`);
+    if (active) active.textContent = state.favorites.includes(key) ? '✓ Saved' : '♡ Save';
+    // Refresh visible dictionary cards so Save/Unsaved state is always correct.
+    const query = $('q')?.value || '';
+    if (query.trim()) searchWord(query, false);
+  }
+
+  function addHistory(query) {
+    const q = String(query || '').trim();
+    if (!q) return;
+    state.history = [q, ...state.history.filter(x => normalize(x) !== normalize(q))].slice(0, 20);
+    saveJSON(STORAGE.history, state.history);
+    renderHistoryPanel();
+  }
+
+  function clearHistory() {
+    state.history = [];
+    saveJSON(STORAGE.history, state.history);
+    renderHistoryPanel();
+  }
+
+  function renderResults(items, query = '') {
+    const box = $('result');
+    if (!box) return;
+
+    if (!items.length) {
+      box.classList.add('has-results');
+      box.innerHTML = `<div class="card empty-result">
+        <div style="font-size:2rem">🧭</div>
+        <p class="meaning">I thu zawn hi hetah hian a awm lo.</p>
+        <small>Thumal dang Mizo, Karbi, or English zawng leh rawh.</small>
+      </div>`;
+      return;
+    }
+
+    box.classList.add('has-results');
+    box.innerHTML = items.map(item => {
+      const key = itemKey(item);
+      const source = getSource(item);
+      const target = getTarget(item);
+      const fav = isFavorite(item);
+      return `<article class="card dictionary-card">
+        <div class="wordrow">
+          <div>
+            <div class="word" style="color:var(--p)">${escapeHTML(source)}</div>
+            <div class="phon">${state.direction === 'mizo-karbi' ? 'Mizo' : 'Karbi'}</div>
+          </div>
+          <div class="arrow">→</div>
+          <div style="text-align:right">
+            <div class="word">${escapeHTML(target)}</div>
+            <div class="phon">${state.direction === 'mizo-karbi' ? 'Karbi' : 'Mizo'}</div>
+          </div>
+        </div>
+        <div class="meaning"><b>English:</b> ${escapeHTML(item.meaning || '—')}</div>
+        <div class="result-actions">
+          <span class="tag">${directionLabel()}</span>
+          <button type="button" class="mini-action" data-speak-mizo="${escapeHTML(item.mizo)}">📢 Mizo</button>
+          <button type="button" class="mini-action" data-speak-karbi="${escapeHTML(item.karbi)}">📢 Karbi</button>
+          <button type="button" class="mini-action" data-copy-key="${escapeHTML(key)}">⧉ Copy</button>
+          <button type="button" class="mini-action" data-share-key="${escapeHTML(key)}">🔗 Share</button>
+          <button type="button" class="mini-action" data-fav-key="${escapeHTML(key)}">${fav ? '✓ Saved' : '♡ Save'}</button>
+        </div>
+      </article>`;
+    }).join('');
+
+    box.querySelectorAll('[data-speak-mizo]').forEach(btn => {
+      btn.addEventListener('click', () => speak(btn.dataset.speakMizo, 'Mizo'));
+    });
+    box.querySelectorAll('[data-speak-karbi]').forEach(btn => {
+      btn.addEventListener('click', () => speak(btn.dataset.speakKarbi, 'Karbi'));
+    });
+    box.querySelectorAll('[data-copy-key]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = completeDictionary().find(x => itemKey(x) === btn.dataset.copyKey);
+        if (item) copyItem(item);
+      });
+    });
+    box.querySelectorAll('[data-share-key]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = completeDictionary().find(x => itemKey(x) === btn.dataset.shareKey);
+        if (item) shareItem(item);
+      });
+    });
+    box.querySelectorAll('[data-fav-key]').forEach(btn => {
+      btn.addEventListener('click', () => toggleFavorite(btn.dataset.favKey));
+    });
+  }
+
+  function searchWord(keyword, addToRecent = true) {
+    const query = String(keyword || '').trim();
+    const box = $('result');
+    if (!box) return;
+
+    if (!query) {
+      box.innerHTML = '';
+      box.classList.remove('has-results');
+      return;
+    }
+
+    const nq = normalize(query);
+    const terms = nq.split(/\s+/).filter(Boolean);
+    const items = completeDictionary().filter(item => {
+      const fields = [item.mizo, item.karbi, item.meaning].map(normalize);
+      return terms.every(term => fields.some(field => field.includes(term)));
+    }).sort((a, b) => {
+      const aSource = normalize(getSource(a));
+      const bSource = normalize(getSource(b));
+      const aExact = aSource === nq ? 0 : aSource.startsWith(nq) ? 1 : 2;
+      const bExact = bSource === nq ? 0 : bSource.startsWith(nq) ? 1 : 2;
+      return aExact - bExact;
+    });
+
+    renderResults(items, query);
+    if (addToRecent) addHistory(query);
+  }
+
+  function createSearchControls() {
+    const searchInput = $('q');
+    if (!searchInput || document.getElementById('kardomSearchControls')) return;
+
+    const controls = document.createElement('div');
+    controls.id = 'kardomSearchControls';
+    controls.className = 'kardom-search-controls';
+    controls.innerHTML = `
+      <div class="direction-row">
+        <button type="button" id="directionBtn" class="secondary-action direction-action" aria-label="Change search direction"></button>
+      </div>
+      <div class="utility-row" aria-label="Quick tools">
+        <button type="button" id="historyBtn" class="utility-action">📑 History</button>
+        <button type="button" id="favoritesBtn" class="utility-action">➕ Saved</button>
+        <button type="button" id="statsBtn" class="utility-action">📊 Progress</button>
+      </div>
+    `;
+    const searchBox = searchInput.closest('.search');
+    if (searchBox) {
+      searchBox.insertAdjacentElement('afterend', controls);
+    } else {
+      searchInput.parentElement?.appendChild(controls);
+    }
+
+    $('directionBtn').addEventListener('click', () => {
+      state.direction = state.direction === 'mizo-karbi' ? 'karbi-mizo' : 'mizo-karbi';
+      localStorage.setItem(STORAGE.direction, state.direction);
+      updateDirectionUI();
+      searchWord(searchInput.value, false);
+    });
+    $('historyBtn').addEventListener('click', openHistory);
+    $('favoritesBtn').addEventListener('click', openFavorites);
+    $('statsBtn').addEventListener('click', openStats);
+  }
+
+  function updateDirectionUI() {
+    const btn = $('directionBtn');
+    if (btn) btn.textContent = state.direction === 'mizo-karbi' ? 'Mizo → Karbi ⇄' : 'Karbi → Mizo ⇄';
+    const input = $('q');
+    if (input) input.placeholder = state.direction === 'mizo-karbi'
+      ? 'Search a Mizo word…'
+      : 'Search a Karbi word…';
+  }
+
+  function speak(text, language) {
+    if (!('speechSynthesis' in window)) {
+      toast('Speech is not supported by this browser.');
+      return;
+    }
+    const value = String(text || '').trim();
+    if (!value) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(value);
+    const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+    // Mizo and Karbi do not have a guaranteed browser TTS locale. Prefer an
+    // Indian English voice as a fallback rather than pretending native support.
+    const preferred = voices.find(v => /^en-IN$/i.test(v.lang))
+      || voices.find(v => /^en/i.test(v.lang));
+    if (preferred) utterance.voice = preferred;
+    utterance.lang = preferred?.lang || 'en-IN';
+    utterance.rate = 0.78;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function plainText(item) {
+    return `Mizo: ${item.mizo}\nKarbi: ${item.karbi}\nEnglish: ${item.meaning || '—'}`;
+  }
+
+  async function copyItem(item) {
+    try {
+      await navigator.clipboard.writeText(plainText(item));
+      toast('Copied ✓');
+    } catch (_) {
+      const ta = document.createElement('textarea');
+      ta.value = plainText(item);
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      toast('Copied ✓');
+    }
+  }
+
+  async function shareItem(item) {
+    const text = plainText(item);
+    if (navigator.share) {
+      try { await navigator.share({ title: 'KARDOM Kachingkime✨', text }); } catch (_) {}
+    } else {
+      await copyItem(item);
+    }
+  }
+
+  function toast(message) {
+    let t = document.getElementById('kardomToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'kardomToast';
+      t.className = 'kardom-toast';
+      document.body.appendChild(t);
+    }
+    t.textContent = message;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 1600);
+  }
+
+  function createPanel(id, title) {
+    let panel = document.getElementById(id);
+    if (panel) return panel;
+    panel = document.createElement('div');
+    panel.id = id;
+    panel.className = 'kardom-panel-overlay';
+    panel.innerHTML = `<div class="kardom-panel" role="dialog" aria-modal="true">
+      <button class="kardom-panel-close" type="button" aria-label="Close">×</button>
+      <h2>${title}</h2>
+      <div class="kardom-panel-content"></div>
+    </div>`;
+    document.body.appendChild(panel);
+    panel.addEventListener('click', e => {
+      if (e.target === panel || e.target.classList.contains('kardom-panel-close')) panel.classList.remove('show');
+    });
+    return panel;
+  }
+
+  function openHistory() {
+    const panel = createPanel('historyPanel', '📜 Search History');
+    renderHistoryPanel();
+    panel.classList.add('show');
+  }
+
+  function renderHistoryPanel() {
+    const panel = document.getElementById('historyPanel');
+    if (!panel) return;
+    const content = panel.querySelector('.kardom-panel-content');
+    content.innerHTML = state.history.length
+      ? `<div class="history-list">${state.history.map(q => `<button class="history-item" type="button" data-history="${escapeHTML(q)}">🔎 ${escapeHTML(q)}</button>`).join('')}</div>
+         <button type="button" class="danger-action" id="clearHistoryBtn">Clear history</button>`
+      : `<div class="panel-empty">No recent searches yet.</div>`;
+    content.querySelectorAll('[data-history]').forEach(btn => btn.addEventListener('click', () => {
+      $('q').value = btn.dataset.history;
+      searchWord(btn.dataset.history, false);
+      panel.classList.remove('show');
+      $('q').focus();
+    }));
+    content.querySelector('#clearHistoryBtn')?.addEventListener('click', clearHistory);
+  }
+
+  function openFavorites() {
+    const panel = createPanel('favoritesPanel', '📌 Saved Words');
+    renderFavoritesPanel();
+    panel.classList.add('show');
+  }
+
+  function renderFavoritesPanel() {
+    const panel = document.getElementById('favoritesPanel');
+    if (!panel) return;
+    const content = panel.querySelector('.kardom-panel-content');
+    const items = completeDictionary().filter(isFavorite);
+    content.innerHTML = items.length
+      ? `<div class="favorite-list">${items.map(item => `<button type="button" class="favorite-item" data-favorite-key="${escapeHTML(itemKey(item))}">
+          <b>${escapeHTML(item.mizo)}</b> <span>→</span> ${escapeHTML(item.karbi)}<small>${escapeHTML(item.meaning || '')}</small>
+        </button>`).join('')}</div>`
+      : `<div class="panel-empty">No saved words yet. Tap ♡ Save on a dictionary result.</div>`;
+    content.querySelectorAll('[data-favorite-key]').forEach(btn => btn.addEventListener('click', () => {
+      const item = completeDictionary().find(x => itemKey(x) === btn.dataset.favoriteKey);
+      if (!item) return;
+      $('q').value = getSource(item);
+      searchWord(getSource(item), false);
+      panel.classList.remove('show');
+    }));
+  }
+
+  function openStats() {
+    const panel = createPanel('statsPanel', '🏆 Learning Progress');
+    renderStatsPanel();
+    panel.classList.add('show');
+  }
+
+  function renderStatsPanel() {
+    const panel = document.getElementById('statsPanel');
+    if (!panel) return;
+    const s = state.stats;
+    const accuracy = s.questions ? Math.round((s.correct / s.questions) * 100) : 0;
+    panel.querySelector('.kardom-panel-content').innerHTML = `
+      <div class="stats-grid">
+        <div><b>${s.quizzes}</b><span>Quizzes</span></div>
+        <div><b>${s.questions}</b><span>Questions</span></div>
+        <div><b>${accuracy}%</b><span>Accuracy</span></div>
+        <div><b>${s.best}/${s.bestTotal || 15}</b><span>Best score</span></div>
+        <div><b>${s.streak}</b><span>Study streak</span></div>
+        <div><b>${state.favorites.length}</b><span>Saved words</span></div>
+      </div>`;
+  }
+
+  function updateStudyStreak() {
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    if (state.stats.lastStudyDate === today) return;
+    const previous = new Date();
+    previous.setDate(previous.getDate() - 1);
+    const yesterday = `${previous.getFullYear()}-${String(previous.getMonth()+1).padStart(2,'0')}-${String(previous.getDate()).padStart(2,'0')}`;
+    state.stats.streak = state.stats.lastStudyDate === yesterday ? state.stats.streak + 1 : 1;
+    state.stats.lastStudyDate = today;
+  }
+
+  function setupExplore() {
+    // Explore words removed from the home screen to keep the phone layout compact.
+  }
+
+  // Quiz session control: prevents any timer/timeout from continuing after Exit.
+  let quizExitRequested = false;
+  let quizNextTimeout = null;
+
+  function startQuiz() {
+    // A new quiz session is allowed to start the timer again.
+    quizExitRequested = false;
+    if (quizNextTimeout) {
+      clearTimeout(quizNextTimeout);
+      quizNextTimeout = null;
+    }
+
+    const pool = completeDictionary();
+    if (pool.length < 4) return;
+    state.quizItems = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(15, pool.length));
+    // Every quiz contains both directions: Mizo → Karbi and Karbi → Mizo.
+    state.quizDirections = state.quizItems.map((_, index) => index % 2 === 0 ? 'mizo-karbi' : 'karbi-mizo');
+    state.quizDirections.sort(() => Math.random() - 0.5);
+    state.quizIndex = 0;
+    state.quizScore = 0;
+    state.quizAnswered = false;
+    state.quizDuration = Number(localStorage.getItem("kardom-quiz-duration")) || 10;
+    $('quiz')?.classList.add('show');
+    loadQuizQuestion();
+  }
+
+  function ensureQuizUI() {
+    const card = document.querySelector('#quiz .card');
+    if (!card || document.getElementById('quizProgressBar')) return;
+    const progress = document.createElement('div');
+    progress.className = 'quiz-progress-wrap';
+    progress.innerHTML = `
+      <div class="quiz-progress-top"><span id="quizProgressText">Question 1 of 15</span><span id="quizAccuracyText">0 correct</span></div>
+      <div class="quiz-progress-track"><div id="quizProgressBar" class="quiz-progress-bar"></div></div>
+      <div id="quizDirectionLabel" class="quiz-direction-label">Mizo → Karbi</div>
+      <div class="quiz-settings" aria-label="Quiz time per question">
+        <span>⌛ Time:</span>
+        <button type="button" data-time="5">5s</button>
+        <button type="button" data-time="10">10s</button>
+        <button type="button" data-time="15">15s</button>
+        <button type="button" data-time="20">20s</button>
+      </div>
+      <div class="quiz-timer-wrap"><div class="quiz-timer-top"><span>⌛ Time left</span><span id="quizTimerText" class="quiz-timer-number">10s</span></div><div class="quiz-timer-track"><div id="quizTimerBar" class="quiz-timer-bar"></div></div></div>`;
+    card.insertBefore(progress, card.firstChild);
+    progress.querySelectorAll('[data-time]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.quizDuration = Number(btn.dataset.time);
+        localStorage.setItem('kardom-quiz-duration', String(state.quizDuration));
+        progress.querySelectorAll('[data-time]').forEach(b => b.classList.toggle('active', b === btn));
+        toast(`⌛ ${state.quizDuration} seconds`);
+      });
+    });
+    const savedTime = String(state.quizDuration);
+    progress.querySelectorAll('[data-time]').forEach(btn => btn.classList.toggle('active', btn.dataset.time === savedTime));
+  }
+
+  function clearQuizTimer() {
+    if (state.quizTimer) {
+      clearInterval(state.quizTimer);
+      state.quizTimer = null;
+    }
+
+    // Also cancel any delayed next-question callback.
+    if (quizNextTimeout) {
+      clearTimeout(quizNextTimeout);
+      quizNextTimeout = null;
+    }
+
+    state.quizTimeLeft = 0;
+    state.quizDeadline = 0;
+
+    const timerText = $('quizTimerText');
+    const timerBar = $('quizTimerBar');
+
+    if (timerText) timerText.textContent = '0s';
+    if (timerBar) timerBar.style.width = '0%';
+  }
+
+  function startQuestionTimer() {
+    clearQuizTimer();
+
+    // Never start a timer after Quiz Exit.
+    if (quizExitRequested) return;
+
+    const duration = Math.max(1, Number(state.quizDuration) || 10);
+    state.quizTimeLeft = duration;
+    state.quizDeadline = Date.now() + duration * 1000;
+
+    const timerText = $('quizTimerText');
+    const timerBar = $('quizTimerBar');
+
+    const paint = () => {
+      if (quizExitRequested) {
+        clearQuizTimer();
+        return 0;
+      }
+
+      const remainingMs = Math.max(0, state.quizDeadline - Date.now());
+      const remaining = Math.ceil(remainingMs / 1000);
+
+      state.quizTimeLeft = remaining;
+
+      if (timerText) timerText.textContent = `${remaining}s`;
+      if (timerBar) {
+        timerBar.style.width =
+          `${Math.min(100, (remainingMs / (duration * 1000)) * 100)}%`;
+      }
+
+      return remainingMs;
+    };
+
+    paint();
+
+    state.quizTimer = setInterval(() => {
+      // Exit always wins over the timer.
+      if (quizExitRequested) {
+        clearQuizTimer();
+        return;
+      }
+
+      const quiz = document.getElementById('quiz');
+
+      // If Quiz is no longer visible, stop the timer.
+      if (!quiz || !quiz.classList.contains('show')) {
+        clearQuizTimer();
+        return;
+      }
+
+      if (state.quizAnswered) return;
+
+      const remainingMs = paint();
+
+      if (remainingMs <= 0) {
+        clearQuizTimer();
+
+        // Do not continue if Exit happened at the same time.
+        if (quizExitRequested) return;
+
+        const buttons = [...document.querySelectorAll('.quiz-option')];
+        const correct = state.quizCurrentTarget;
+
+        buttons.forEach(btn => {
+          btn.disabled = true;
+          if (btn.dataset.answer === correct) {
+            btn.classList.add('correct');
+          }
+        });
+
+        state.quizAnswered = true;
+        state.stats.questions++;
+        saveJSON(STORAGE.stats, state.stats);
+        toast(`⏰ ${duration}s time up!`);
+
+        // Store the timeout so Exit can cancel it.
+        quizNextTimeout = setTimeout(() => {
+          quizNextTimeout = null;
+
+          if (quizExitRequested) return;
+
+          const quiz = document.getElementById('quiz');
+          if (!quiz || !quiz.classList.contains('show')) return;
+
+          state.quizIndex++;
+          loadQuizQuestion();
+        }, 700);
+      }
+    }, 100);
+  }
+
+  function loadQuizQuestion() {
+    // Never load a new question after Exit.
+    if (quizExitRequested) return;
+
+    ensureQuizUI();
+    clearQuizTimer();
+
+    if (state.quizIndex >= state.quizItems.length) {
+      finishQuiz();
+      return;
+    }
+
+    const current = state.quizItems[state.quizIndex];
+    const quizDirection =
+      state.quizDirections[state.quizIndex] ||
+      (state.quizIndex % 2 === 0 ? 'mizo-karbi' : 'karbi-mizo');
+
+    const source =
+      quizDirection === 'mizo-karbi' ? current.mizo : current.karbi;
+
+    const target =
+      quizDirection === 'mizo-karbi' ? current.karbi : current.mizo;
+
+    state.quizAnswered = false;
+    state.quizCurrentTarget = target;
+
+    $('score').textContent =
+      `${state.quizIndex + 1}/${state.quizItems.length}`;
+
+    const progressBar = $('quizProgressBar');
+    const progressText = $('quizProgressText');
+    const accuracyText = $('quizAccuracyText');
+    const total = state.quizItems.length || 15;
+
+    if (progressBar) {
+      progressBar.style.width = `${(state.quizIndex / total) * 100}%`;
+    }
+
+    if (progressText) {
+      progressText.textContent =
+        `Question ${state.quizIndex + 1} of ${total}`;
+    }
+
+    if (accuracyText) {
+      accuracyText.textContent = `${state.quizScore} correct`;
+    }
+
+    const sourceLanguage =
+      quizDirection === 'mizo-karbi' ? 'Mizo' : 'Karbi';
+
+    const targetLanguage =
+      quizDirection === 'mizo-karbi' ? 'Karbi' : 'Mizo';
+
+    $('qword').innerHTML =
+      `${escapeHTML(source)} <span class="quiz-language">(${sourceLanguage})</span>`;
+
+    const wrongPool = completeDictionary()
+      .filter(item => itemKey(item) !== itemKey(current))
+      .map(item =>
+        quizDirection === 'mizo-karbi' ? item.karbi : item.mizo
+      );
+
+    const uniqueWrong = [...new Set(wrongPool.filter(Boolean))]
+      .filter(x => normalize(x) !== normalize(target))
+      .sort(() => Math.random() - 0.5);
+
+    const options = [target, ...uniqueWrong.slice(0, 3)]
+      .sort(() => Math.random() - 0.5);
+
+    if (options.length < 2) {
+      options.push('—');
+    }
+
+    $('options').innerHTML = options.map((opt, index) => `
+      <button
+        type="button"
+        class="quiz-option"
+        data-answer="${escapeHTML(opt)}"
+      >
+        ${String.fromCharCode(65 + index)}. ${escapeHTML(opt)}
+      </button>
+    `).join('');
+
+    const label = document.getElementById('quizDirectionLabel');
+    if (label) {
+      label.textContent = `${sourceLanguage} → ${targetLanguage}`;
+    }
+
+    $('options').querySelectorAll('.quiz-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        checkAnswer(btn, btn.dataset.answer, target);
+      });
+    });
+
+    const quiz = document.getElementById('quiz');
+
+    if (quiz && quiz.classList.contains('show') && !quizExitRequested) {
+      startQuestionTimer();
+    }
+  }
+
+  function checkAnswer(button, selected, correct) {
+    if (quizExitRequested) return;
+    if (state.quizAnswered) return;
+
+    clearQuizTimer();
+    state.quizAnswered = true;
+
+    const buttons = [...document.querySelectorAll('.quiz-option')];
+    buttons.forEach(btn => btn.disabled = true);
+
+    state.stats.questions++;
+
+    if (selected === correct) {
+      state.quizScore++;
+      state.stats.correct++;
+      button.classList.add('correct');
+      toast('✓ I ti tha e!');
+    } else {
+      button.classList.add('wrong');
+
+      buttons.forEach(btn => {
+        if (btn.dataset.answer === correct) {
+          btn.classList.add('correct');
+        }
+      });
+
+      toast('Try again next time!');
+    }
+
+    saveJSON(STORAGE.stats, state.stats);
+
+    const accuracyText = $('quizAccuracyText');
+    if (accuracyText) {
+      accuracyText.textContent = `${state.quizScore} correct`;
+    }
+
+    // Cancel any previous delayed callback.
+    if (quizNextTimeout) {
+      clearTimeout(quizNextTimeout);
+      quizNextTimeout = null;
+    }
+
+    quizNextTimeout = setTimeout(() => {
+      quizNextTimeout = null;
+
+      // Exit means no next question.
+      if (quizExitRequested) return;
+
+      const quiz = document.getElementById('quiz');
+      if (!quiz || !quiz.classList.contains('show')) return;
+
+      state.quizIndex++;
+      loadQuizQuestion();
+    }, 650);
+  }
+
+  function finishQuiz() {
+    clearQuizTimer();
+    updateStudyStreak();
+    state.stats.quizzes++;
+    if (state.quizScore >= state.stats.best) {
+      state.stats.best = state.quizScore;
+      state.stats.bestTotal = state.quizItems.length;
+    }
+    saveJSON(STORAGE.stats, state.stats);
+    $('quiz')?.classList.remove('show');
+
+    const overlay = document.createElement('div');
+    overlay.className = 'perfect-overlay';
+    overlay.innerHTML = `<div class="perfect-modal" role="dialog" aria-modal="true">
+      <div class="perfect-trophy">${state.quizScore === state.quizItems.length ? '🏆' : '🎉'}</div>
+      <h2 class="perfect-title">${state.quizScore === state.quizItems.length ? '🎉 CONGRATULATION!<br><span style="white-space:nowrap;">I ti tha lutuk aw!! Bawihpui</span>' : 'I ti tha lutuk!'}</h2>
+      <p class="perfect-sub">${state.quizScore === state.quizItems.length ? 'I tiam lutuk ringawt!' : 'Score: ' + state.quizScore + ' / ' + state.quizItems.length}</p>
+      <div class="perfect-actions">
+        <button type="button" class="perfect-try" id="retryQuizBtn">🔄 Try Again</button>
+        <button type="button" class="perfect-close" id="closeQuizResultBtn">Close</button>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#retryQuizBtn').addEventListener('click', () => { overlay.remove(); startQuiz(); });
+    overlay.querySelector('#closeQuizResultBtn').addEventListener('click', () => overlay.remove());
+    if (state.quizScore === state.quizItems.length) celebratePerfectConfetti();
+  }
+
+  function celebratePerfectConfetti() {
+    const celebration = document.createElement('div');
+    celebration.className = 'quiz-celebration';
+    celebration.innerHTML = '<div class="firework f1"></div><div class="firework f2"></div><div class="firework f3"></div><div class="firework f4"></div>';
+    const shapes = ['✦','✧','◆','●','★','❖'];
+    const colors = ['#e63946','#f4c542','#8f1018','#ffffff','#d6a548','#111111'];
+    for (let i = 0; i < 90; i++) {
+      const piece = document.createElement('span');
+      piece.className = 'confetti-piece';
+      piece.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.color = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.fontSize = (9 + Math.random() * 15) + 'px';
+      piece.style.setProperty('--drift', (-180 + Math.random() * 360) + 'px');
+      piece.style.animationDelay = (Math.random() * .7) + 's';
+      celebration.appendChild(piece);
+    }
+    document.body.appendChild(celebration);
+    setTimeout(() => celebration.remove(), 3600);
+  }
+
+  function setupTheme() {
+    const saved = localStorage.getItem(STORAGE.theme);
+    const preferred = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const dark = preferred === 'dark';
+    document.body.classList.toggle('dark', dark);
+    const btn = $('dark');
+    if (btn) btn.textContent = dark ? '☀️' : '☾';
+    btn?.addEventListener('click', () => {
+      const nextDark = !document.body.classList.contains('dark');
+      document.body.classList.toggle('dark', nextDark);
+      localStorage.setItem(STORAGE.theme, nextDark ? 'dark' : 'light');
+      btn.textContent = nextDark ? '☀️' : '☾';
+    });
+  }
+
+  function bindSearch() {
+    const input = $('q');
+    if (!input) return;
+    $('go')?.addEventListener('click', () => searchWord(input.value));
+    input.addEventListener('input', () => {
+      searchWord(input.value, false);
+    });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') searchWord(input.value);
+      if (e.key === 'Escape') {
+        input.value = '';
+        searchWord('', false);
+        input.blur();
+      }
+    });
+
+  }
+
+  function injectStyles() {
+    if (document.getElementById('kardom-v2-style')) return;
+    const style = document.createElement('style');
+    style.id = 'kardom-v2-style';
+    style.textContent = `
+      .kardom-search-controls{margin-top:7px;margin-bottom:4px}
+      .direction-row{display:block;width:100%}
+      .direction-action{width:100%;min-height:36px;padding:7px 10px;font-size:.82rem;font-weight:900;white-space:nowrap;overflow:visible;text-overflow:clip}
+      .utility-row{display:flex;justify-content:flex-end;align-items:center;gap:5px;margin-top:5px}
+      .utility-action{font-size:.66rem!important;min-height:27px!important;padding:4px 8px!important;border-radius:999px!important}
+      .quiz-timer-wrap{margin:4px 0 12px}
+      .quiz-timer-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:900;margin-bottom:5px}
+      .quiz-timer-track{height:7px;border-radius:99px;background:var(--soft);overflow:hidden}
+      .quiz-timer-bar{height:100%;width:100%;background:linear-gradient(90deg,#8f1018,#f4c542,#e63946);border-radius:99px;transition:width 1s linear}
+      .quiz-timer-number{font-size:15px;min-width:32px;text-align:right}
+      .quiz-celebration{position:fixed;inset:0;pointer-events:none;z-index:40000;overflow:hidden;background:radial-gradient(circle at center,rgba(255,255,255,.06),transparent 45%)}
+      .firework{position:absolute;width:8px;height:8px;border-radius:50%;opacity:0;animation:fireworkBurst 1.15s ease-out infinite}
+      .f1{left:18%;top:25%;box-shadow:0 -55px 0 2px #e63946,40px -40px 0 2px #f4c542,55px 0 0 2px #8f1018,40px 40px 0 2px #111111,0 55px 0 2px #ff7b00,-40px 40px 0 2px #e63946,-55px 0 0 2px #f4c542,-40px -40px 0 2px #8f1018;animation-delay:.05s}
+      .f2{left:76%;top:27%;box-shadow:0 -48px 0 2px #111111,34px -34px 0 2px #e63946,48px 0 0 2px #f4c542,34px 34px 0 2px #8f1018,0 48px 0 2px #ff7b00,-34px 34px 0 2px #e63946,-48px 0 0 2px #111111,-34px -34px 0 2px #f4c542;animation-delay:.35s}
+      .f3{left:50%;top:18%;box-shadow:0 -62px 0 2px #8f1018,44px -44px 0 2px #f4c542,62px 0 0 2px #e63946,44px 44px 0 2px #111111,0 62px 0 2px #ff7b00,-44px 44px 0 2px #8f1018,-62px 0 0 2px #f4c542,-44px -44px 0 2px #e63946;animation-delay:.7s}
+      .f4{left:50%;top:62%;transform:scale(.75);box-shadow:0 -52px 0 2px #f4c542,37px -37px 0 2px #e63946,52px 0 0 2px #8f1018,37px 37px 0 2px #111111,0 52px 0 2px #ff7b00,-37px 37px 0 2px #f4c542,-52px 0 0 2px #e63946,-37px -37px 0 2px #8f1018;animation-delay:.95s}
+      @keyframes fireworkBurst{0%,100%{opacity:0;transform:scale(.15)}18%{opacity:1;transform:scale(1)}70%{opacity:.75;transform:scale(1.15)}90%{opacity:0;transform:scale(1.35)}}
+      .confetti-piece{position:absolute;top:-30px;animation:confettiFall 2.9s linear forwards}
+      @keyframes confettiFall{0%{transform:translate3d(0,-20px,0) rotate(0deg);opacity:0}10%{opacity:1}100%{transform:translate3d(var(--drift),110vh,0) rotate(720deg);opacity:0}}
+
+      .secondary-action,.utility-action,.mini-action,.danger-action{border:1px solid rgba(120,80,40,.22);background:var(--card,#fff);color:inherit;border-radius:12px;padding:8px 11px;cursor:pointer;font:inherit;transition:transform .15s ease,box-shadow .15s ease}
+      .secondary-action{font-weight:800}
+      .secondary-action:hover,.utility-action:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(0,0,0,.08)}
+      .quiz-progress-wrap{margin:2px 0 12px}
+      .quiz-progress-top{display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:800;color:var(--mut);margin-bottom:7px}
+      .quiz-progress-track{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+      .quiz-progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--p2));border-radius:999px;transition:width .25s ease}
+      .quiz-direction-label{display:inline-block;margin-top:7px;font-size:.74rem;font-weight:900;padding:4px 9px;border-radius:999px;background:rgba(127,90,50,.10)}
+      .quiz-language{font-size:.65em;opacity:.65;font-weight:800;margin-left:5px}
+      .quiz .card{overflow:hidden}
+      .result-actions{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:14px}
+      .mini-action{font-size:.82rem;padding:7px 10px}
+      .dictionary-card{overflow:hidden}
+      .empty-result,.panel-empty{text-align:center;padding:24px}
+      .kardom-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#222;color:#fff;padding:11px 16px;border-radius:999px;z-index:10001;transition:.2s}
+      .kardom-toast.show{opacity:1;transform:translate(-50%,0)}
+      .kardom-panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(7px);display:none;align-items:flex-end;justify-content:center;z-index:9998;padding:14px}
+      .kardom-panel-overlay.show{display:flex}
+      .kardom-panel{width:min(560px,100%);max-height:82vh;overflow:auto;background:var(--card,#fff);color:inherit;border-radius:24px;padding:22px;box-shadow:0 25px 70px rgba(0,0,0,.25);position:relative}
+      .kardom-panel-close{position:absolute;right:14px;top:12px;border:0;background:transparent;font-size:28px;cursor:pointer;color:inherit}
+      .kardom-panel h2{margin:0 35px 18px 0}
+      .history-list,.favorite-list{display:grid;gap:8px}
+      .history-item,.favorite-item{border:1px solid rgba(120,80,40,.18);background:transparent;color:inherit;border-radius:14px;padding:12px;text-align:left;cursor:pointer}
+      .favorite-item small{display:block;opacity:.7;margin-top:4px}
+      .danger-action{margin-top:14px}
+      .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+      .stats-grid>div{padding:16px;border-radius:16px;background:rgba(127,90,50,.08);text-align:center}
+      .stats-grid b{display:block;font-size:1.5rem}
+      .stats-grid span{font-size:.82rem;opacity:.75}
+      @media(max-width:520px){.utility-row{justify-content:center;gap:5px}.utility-action{font-size:.68rem;padding:5px 8px}.secondary-action{font-size:.9rem}.mini-action{font-size:.76rem}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+      .kardom-search-controls{position:relative;margin-top:8px;padding:9px;border-radius:18px;border:1px solid rgba(143,16,24,.28);overflow:hidden;background:linear-gradient(90deg,rgba(255,250,244,.94),rgba(255,255,255,.92));box-shadow:0 8px 20px rgba(70,24,19,.10)}
+      .kardom-search-controls::before{content:"";position:absolute;inset:0;opacity:.24;background:linear-gradient(90deg,var(--mizo-puan) left/50% 100% no-repeat,var(--karbi-puan) right/50% 100% no-repeat);pointer-events:none}
+      .kardom-search-controls>*{position:relative;z-index:1}
+      .direction-action{background:linear-gradient(135deg,#111,#8f1018)!important;color:#fff!important;border:1px solid #d6a548!important;box-shadow:0 5px 14px rgba(20,10,10,.18)}
+      .utility-row{justify-content:flex-end}
+      .utility-action{background:rgba(255,255,255,.88)!important;border:1px solid rgba(143,16,24,.25)!important;color:#111!important;box-shadow:0 3px 8px rgba(0,0,0,.08)}
+      .utility-action:hover{background:#fff!important;transform:translateY(-1px)}
+      .hero{position:relative;overflow:hidden;min-height:245px}
+      .hero-copy{position:relative;z-index:3;max-width:68%}
+      .karbi-girl-hero{position:absolute;right:4px;bottom:-2px;width:190px;height:240px;object-fit:contain;object-position:center bottom;z-index:1;filter:drop-shadow(0 10px 14px rgba(89,12,17,.18));pointer-events:none}
+      .mark{overflow:hidden;position:relative}
+      .mark img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+      .quiz-settings{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin:7px 0 10px;font-size:11px;font-weight:900}
+      .quiz-settings button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 9px;font-weight:900;cursor:pointer}
+      .quiz-settings button.active{background:#8f1018;color:#fff;border-color:#8f1018;box-shadow:0 3px 8px rgba(143,16,24,.25)}
+      .perfect-modal{border:2px solid #d6a548!important;background:linear-gradient(145deg,#fffaf4,#fff)!important;box-shadow:0 25px 90px rgba(0,0,0,.35),0 0 0 6px rgba(143,16,24,.08)!important}
+      .perfect-title{color:#8f1018!important}
+      @media(max-width:520px){.hero{min-height:210px}.hero-copy{max-width:66%}.karbi-girl-hero{width:145px;height:205px;right:0;bottom:-3px}.kardom-search-controls{padding:7px}.direction-action{min-height:34px;font-size:.78rem}.utility-row{justify-content:center;gap:4px}.utility-action{font-size:.61rem!important;padding:4px 7px!important}.quiz-settings{gap:5px}}
+      @media(max-width:380px){
+  .utility-row{display:grid;grid-template-columns:repeat(3,1fr)}
+  .utility-action{width:100%;font-size:.66rem!important}
+  .result-actions{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    grid-template-columns:none!important;
+    gap:3px!important;
+    width:100%!important;
+  }
+  .result-actions .tag,
+  .result-actions .mini-action{
+    grid-column:auto!important;
+    flex:1 1 0!important;
+    width:0!important;
+    min-width:0!important;
+    height:30px!important;
+    min-height:30px!important;
+    padding:2px 2px!important;
+    font-size:8.5px!important;
+    border-radius:7px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .mini-action{width:auto;font-size:.78rem;padding:8px 6px}
+  .actions{flex-wrap:wrap}.actions button{min-width:calc(50% - 5px)}
+}
+    `;
+    document.head.appendChild(style);
+  }
+
+  /* Public compatibility functions used by existing markup. */
+  window.searchWord = searchWord;
+  window.checkAnswer = checkAnswer;
+  window.startKardomQuiz = startQuiz;
+  window.speakKardom = speak;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    injectStyles();
+    setupTheme();
+    createSearchControls();
+    updateDirectionUI();
+    bindSearch();
+    setupExplore();
+    $('start')?.addEventListener('click', startQuiz);
+  });
+
+})();
+
+
+// PWA registration (works when served over HTTPS, including GitHub Pages).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+
+
+<script id="quiz-exit-only-script">
+function exitQuiz(){
+  // IMPORTANT: close the UI first, then stop every possible timer/callback.
+  // This makes the Exit button work even if another quiz callback is pending.
+  const quiz = document.getElementById("quiz");
+  if (quiz) {
+    quiz.classList.remove("show");
+    quiz.setAttribute("aria-hidden", "true");
+    // Do NOT leave inline display:none here; startQuiz() must be able to reopen it.
+    quiz.style.removeProperty("display");
+  }
+
+  // Block all pending quiz callbacks immediately.
+  quizExitRequested = true;
+
+  if (typeof state !== "undefined") {
+    if (state.quizTimer) {
+      clearInterval(state.quizTimer);
+      state.quizTimer = null;
+    }
+    state.quizAnswered = true;
+    state.quizTimeLeft = 0;
+    state.quizDeadline = 0;
+    state.quizCurrentTarget = null;
+  }
+
+  if (typeof quizNextTimeout !== "undefined" && quizNextTimeout) {
+    clearTimeout(quizNextTimeout);
+    quizNextTimeout = null;
+  }
+
+  if (typeof clearQuizTimer === "function") {
+    clearQuizTimer();
+  }
+
+  document.querySelectorAll(".quiz-option").forEach(btn => {
+    btn.disabled = true;
+  });
+  document.querySelectorAll(".quiz-celebration").forEach(el => el.remove());
+
+  const timerText = document.getElementById("quizTimerText");
+  const timerBar = document.getElementById("quizTimerBar");
+  if (timerText) timerText.textContent = "0s";
+  if (timerBar) timerBar.style.width = "0%";
+}
+
+// Backup click handler: guarantees the visible Exit button closes the quiz.
+document.addEventListener("click", function(e){
+  const btn = e.target.closest(".quiz-exit-btn");
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  exitQuiz();
+}, true);
+</script>
+
+
+<script id="quiz-instant-start-fix">
+(function(){
+  // Prevent smooth scrolling while the quiz is being opened.
+  document.addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    const text = (btn.textContent || "").trim().toLowerCase();
+    const isQuizStart =
+      btn.matches('[onclick*="startQuiz"], [id*="startQuiz"], [class*="start-quiz"]') ||
+      text.includes("start 15-word quiz") ||
+      text.includes("start quiz");
+
+    if(!isQuizStart) return;
+
+    // After the existing click handler opens the quiz, jump directly to it.
+    setTimeout(function(){
+      const quiz = document.getElementById("quiz");
+      if(quiz && (quiz.classList.contains("show") || getComputedStyle(quiz).display !== "none")){
+        const old = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = "auto";
+        window.scrollTo({top: quiz.offsetTop - 8, behavior: "instant"});
+        document.documentElement.style.scrollBehavior = old;
+      }
+    }, 0);
+  }, true);
+})();
+</script>
+
+
+<style id="final-equal-result-buttons">
+/* Final result-button sizing: five equal buttons in one row */
+.result-actions{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  align-items:stretch !important;
+  gap:5px !important;
+  width:100% !important;
+  margin-top:10px !important;
+  overflow:hidden !important;
+}
+.result-actions > .tag,
+.result-actions > .mini-action,
+.result-actions > button{
+  flex:1 1 0 !important;
+  width:0 !important;
+  min-width:0 !important;
+  height:34px !important;
+  min-height:34px !important;
+  max-height:34px !important;
+  padding:3px 3px !important;
+  margin:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-sizing:border-box !important;
+  border-radius:8px !important;
+  font-size:9px !important;
+  line-height:1 !important;
+  font-weight:800 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+.result-actions > .tag{
+  grid-column:auto !important;
+}
+@media(max-width:380px){
+  .result-actions{gap:3px !important}
+  .result-actions > .tag,
+  .result-actions > .mini-action,
+  .result-actions > button{
+    height:30px !important;
+    min-height:30px !important;
+    max-height:30px !important;
+    padding:2px !important;
+    font-size:8px !important;
+    border-radius:7px !important;
+  }
+}
+</style>
+</body>
+</html>
